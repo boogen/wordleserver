@@ -8,6 +8,7 @@ const { id } = require('@hapi/joi/lib/base');
 const db = monk(process.env.MONGO_URI);
 const words = db.get('words');
 const player_word = db.get('player_word');
+const possible_words = db.get('possible_words');
 
 player_word.createIndex({id: 1}, {unique:true});
 const drawSchema = joi.object({
@@ -59,6 +60,7 @@ router.post('/validate', async (req, res, next) => {
         const guess = value.word;
         const word = wordEntry.word;
         const guessed = (word == value.word);
+        const isWord = await possible_words.findOne({word:value.word}) != null;
         var result = [];
         for (var i = 0; i < guess.length; i++) {
             if (guess.charAt(i) == word.charAt(i)) {
@@ -72,7 +74,7 @@ router.post('/validate', async (req, res, next) => {
             }
           }
         res.json({
-            isWord: true,
+            isWord: isWord,
             guess: guess,
             answer: result,
             isGuessed: guessed
