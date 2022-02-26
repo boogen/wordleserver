@@ -64,8 +64,8 @@ router.post('/validate', async (req, res, next) => {
         const guessed = (word == value.word);
         const isWord = await possible_words.findOne({word:value.word}) != null;
        
-        var tries = await player_tries.findOne({id:player_id, word:word }).tries;
-        tries += 1;
+        const t = await player_tries.findOne({id:player_id, word:word });
+        const tries = t.tries + 1;
         if (isWord) {
             await player_tries.findOneAndUpdate({id:player_id, word:word }, { $set: { tries: tries} });
         }
