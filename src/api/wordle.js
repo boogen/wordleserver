@@ -64,9 +64,10 @@ router.post('/validate', async (req, res, next) => {
         const guessed = (word == value.word);
         const isWord = await possible_words.findOne({word:value.word}) != null;
        
-        const tries = await player_tries.findOne({id:player_id, word:word });
+        var tries = await player_tries.findOne({id:player_id, word:word }).tries;
+        tries += 1;
         if (isWord) {
-            await player_tries.findOneAndUpdate({id:player_id, word:word }, { $set: { tries: tries.tries + 1} });
+            await player_tries.findOneAndUpdate({id:player_id, word:word }, { $set: { tries: tries} });
         }
         var result = [];
         for (var i = 0; i < guess.length; i++) {
@@ -81,8 +82,8 @@ router.post('/validate', async (req, res, next) => {
             }
         }
 
-        console.log("tries: " + tries.tries);
-        if (tries.tries == 6) {
+        console.log("tries: " + tries);
+        if (tries == 6) {
             res.json({
                 isWord: isWord,
                 guess: guess,
