@@ -9,6 +9,7 @@ const db = monk(process.env.MONGO_URI);
 const words = db.get('words');
 const player_word = db.get('player_word');
 const possible_words = db.get('possible_words');
+const player_tries = db.get('player_tries');
 
 player_word.createIndex({id: 1}, {unique:true});
 const drawSchema = joi.object({
@@ -37,9 +38,9 @@ router.post('/draw', async (req, res, next) => {
                 word: word
             });
         }
+        await player_tries.insert({id:value.id, word:word, tries:0 });
         res.json({
-            message: 'ok',
-            word: word
+            message: 'ok'
         });
     } catch (error) {
         console.log(error);
@@ -53,7 +54,8 @@ router.post('/validate', async (req, res, next) => {
         const value = await validateSchema.validateAsync(req.body);
         console.log(value);
 
-        wordEntry = await player_word.findOne({id:value.id});
+        const player_id = value.id;
+        wordEntry = await player_word.findOne({id:player_id});
         if (!wordEntry) {
 
         }
@@ -61,6 +63,11 @@ router.post('/validate', async (req, res, next) => {
         const word = wordEntry.word;
         const guessed = (word == value.word);
         const isWord = await possible_words.findOne({word:value.word}) != null;
+       
+        const tries = await player_tries.findOne({id:player_id, word:word });
+        if (isWord) {
+            await player_tries.findOneAndUpdate({id:player_id, word:word }, { $set: { tries: tries.tries + 1} });
+        }
         var result = [];
         for (var i = 0; i < guess.length; i++) {
             if (guess.charAt(i) == word.charAt(i)) {
@@ -72,13 +79,26 @@ router.post('/validate', async (req, res, next) => {
             else {
                 result.push(0);
             }
-          }
-        res.json({
-            isWord: isWord,
-            guess: guess,
-            answer: result,
-            isGuessed: guessed
-        });
+        }
+
+        console.log("tries: " + tries.tries);
+        if (tries.tries == 6) {
+            res.json({
+                isWord: isWord,
+                guess: guess,
+                answer: result,
+                isGuessed: guessed,
+                correctWord: word
+            });
+        }
+        else {
+            res.json({
+                isWord: isWord,
+                guess: guess,
+                answer: result,
+                isGuessed: guessed
+            });
+        }
     } catch (error) {
         console.log(error);
         next(error);
