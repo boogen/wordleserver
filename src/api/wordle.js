@@ -37,8 +37,8 @@ router.post('/draw', async (req, res, next) => {
                 id: value.id,
                 word: word
             });
-            await player_tries.insert({id:value.id, word:word, tries:0 });
         }
+        await player_tries.insert({id:value.id, word:word, tries:0 });
         res.json({
             message: 'ok'
         });
