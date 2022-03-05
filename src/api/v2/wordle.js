@@ -100,15 +100,25 @@ router.post('/validate', async (req, res, next) => {
             await player_tries.findOneAndUpdate({id:player_id, word:word }, { $set: { tries: tries} });
         }
         var result = [];
+        var usedLetters = [];
+        for (var i = 0; i < guess.length; i++) {
+            result.push(0);
+            usedLetters.push(false);
+        }
+
         for (var i = 0; i < guess.length; i++) {
             if (guess.charAt(i) == word.charAt(i)) {
-                result.push(2);
+                result[i] = 2;
+                usedLetters[i] = true;
             }
-            else if (word.includes(guess.charAt(i))) {
-                result.push(1);
-            }
-            else {
-                result.push(0);
+        }
+        for (var i = 0; i < guess.length; i++) {
+            while(index = word.indexof(guess.charAt(i)) > -1) {
+                if (!usedLetters[index]) {
+                    result[i] = 1;
+                    usedLetters[i] = true;
+                    break;
+                }
             }
         }
 
