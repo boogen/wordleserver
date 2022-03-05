@@ -52,7 +52,7 @@ router.post("/register", async (req, res, next) => {
 router.post('/draw', async (req, res, next) => {
     try {
         const value = await drawSchema.validateAsync(req.body);
-        const player_id = await player_auth.findOne({auth_id : value.authId}).player_id
+        const player_id = (await player_auth.findOne({auth_id : value.authId})).player_id
         var val = await words.aggregate([{ $sample: { size: 1 } }]);
         var word = val[0].word;
         console.log(word);
@@ -80,7 +80,7 @@ router.post('/draw', async (req, res, next) => {
 router.post('/validate', async (req, res, next) => {
     try {
         const value = await validateSchema.validateAsync(req.body);
-        const player_id = await player_auth.findOne({auth_id : value.authId}).player_id
+        const player_id = (await player_auth.findOne({auth_id : value.authId})).player_id
         console.log(value);
 
         wordEntry = await player_word.findOne({id:player_id});
