@@ -24,15 +24,25 @@ const validateSchema = joi.object({
     word: joi.string().trim().required()
 });
 
+function makeid() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  
+    for (var i = 0; i < 36; i++)
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+  
+    return text;
+}
+
 function getNextSequenceValue(sequenceName){
     var sequenceDocument = player_counter.findOneAndUpdate({id: sequenceName}, {$inc:{sequence_value:1}});
     return sequenceDocument.sequence_value;
 }
 
 router.post("/register", async (req, res, next) => {
-    var authId = Math.random().toString(36).replace(/[^a-z]+/g, '').substring(0, 32);
+    var authId = makeid();
     while ((await player_auth.findOne({auth_id: authId})) !== null) {
-        authId = Math.random().toString(36).replace(/[^a-z]+/g, '').substring(0, 32);
+        authId = makeid();
     }
     await player_auth.insert({auth_id: authId, player_id: getNextSequenceValue("player_id")})
     res.json({message:'ok', auth_id: authId})
