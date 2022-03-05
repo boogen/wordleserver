@@ -45,7 +45,7 @@ router.post("/register", async (req, res, next) => {
     while ((await player_auth.findOne({auth_id: authId})) !== null) {
         authId = makeid();
     }
-    await player_auth.insert({auth_id: authId, player_id: getNextSequenceValue("player_id")})
+    await player_auth.insert({auth_id: authId, player_id: await getNextSequenceValue("player_id")})
     res.json({message:'ok', auth_id: authId})
 });
 
