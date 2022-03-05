@@ -34,7 +34,7 @@ function makeid() {
     return text;
 }
 
-function getNextSequenceValue(sequenceName){
+async function getNextSequenceValue(sequenceName){
     var sequenceDocument = await player_counter.findOneAndUpdate({id: sequenceName}, {$inc:{sequence_value:1}});
     console.log(sequenceDocument);
     return sequenceDocument.sequence_value;
