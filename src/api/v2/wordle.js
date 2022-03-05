@@ -16,11 +16,11 @@ const player_counter = db.get("player_id_counter");
 player_word.createIndex({id: 1}, {unique:true});
 player_auth.createIndex({auth_id: 1}, {unique: true});
 const drawSchema = joi.object({
-    auth_id: joi.string().trim().required()
+    authId: joi.string().trim().required()
 });
 
 const validateSchema = joi.object({
-    auth_id: joi.string().trim().required(),
+    authId: joi.string().trim().required(),
     word: joi.string().trim().required()
 });
 
@@ -52,7 +52,7 @@ router.post("/register", async (req, res, next) => {
 router.post('/draw', async (req, res, next) => {
     try {
         const value = await drawSchema.validateAsync(req.body);
-        const player_id = await player_auth.findOne({auth_id : value.auth_id}).player_id
+        const player_id = await player_auth.findOne({auth_id : value.authId}).player_id
         var val = await words.aggregate([{ $sample: { size: 1 } }]);
         var word = val[0].word;
         console.log(word);
@@ -80,7 +80,7 @@ router.post('/draw', async (req, res, next) => {
 router.post('/validate', async (req, res, next) => {
     try {
         const value = await validateSchema.validateAsync(req.body);
-        const player_id = await player_auth.findOne({auth_id : value.auth_id}).player_id
+        const player_id = await player_auth.findOne({auth_id : value.authId}).player_id
         console.log(value);
 
         wordEntry = await player_word.findOne({id:player_id});
