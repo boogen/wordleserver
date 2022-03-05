@@ -11,6 +11,7 @@ const player_word = db.get('player_word');
 const possible_words = db.get('possible_words');
 const player_tries = db.get('player_tries');
 const player_auth = db.get('player_auth');
+const player_counter = db.get("player_id_counter");
 
 player_word.createIndex({id: 1}, {unique:true});
 player_auth.createIndex({auth_id: 1}, {unique: true});
@@ -24,7 +25,7 @@ const validateSchema = joi.object({
 });
 
 function getNextSequenceValue(sequenceName){
-    var sequenceDocument = db.counters.findAndModify({
+    var sequenceDocument = player_id_counter.findAndModify({
        query:{_id: sequenceName },
        update: {$inc:{sequence_value:1}},
        new:true
