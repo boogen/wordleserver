@@ -46,7 +46,7 @@ router.post("/register", async (req, res, next) => {
         authId = makeid();
     }
     await player_auth.insert({auth_id: authId, player_id: await getNextSequenceValue("player_id")})
-    res.json({message:'ok', auth_id: authId})
+    res.json({message:'ok', authId: authId})
 });
 
 router.post('/draw', async (req, res, next) => {
