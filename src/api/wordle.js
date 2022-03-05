@@ -25,7 +25,7 @@ const validateSchema = joi.object({
 });
 
 function getNextSequenceValue(sequenceName){
-    var sequenceDocument = player_id_counter.findAndModify({
+    var sequenceDocument = player_counter.findAndModify({
        query:{_id: sequenceName },
        update: {$inc:{sequence_value:1}},
        new:true
