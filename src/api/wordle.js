@@ -10,8 +10,10 @@ const words = db.get('words');
 const player_word = db.get('player_word');
 const possible_words = db.get('possible_words');
 const player_tries = db.get('player_tries');
+const player_auth = db.get('player_auth');
 
 player_word.createIndex({id: 1}, {unique:true});
+player_auth.createIndex({auth_id: 1}, {unique: true});
 const drawSchema = joi.object({
     id: joi.string().trim().required()
 });
@@ -19,6 +21,24 @@ const drawSchema = joi.object({
 const validateSchema = joi.object({
     id: joi.string().trim().required(),
     word: joi.string().trim().required()
+});
+
+function getNextSequenceValue(sequenceName){
+    var sequenceDocument = db.counters.findAndModify({
+       query:{_id: sequenceName },
+       update: {$inc:{sequence_value:1}},
+       new:true
+    });
+    return sequenceDocument.sequence_value;
+}
+
+router.post("/register", async (req, res, next) => {
+    var authId = Math.random().toString(36).replace(/[^a-z]+/g, '').substring(0, 32);
+    while ((await player_auth.findOne({auth_id: authId})) !== null) {
+        authId = Math.random().toString(36).replace(/[^a-z]+/g, '').substring(0, 32);
+    }
+    await player_auth.insert({auth_id: authId, player_id: getNextSequenceValue("player_id_counter")})
+    res.json({message:'ok', auth_id: authId})
 });
 
 router.post('/draw', async (req, res, next) => {
