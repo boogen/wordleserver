@@ -37,8 +37,8 @@ router.post('/draw', async (req, res, next) => {
                 id: value.id,
                 word: word
             });
+            await player_tries.insert({id:value.id, word:word, tries:0 });
         }
-        await player_tries.insert({id:value.id, word:word, tries:0 });
         res.json({
             message: 'ok'
         });
@@ -64,6 +64,8 @@ router.post('/validate', async (req, res, next) => {
         const guessed = (word == value.word);
         const isWord = await possible_words.findOne({word:value.word}) != null;
        
+        console.log("Guessed word: %s, actual word: %s", guess, word)
+
         const t = await player_tries.findOne({id:player_id, word:word });
         const tries = t.tries + 1;
         if (isWord) {
