@@ -30,7 +30,7 @@ router.post('/draw', async (req, res, next) => {
         console.log(word);
         const existing = await player_word.findOne({id:value.id});
         if (existing) {
-            await player_word.findOneAndUpdate({id: value.id}, { $set: { word: word} });
+            await player_word.findOneAndUpdate({id: value.id}, { $set: { word: "ruina"} });
         }
         else {
             await player_word.insert({
