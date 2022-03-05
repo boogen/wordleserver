@@ -26,8 +26,7 @@ router.post('/draw', async (req, res, next) => {
         const value = await drawSchema.validateAsync(req.body);
 
         var val = await words.aggregate([{ $sample: { size: 1 } }]);
-        //var word = val[0].word;
-        var word = "ruina";
+        var word = val[0].word;
         console.log(word);
         const existing = await player_word.findOne({id:value.id});
         if (existing) {
