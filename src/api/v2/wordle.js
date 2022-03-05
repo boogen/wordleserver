@@ -113,10 +113,10 @@ router.post('/validate', async (req, res, next) => {
             }
         }
         for (var i = 0; i < guess.length; i++) {
-            while(index = word.indexof(guess.charAt(i)) > -1) {
-                if (!usedLetters[index]) {
+            for (var j = 0; j < word.length; j++) {
+                if (word[j] === guess[i] && !usedLetters[j]) {
                     result[i] = 1;
-                    usedLetters[i] = true;
+                    usedLetters[j] = true;
                     break;
                 }
             }
