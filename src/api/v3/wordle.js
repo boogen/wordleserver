@@ -81,7 +81,7 @@ router.post('/draw', async (req, res, next) => {
 
 });
 
-function validateGuess(guess, word) {
+async function validateGuess(guess, word) {
     const guessed = (word == value.word);
     const isWord = await possible_words.findOne({word:value.word}) != null;
    
