@@ -25,11 +25,7 @@ const validateSchema = joi.object({
 });
 
 function getNextSequenceValue(sequenceName){
-    var sequenceDocument = player_counter.findAndModify({
-       query:{_id: sequenceName },
-       update: {$inc:{sequence_value:1}},
-       new:true
-    });
+    var sequenceDocument = player_counter.findOneAndUpdate({id: sequenceName}, {$inc:{sequence_value:1}});
     return sequenceDocument.sequence_value;
 }
 
@@ -38,7 +34,7 @@ router.post("/register", async (req, res, next) => {
     while ((await player_auth.findOne({auth_id: authId})) !== null) {
         authId = Math.random().toString(36).replace(/[^a-z]+/g, '').substring(0, 32);
     }
-    await player_auth.insert({auth_id: authId, player_id: getNextSequenceValue("player_id_counter")})
+    await player_auth.insert({auth_id: authId, player_id: getNextSequenceValue("player_id")})
     res.json({message:'ok', auth_id: authId})
 });
 
