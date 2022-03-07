@@ -11,7 +11,7 @@ const player_word = db.get('player_word');
 const possible_words = db.get('possible_words');
 const player_tries = db.get('player_tries');
 const player_auth = db.get('player_auth');
-const player_counter = db.get("player_id_counter");
+const player_counter = db.get("counters");
 const WORD_VALIDITY = 600;
 
 player_word.createIndex({id: 1}, {unique:true});
@@ -36,7 +36,8 @@ function makeid() {
 }
 
 async function getNextSequenceValue(sequenceName){
-    var sequenceDocument = await player_counter.findOneAndUpdate({id: sequenceName}, {$inc:{sequence_value:1}});
+    var sequenceDocument = await player_counter.findOneAndUpdate({id: sequenceName},
+        {$inc:{sequence_value:1}}, {upsert:true});
     console.log(sequenceDocument);
     return sequenceDocument.sequence_value;
 }
@@ -55,24 +56,24 @@ router.post("/register", async (req, res, next) => {
 router.post('/draw', async (req, res, next) => {
     try {
         const value = await drawSchema.validateAsync(req.body);
-        const player_id = await player_auth.findOne({auth_id : value.authId}).player_id
+        const player_id = (await player_auth.findOne({auth_id : value.authId})).player_id
         var val = await words.aggregate([{ $sample: { size: 1 } }]);
         var word = val[0].word;
         console.log(word);
-        const existing = await player_word.find({$query: {id:player_id}, $orderby: {$natural : -1}}).limit(1);
+        const existing = await player_word.findOne({$query: {id:player_id}, $orderby: {$natural : -1}});
         const timestamp = Date.now();
         if (existing === null || existing.expiration <= timestamp) {
-            const wordId = getNextSequenceValue("player#" + player_id + "_word");
-            await player_word.insert({
+            const wordId = await getNextSequenceValue("player#" + player_id + "_word");
+            existing = await player_word.insert({
                 id: player_id,
                 word_id:wordId,
                 word: word,
             });
-            existing = await player_tries.insert({id:player_id, word_id:existing.word_id, guesses:[]});
         }
+        const tries = await player_tries.findOneAndUpdate({id:player_id, word_id:existing.word_id}, {$setOnInsert:{guesses:[]}}, {upsert:true});
         res.json({
             message: 'ok',
-            guesses: existing.guesses.map(function(g) { validateGuess(g, existing.word) })
+            guesses: await Promise.all(tries.guesses.map(async function(g) { return validateGuess(g, existing.word) }))
         });
     } catch (error) {
         console.log(error);
@@ -82,41 +83,52 @@ router.post('/draw', async (req, res, next) => {
 });
 
 async function validateGuess(guess, word) {
-    const guessed = (word == value.word);
-    const isWord = await possible_words.findOne({word:value.word}) != null;
+    const guessed = (guess == word);
+    const isWord = await possible_words.findOne({word:guess}) != null;
    
     console.log("Guessed word: %s, actual word: %s", guess, word)
 
     var result = [];
-    for (var i = 0; i < guess.length; i++) {
-        if (guess.charAt(i) == word.charAt(i)) {
-            result.push(2);
-        }
-        else if (word.includes(guess.charAt(i))) {
-            result.push(1);
-        }
-        else {
+        var usedLetters = [];
+        for (var i = 0; i < guess.length; i++) {
             result.push(0);
+            usedLetters.push(false);
         }
-    }
+
+        for (var i = 0; i < guess.length; i++) {
+            if (guess.charAt(i) == word.charAt(i)) {
+                result[i] = 2;
+                usedLetters[i] = true;
+            }
+        }
+        for (var i = 0; i < guess.length; i++) {
+            for (var j = 0; j < word.length; j++) {
+                if (word[j] === guess[i] && !usedLetters[j]) {
+                    result[i] = 1;
+                    usedLetters[j] = true;
+                    break;
+                }
+            }
+        }
     return {isWord: isWord, guess: guess, answer: result, isGuessed: guessed};
 }
 
 router.post('/validate', async (req, res, next) => {
     try {
         const value = await validateSchema.validateAsync(req.body);
-        const player_id = await player_auth.findOne({auth_id : value.authId}).player_id
+        const player_id = (await player_auth.findOne({auth_id : value.authId})).player_id
         console.log(value);
 
-        wordEntry = await player_word.find({$query: {id:player_id}, $orderby: {$natural : -1}}).limit(1);
+        wordEntry = await player_word.findOne({$query: {id:player_id}, $orderby: {$natural : -1}});
 
         const guess = value.word;
+        console.log("Player id: %s", player_id);
         const word = wordEntry.word;
         
         const t = await player_tries.findOne({id:player_id, word_id:wordEntry.word_id });
-        const tries = t.guesses.size();
+        var tries = t.guesses.length;
 
-        var guessResult = validateGuess(guess, word);
+        const guessResult = await validateGuess(guess, word);
 
         if (guessResult.isWord) {
             await player_tries.findOneAndUpdate({id:player_id, word_id:wordEntry.word_id }, { $push: { guesses: guess} });
@@ -127,6 +139,7 @@ router.post('/validate', async (req, res, next) => {
         if (tries == 6) {
             guessResult.correctWord = word;
         }
+        console.log(guessResult);
         res.json(guessResult);
     } catch (error) {
         console.log(error);
