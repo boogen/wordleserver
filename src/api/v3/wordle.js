@@ -1,23 +1,20 @@
 const express = require('express');
 const joi = require('@hapi/joi');
 const router = express.Router();
-const monk = require('monk');
 const { id } = require('@hapi/joi/lib/base');
 
-
-const db = monk(process.env.MONGO_URI);
-const words = db.get('words');
-const player_word = db.get('player_word');
-const possible_words = db.get('possible_words');
-const player_tries = db.get('player_tries');
-const player_auth = db.get('player_auth');
-const player_counter = db.get("counters");
 const WORD_VALIDITY = 600;
-
-player_word.createIndex({id: 1}, {unique:true});
-player_auth.createIndex({auth_id: 1}, {unique: true});
+const dbi = require('../../DBI.js').createDBI();
 const drawSchema = joi.object({
     authId: joi.string().trim().required()
+});
+const friendCodeSchema = joi.object({
+    authId: joi.string().trim().required()
+});
+
+const addFriendSchema = joi.object({
+    authId: joi.string().trim().required(),
+    friendCode: joi.string().trim().required()
 });
 
 const validateSchema = joi.object({
@@ -26,51 +23,43 @@ const validateSchema = joi.object({
 });
 
 function makeid() {
+    return randomString(36);
+}
+
+function randomString(length) {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   
-    for (var i = 0; i < 36; i++)
+    for (var i = 0; i < length; i++)
       text += possible.charAt(Math.floor(Math.random() * possible.length));
   
     return text;
 }
 
-async function getNextSequenceValue(sequenceName){
-    var sequenceDocument = await player_counter.findOneAndUpdate({id: sequenceName},
-        {$inc:{sequence_value:1}}, {upsert:true});
-    console.log(sequenceDocument);
-    return sequenceDocument.sequence_value;
-}
-
 router.post("/register", async (req, res, next) => {
     var authId = makeid();
-    while ((await player_auth.findOne({auth_id: authId})) !== null) {
+    while (await dbi.resolvePlayerId(authId)) {
         authId = makeid();
     }
-    const playerId = await getNextSequenceValue("player_id");
-    await player_auth.insert({auth_id: authId, player_id: playerId});
-    player_counter.insert({id:"player#" + playerId + "_word", sequence_value:0});
+    const playerId = await dbi.getNextSequenceValue("player_id");
+    await dbi.addPlayerToAuthMap(authId, playerId);
     res.json({message:'ok', authId: authId})
 });
 
 router.post('/draw', async (req, res, next) => {
     try {
         const value = await drawSchema.validateAsync(req.body);
-        const player_id = (await player_auth.findOne({auth_id : value.authId})).player_id
-        var val = await words.aggregate([{ $sample: { size: 1 } }]);
+        const player_id = await dbi.resolvePlayerId(value.authId);
+        var val = await dbi.getWord();
         var word = val[0].word;
-        console.log(word);
-        const existing = await player_word.findOne({$query: {id:player_id}, $orderby: {$natural : -1}});
-        const timestamp = Date.now();
-        if (existing === null || existing.expiration <= timestamp) {
-            const wordId = await getNextSequenceValue("player#" + player_id + "_word");
-            existing = await player_word.insert({
-                id: player_id,
-                word_id:wordId,
-                word: word,
-            });
+        console.log("word %s player id %s", word, player_id);
+
+        var existing = await dbi.getPlayerLastWord(player_id);
+        const timestamp = Date.now() / 1000;
+        if (existing == null || existing.expiration <= timestamp) {
+            existing = await dbi.addNewPlayerWord(player_id, word, timestamp + WORD_VALIDITY);
         }
-        const tries = await player_tries.findOneAndUpdate({id:player_id, word_id:existing.word_id}, {$setOnInsert:{guesses:[]}}, {upsert:true});
+        const tries = await dbi.getPlayerTries(player_id, existing.word_id);
         res.json({
             message: 'ok',
             guesses: await Promise.all(tries.guesses.map(async function(g) { return validateGuess(g, existing.word) }))
@@ -84,7 +73,7 @@ router.post('/draw', async (req, res, next) => {
 
 async function validateGuess(guess, word) {
     const guessed = (guess == word);
-    const isWord = await possible_words.findOne({word:guess}) != null;
+    const isWord = await dbi.isWordValid(guess);
    
     console.log("Guessed word: %s, actual word: %s", guess, word)
 
@@ -116,22 +105,22 @@ async function validateGuess(guess, word) {
 router.post('/validate', async (req, res, next) => {
     try {
         const value = await validateSchema.validateAsync(req.body);
-        const player_id = (await player_auth.findOne({auth_id : value.authId})).player_id
+        const player_id = await dbi.resolvePlayerId(value.authId)
         console.log(value);
 
-        wordEntry = await player_word.findOne({$query: {id:player_id}, $orderby: {$natural : -1}});
+        wordEntry = await dbi.getPlayerLastWord(player_id);
 
         const guess = value.word;
         console.log("Player id: %s", player_id);
         const word = wordEntry.word;
         
-        const t = await player_tries.findOne({id:player_id, word_id:wordEntry.word_id });
+        const t = await dbi.getPlayerTriesForWord(player_id, wordEntry.word_id);
         var tries = t.guesses.length;
 
         const guessResult = await validateGuess(guess, word);
 
         if (guessResult.isWord) {
-            await player_tries.findOneAndUpdate({id:player_id, word_id:wordEntry.word_id }, { $push: { guesses: guess} });
+            dbi.addGuess(player_id, wordEntry.word_id, guess);
             tries += 1;
         }
 
@@ -145,8 +134,66 @@ router.post('/validate', async (req, res, next) => {
         console.log(error);
         next(error);
     }
-
 })
+
+router.post('/friendCode', async (req, res, next) => {
+    try {
+        const value = await friendCodeSchema.validateAsync(req.body);
+        const player_id = await dbi.resolvePlayerId(value.authId);
+        var friend_code = null;
+        var generated_friend_code = null;
+        do {
+            generated_friend_code = randomString(4) + "-" + randomString(4) + "-" + randomString(4);
+            console.log(friend_code)
+        } while ((friend_code = await dbi.addFriendCode(player_id, generated_friend_code)) == null);
+        res.json({
+            status: "ok",
+            friendCode: friend_code
+        })
+    }
+    catch(error) {
+        console.log(error);
+        next(error);
+    }
+})
+
+router.post('/addFriend', async (req, res, next) => {
+    try {
+        const value = await addFriendSchema.validateAsync(req.body);
+        const player_id = await dbi.resolvePlayerId(value.authId);
+        if (await dbi.addFriend(player_id, value.friendCode)) {
+            res.json({
+                status: "ok"
+            })
+        }
+        else {
+            res.json({
+                status: "failed"
+            })
+        }
+    }
+    catch(error) {
+        console.log(error);
+        next(error);
+    }
+})
+
+router.post('/friendList', async (req, res, next) => {
+    try {
+        const value = await friendCodeSchema.validateAsync(req.body);
+        const player_id = await dbi.resolvePlayerId(value.authId);
+        var friendList = await dbi.friendList(player_id);
+        res.json({
+            status: "ok",
+            friendList: friendList
+        })
+    }
+    catch(error) {
+        console.log(error);
+        next(error);
+    }
+})
+
 
 router.post('/word', (req, res, next) => {
     res.json({
