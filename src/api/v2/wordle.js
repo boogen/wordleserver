@@ -113,6 +113,9 @@ router.post('/validate', async (req, res, next) => {
             }
         }
         for (var i = 0; i < guess.length; i++) {
+            if (result[i] > 0) {
+                continue;
+            }
             for (var j = 0; j < word.length; j++) {
                 if (word[j] === guess[i] && !usedLetters[j]) {
                     result[i] = 1;
