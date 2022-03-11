@@ -19,7 +19,7 @@ class WordleDBI {
     friend_codes() {return _friend_codes}
 
     constructor() {
-        _friend_codes.createIndex({code: 1}, {unique:true})
+        _friend_codes.createIndex({friend_code: 1}, {unique:true})
         _friend_codes.createIndex({player_id: 1}, {unique:true})
         _player_word.createIndex({id: 1, word_id: 1}, {unique:true}), 
         _player_auth.createIndex({auth_id: 1}, {unique: true});
@@ -81,14 +81,17 @@ class WordleDBI {
         if (friend_id == null || player_id === friend_id) {
             return false;
         }
-        const friends =  this.db().get("friends.plr#" + player_id);
-        friends.createIndex({id:1}, {unique: true})
-        const friendOnList = await friends.findOne({id: friend_id});
-        if (friendOnList == null) {
-            friends.insert({id: friend_id});
-            return true;
+        async function addFriendToList(id, friendId, db) {
+            const friends =  db.get("friends.plr#" + id);
+            friends.createIndex({id:1}, {unique: true})
+            const friendOnList = await friends.findOne({id: friendId});
+            if (friendOnList == null) {
+                friends.insert({id: friendId});
+            }
         }
-        return false;
+        addFriendToList(player_id, friend_id, this.db())
+        addFriendToList(friend_id, player_id, this.db())
+        return true;
     }
 
     async friendList(player_id) {
@@ -101,6 +104,7 @@ class WordleDBI {
             return (await this.friend_codes().findOneAndUpdate({player_id: player_id}, {$setOnInsert:{player_id: player_id, friend_code: friend_code}}, {upsert:true})).friend_code;
         }
         catch(error) {
+            console.log(error)
             return null;
         }
     }
