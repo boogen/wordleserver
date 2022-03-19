@@ -79,21 +79,21 @@ class WordleDBI {
         const rank =  this.db().get("word#" + word_id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
-        return rank.findOneAndUpdate({player_id: player_id}, {$setOnInsert:{score: tries, time: timestamp}}, {sort: {score:1, time: 1}, upsert:true})
+        return rank.findOneAndUpdate({player_id: player_id}, {$setOnInsert:{score: tries, time: timestamp}}, {upsert:true})
     }
 
     async getRanking(word_id) {
         const rank =  this.db().get("word#" + word_id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
-        return rank.find({}, {limit:100})
+        return rank.find({}, {sort: {score:1, time: 1}, limit:100})
     }
 
     async getRankingWithFilter(word_id, friends) {
         const rank =  this.db().get("word#" + word_id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
-        return rank.find({playerId:{$in: friends}}, {limit:100})
+        return rank.find({playerId:{$in: friends}}, {sort: {score:1, time: 1}, limit:100})
     }
 
     async getGlobalWord(timestamp) {
