@@ -105,7 +105,7 @@ router.post('/ranking', async (req, res, next) => {
         const ranking = await dbi.getRanking(wordEntry.word_id)
         res.json({message:'ok',
         myInfo:await getMyPositionInRank(player_id, ranking, dbi),
-        ranking: await Promise.all(ranking.map( async function(re) { return {player:(((await dbi.getProfile(re.player_id)))?? {nick: null}).nick, score: re.score};}))});
+        ranking: await Promise.all(ranking.map( async function(re) { return {player:(((await dbi.getProfile(re.player_id))) || {nick: null}).nick, score: re.score};}))});
     }
     catch (error) {
         console.log(error);
@@ -128,7 +128,7 @@ router.post('/friendRanking', async (req, res, next) => {
         const ranking = await dbi.getRankingWithFilter(wordEntry.word_id, friends)
         res.json({message:'ok',
         myInfo: await getMyPositionInRank(player_id, ranking, dbi),
-        ranking: await Promise.all(ranking.map( async function(re) { return {player:(((await dbi.getProfile(re.player_id)))?? {nick: null}).nick, score: re.score};}))});
+        ranking: await Promise.all(ranking.map( async function(re) { return {player:(((await dbi.getProfile(re.player_id))) || {nick: null}).nick, score: re.score};}))});
     }
     catch (error) {
         console.log(error);
