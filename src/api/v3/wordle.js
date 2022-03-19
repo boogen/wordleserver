@@ -48,7 +48,9 @@ router.post('/getState', async (req, res, next) => {
         }
         res.json({
             message: 'ok',
-            guesses: await Promise.all(tries.guesses.map(async function(g) { return validateGuess(g, existing.word) }))
+            guesses: await Promise.all(tries.guesses.map(async function(g) { return validateGuess(g, existing.word) })),
+            timeToNext: Math.floor(existing.validity - timestamp),
+            finished: tries.guesses.length == 6 || tries.guesses.includes(existing.word)
         });
     } catch (error) {
         console.log(error);

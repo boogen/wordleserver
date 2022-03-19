@@ -100,6 +100,10 @@ class WordleDBI {
         return this.global_word().findOne({validity:{$gt: timestamp}})
     }
 
+    async getGlobalWordById(word_id) {
+        return this.global_word().findOne({word_id:word_id})
+    }
+
     async isWordValid(word) {
         return this.possible_words().findOne({word:word}).then(value => {return value != null});
     }
