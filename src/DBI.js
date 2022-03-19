@@ -7,6 +7,7 @@ const _player_tries = _db.get("player_tries")
 const _player_auth = _db.get("player_auth")
 const _counters = _db.get("counters")
 const _friend_codes = _db.get("friend_codes")
+const _player_profile = _db.get("player_profile")
 
 class WordleDBI {
     db() { return _db;}
@@ -17,12 +18,14 @@ class WordleDBI {
     player_auth() { return _player_auth}
     counters() { return _counters}
     friend_codes() {return _friend_codes}
+    player_profile() {return _player_profile}
 
     constructor() {
         _friend_codes.createIndex({friend_code: 1}, {unique:true})
         _friend_codes.createIndex({player_id: 1}, {unique:true})
         _player_word.createIndex({id: 1, word_id: 1}, {unique:true}), 
         _player_auth.createIndex({auth_id: 1}, {unique: true});
+        _player_profile.createIndex({id: 1}, {unique: true});
     }
 
     async getNextSequenceValue(sequenceName){
@@ -33,7 +36,6 @@ class WordleDBI {
     }
 
     async addPlayerToAuthMap(authId, playerId) {
-
         return await this.player_auth().insert({auth_id: authId, player_id: playerId});
     }
 
@@ -74,6 +76,14 @@ class WordleDBI {
 
     async addGuess(player_id, word_id, guess) {
         return this.player_tries().findOneAndUpdate({id:player_id, word_id:word_id }, { $push: { guesses: guess} });
+    }
+
+    async setNick(playerId, nick) {
+        return this.player_profile().findOneAndUpdate({id: playerId, nick: nick},  {$setOnInsert:{nick: nick}}, {upsert: true});
+    }
+
+    async getProfile(playerId) {
+        return this.player_profile().findOne({id: playerId});
     }
 
     async addFriend(player_id, friend_code) {
