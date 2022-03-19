@@ -83,6 +83,8 @@ router.post('/validate', async (req, res, next) => {
 
 router.post('/ranking', async (req, res, next) => {
     try {
+        const value = await validateSchema.validateAsync(req.body);
+        const player_id = await dbi.resolvePlayerId(value.authId);
         const timestamp = Date.now() / 1000;
         const wordEntry = await dbi.getGlobalWord(timestamp);
         if (wordEntry === null) {
@@ -91,6 +93,7 @@ router.post('/ranking', async (req, res, next) => {
         }
         const ranking = await dbi.getRanking(wordEntry.word_id)
         res.json({message:'ok',
+        myPosition:getMyPositionInRank(player_id, ranking),
         ranking: await Promise.all(ranking.map( async function(re) { return {player:(await dbi.getProfile(re.player_id)), score: re.score};}))});
     }
     catch (error) {
@@ -98,6 +101,39 @@ router.post('/ranking', async (req, res, next) => {
         next(error);
     }
 })
+
+router.post('/friendRanking', async (req, res, next) => {
+    try {
+        const value = await validateSchema.validateAsync(req.body);
+        const player_id = await dbi.resolvePlayerId(value.authId)
+
+        const timestamp = Date.now() / 1000;
+        const wordEntry = await dbi.getGlobalWord(timestamp);
+        if (wordEntry === null) {
+            res.json({message: 'ok', ranking:[]})
+            return
+        }
+        var friends = await dbi.friendList(player_id);
+        const ranking = await dbi.getRankingWithFilter(wordEntry.word_id, friends)
+        res.json({message:'ok',
+        myPosition: getMyPositionInRank(player_id, ranking),
+        ranking: await Promise.all(ranking.map( async function(re) { return {player:(await dbi.getProfile(re.player_id)), score: re.score};}))});
+    }
+    catch (error) {
+        console.log(error);
+        next(error);
+    }
+})
+
+function getMyPositionInRank(player_id, rank) {
+    for (const index in rank) {
+        const rankEntry = rank[index]
+        if (rankEntry.player_id === player_id) {
+            return parseInt(index) + 1
+        }
+    }
+    return null;
+}
 
 async function validateGuess(guess, word, word_id, tries, timestamp, player_id) {
     const guessed = (guess == word);
