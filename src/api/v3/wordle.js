@@ -140,7 +140,7 @@ async function getMyPositionInRank(player_id, rank, dbi) {
     for (const index in rank) {
         const rankEntry = rank[index]
         if (rankEntry.player_id === player_id) {
-            return {position: parseInt(index) + 1, score: rankEntry.score, nick: (((await dbi.getProfile(player_id)))?? {nick: null}).nick}
+            return {position: parseInt(index) + 1, score: rankEntry.score, nick: (((await dbi.getProfile(player_id)))|| {nick: null}).nick}
         }
     }
     return null;
