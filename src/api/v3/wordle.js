@@ -125,7 +125,7 @@ router.post('/friendRanking', async (req, res, next) => {
             return
         }
         var friends = await dbi.friendList(player_id);
-        friends.add(player_id)
+        friends.push(player_id)
         const ranking = await dbi.getRankingWithFilter(wordEntry.word_id, friends)
         res.json({message:'ok',
         myInfo: await getMyPositionInRank(player_id, ranking, dbi),
