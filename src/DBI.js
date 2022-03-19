@@ -75,6 +75,20 @@ class WordleDBI {
         return this.global_word().findOneAndUpdate({validity:{$gt: timestamp}}, {$setOnInsert: {word:new_word, validity: new_validity, word_id: new_word_id}}, {upsert: true})
     }
 
+    async increaseRank(player_id, word_id, tries, timestamp) {
+        const rank =  this.db().get("word#" + word_id + "_ranking");
+        rank.createIndex({player_id: 1})
+        rank.createIndex({score: 1});
+        return rank.findOneAndUpdate({player_id: player_id}, {$setOnInsert:{score: tries, time: timestamp}}, {sort: {score:1, time: 1}, upsert:true})
+    }
+
+    async getRanking(word_id) {
+        const rank =  this.db().get("word#" + word_id + "_ranking");
+        rank.createIndex({player_id: 1})
+        rank.createIndex({score: 1});
+        return rank.find()
+    }
+
     async getGlobalWord(timestamp) {
         return this.global_word().findOne({validity:{$gt: timestamp}})
     }

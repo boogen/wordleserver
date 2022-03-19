@@ -53,7 +53,7 @@ router.post('/validate', async (req, res, next) => {
         const player_id = await dbi.resolvePlayerId(value.authId)
         console.log(value);
         const timestamp = Date.now() / 1000;
-        wordEntry = await dbi.getGlobalWord(timestamp);
+        const wordEntry = await dbi.getGlobalWord(timestamp);
 
         const guess = value.word;
         console.log("Player id: %s", player_id);
@@ -62,7 +62,7 @@ router.post('/validate', async (req, res, next) => {
         const t = await dbi.getPlayerTriesForWord(player_id, wordEntry.word_id);
         var tries = t.guesses.length;
 
-        const guessResult = await validateGuess(guess, word);
+        const guessResult = await validateGuess(guess, word, wordEntry.word_id, tries + 1, timestamp, player_id);
 
         if (guessResult.isWord) {
             dbi.addGuess(player_id, wordEntry.word_id, guess);
@@ -81,34 +81,55 @@ router.post('/validate', async (req, res, next) => {
     }
 })
 
-async function validateGuess(guess, word) {
+router.post('/ranking', async (req, res, next) => {
+    try {
+        const timestamp = Date.now() / 1000;
+        const wordEntry = await dbi.getGlobalWord(timestamp);
+        if (wordEntry === null) {
+            res.json({message: 'ok', ranking:[]})
+            return
+        }
+        const ranking = await dbi.getRanking(wordEntry.word_id)
+        res.json({message:'ok',
+        ranking: await Promise.all(ranking.map( async function(re) { return {player:(await dbi.getProfile(re.player_id)), score: re.score};}))});
+    }
+    catch (error) {
+        console.log(error);
+        next(error);
+    }
+})
+
+async function validateGuess(guess, word, word_id, tries, timestamp, player_id) {
     const guessed = (guess == word);
     const isWord = await dbi.isWordValid(guess);
    
     console.log("Guessed word: %s, actual word: %s", guess, word)
 
     var result = [];
-        var usedLetters = [];
-        for (var i = 0; i < guess.length; i++) {
-            result.push(0);
-            usedLetters.push(false);
-        }
+    var usedLetters = [];
+    for (var i = 0; i < guess.length; i++) {
+        result.push(0);
+        usedLetters.push(false);
+    }
 
-        for (var i = 0; i < guess.length; i++) {
-            if (guess.charAt(i) == word.charAt(i)) {
-                result[i] = 2;
-                usedLetters[i] = true;
+    for (var i = 0; i < guess.length; i++) {
+        if (guess.charAt(i) == word.charAt(i)) {
+            result[i] = 2;
+            usedLetters[i] = true;
+        }
+    }
+    for (var i = 0; i < guess.length; i++) {
+        for (var j = 0; j < word.length; j++) {
+            if (word[j] === guess[i] && !usedLetters[j]) {
+                result[i] = 1;
+                usedLetters[j] = true;
+                break;
             }
         }
-        for (var i = 0; i < guess.length; i++) {
-            for (var j = 0; j < word.length; j++) {
-                if (word[j] === guess[i] && !usedLetters[j]) {
-                    result[i] = 1;
-                    usedLetters[j] = true;
-                    break;
-                }
-            }
-        }
+    }
+    if (guessed) {
+        await dbi.increaseRank(player_id, word_id, tries, timestamp)
+    }
     return {isWord: isWord, guess: guess, answer: result, isGuessed: guessed};
 }
 
