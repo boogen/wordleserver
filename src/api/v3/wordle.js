@@ -115,7 +115,7 @@ router.post('/ranking', async (req, res, next) => {
 
 router.post('/friendRanking', async (req, res, next) => {
     try {
-        const value = await validateSchema.validateAsync(req.body);
+        const value = await authIdSchema.validateAsync(req.body);
         const player_id = await dbi.resolvePlayerId(value.authId)
 
         const timestamp = Date.now() / 1000;
@@ -125,6 +125,7 @@ router.post('/friendRanking', async (req, res, next) => {
             return
         }
         var friends = await dbi.friendList(player_id);
+        friends.add(player_id)
         const ranking = await dbi.getRankingWithFilter(wordEntry.word_id, friends)
         res.json({message:'ok',
         myInfo: await getMyPositionInRank(player_id, ranking, dbi),
