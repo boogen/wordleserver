@@ -17,7 +17,7 @@ const validateSchema = joi.object({
 });
 
 
-router.post('/draw', async (req, res, next) => {
+router.post('/getState', async (req, res, next) => {
     try {
         const value = await authIdSchema.validateAsync(req.body);
         const player_id = await dbi.resolvePlayerId(value.authId);
