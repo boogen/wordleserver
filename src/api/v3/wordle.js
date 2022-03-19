@@ -4,6 +4,7 @@ const router = express.Router();
 const { id } = require('@hapi/joi/lib/base');
 
 const WORD_VALIDITY = 600;
+const GLOBAL_TIME_START = 1647644400;
 const dbi = require('../../DBI.js').createDBI();
 const authIdSchema = joi.object({
     authId: joi.string().trim().required()
@@ -24,11 +25,16 @@ router.post('/draw', async (req, res, next) => {
         var word = val[0].word;
         console.log("word %s player id %s", word, player_id);
 
-        var existing = await dbi.getPlayerLastWord(player_id);
+        //var existing = await dbi.getPlayerLastWord(player_id);
         const timestamp = Date.now() / 1000;
-        if (existing == null || existing.expiration <= timestamp) {
-            existing = await dbi.addNewPlayerWord(player_id, word, timestamp + WORD_VALIDITY);
+        var new_validity_timestamp = GLOBAL_TIME_START;
+        while (new_validity_timestamp < timestamp) {
+            new_validity_timestamp += WORD_VALIDITY;
         }
+        // if (existing == null || existing.expiration <= timestamp) {
+        //     existing = await dbi.addNewPlayerWord(player_id, word, timestamp + WORD_VALIDITY);
+        // }
+        const existing = await dbi.getOrCreateGlobalWord(timestamp, new_validity_timestamp, word);
         const tries = await dbi.getPlayerTries(player_id, existing.word_id);
         res.json({
             message: 'ok',
@@ -46,8 +52,8 @@ router.post('/validate', async (req, res, next) => {
         const value = await validateSchema.validateAsync(req.body);
         const player_id = await dbi.resolvePlayerId(value.authId)
         console.log(value);
-
-        wordEntry = await dbi.getPlayerLastWord(player_id);
+        const timestamp = Date.now() / 1000;
+        wordEntry = await dbi.getGlobalWord(timestamp);
 
         const guess = value.word;
         console.log("Player id: %s", player_id);

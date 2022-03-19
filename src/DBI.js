@@ -8,6 +8,7 @@ const _player_auth = _db.get("player_auth")
 const _counters = _db.get("counters")
 const _friend_codes = _db.get("friend_codes")
 const _player_profile = _db.get("player_profile")
+const _global_word = _db.get("global_word")
 
 class WordleDBI {
     db() { return _db;}
@@ -19,6 +20,7 @@ class WordleDBI {
     counters() { return _counters}
     friend_codes() {return _friend_codes}
     player_profile() {return _player_profile}
+    global_word() {return _global_word}
 
     constructor() {
         _friend_codes.createIndex({friend_code: 1}, {unique:true})
@@ -26,6 +28,8 @@ class WordleDBI {
         _player_word.createIndex({id: 1, word_id: 1}, {unique:true}), 
         _player_auth.createIndex({auth_id: 1}, {unique: true});
         _player_profile.createIndex({id: 1}, {unique: true});
+        _global_word.createIndex({validity: 1}, {unique: true});
+        _global_word.createIndex({word_id : 1}, {unique: true});
     }
 
     async getNextSequenceValue(sequenceName){
@@ -66,6 +70,15 @@ class WordleDBI {
         return this.player_tries().findOneAndUpdate({id:player_id, word_id:word_id}, {$setOnInsert:{guesses:[]}}, {upsert:true});
     }
 
+    async getOrCreateGlobalWord(timestamp, new_validity, new_word) {
+        var new_word_id = await this.getNextSequenceValue("global_word")
+        return this.global_word().findOneAndUpdate({validity:{$gt: timestamp}}, {$setOnInsert: {word:new_word, validity: new_validity, word_id: new_word_id}}, {upsert: true})
+    }
+
+    async getGlobalWord(timestamp) {
+        return this.global_word().findOne({validity:{$gt: timestamp}})
+    }
+
     async isWordValid(word) {
         return this.possible_words().findOne({word:word}).then(value => {return value != null});
     }
@@ -79,7 +92,7 @@ class WordleDBI {
     }
 
     async setNick(playerId, nick) {
-        return this.player_profile().findOneAndUpdate({id: playerId, nick: nick},  {$setOnInsert:{nick: nick}}, {upsert: true});
+        return this.player_profile().findOneAndUpdate({id: playerId},  {$set:{nick: nick}}, {upsert: true});
     }
 
     async getProfile(playerId) {
