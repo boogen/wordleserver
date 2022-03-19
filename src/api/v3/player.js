@@ -4,6 +4,7 @@ const router = express.Router();
 const { id } = require('@hapi/joi/lib/base');
 const dbi = require('../../DBI.js').createDBI();
 const utils = require('./utils');
+var geoip = require('geoip-lite');
 const setNickSchema = joi.object({
     authId: joi.string().trim().required(),
     nick: joi.string().trim().required()
@@ -29,7 +30,9 @@ router.post("/register", async (req, res, next) => {
 
 router.post("/setNick", async (req, res, next) => {
     const value = await setNickSchema.validateAsync(req.body);
+    console.log(value.authId)
     const player_id = await dbi.resolvePlayerId(value.authId);
+
     const profile = await dbi.setNick(player_id, value.nick)
     res.json({message:'ok', profile: {nick: profile.nick}})
 });

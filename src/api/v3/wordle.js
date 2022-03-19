@@ -36,6 +36,16 @@ router.post('/getState', async (req, res, next) => {
         // }
         const existing = await dbi.getOrCreateGlobalWord(timestamp, new_validity_timestamp, word);
         const tries = await dbi.getPlayerTries(player_id, existing.word_id);
+        if (tries.length == 0) {
+            console.log(req.ip)
+            var locationInfo = geoip.lookup(req.ip);
+            var city = null;
+            if (locationInfo != null) {
+                city = locationInfo.city;
+            }
+            console.log(city)
+            dbi.setCity(player_id, city);
+        }
         res.json({
             message: 'ok',
             guesses: await Promise.all(tries.guesses.map(async function(g) { return validateGuess(g, existing.word) }))
@@ -83,8 +93,9 @@ router.post('/validate', async (req, res, next) => {
 
 router.post('/ranking', async (req, res, next) => {
     try {
-        const value = await validateSchema.validateAsync(req.body);
+        const value = await authIdSchema.validateAsync(req.body);
         const player_id = await dbi.resolvePlayerId(value.authId);
+        console.log(player_id)
         const timestamp = Date.now() / 1000;
         const wordEntry = await dbi.getGlobalWord(timestamp);
         if (wordEntry === null) {
@@ -93,8 +104,8 @@ router.post('/ranking', async (req, res, next) => {
         }
         const ranking = await dbi.getRanking(wordEntry.word_id)
         res.json({message:'ok',
-        myPosition:getMyPositionInRank(player_id, ranking),
-        ranking: await Promise.all(ranking.map( async function(re) { return {player:(await dbi.getProfile(re.player_id)), score: re.score};}))});
+        myInfo:await getMyPositionInRank(player_id, ranking, dbi),
+        ranking: await Promise.all(ranking.map( async function(re) { return {player:(((await dbi.getProfile(re.player_id)))?? {nick: null}).nick, score: re.score};}))});
     }
     catch (error) {
         console.log(error);
@@ -116,8 +127,8 @@ router.post('/friendRanking', async (req, res, next) => {
         var friends = await dbi.friendList(player_id);
         const ranking = await dbi.getRankingWithFilter(wordEntry.word_id, friends)
         res.json({message:'ok',
-        myPosition: getMyPositionInRank(player_id, ranking),
-        ranking: await Promise.all(ranking.map( async function(re) { return {player:(await dbi.getProfile(re.player_id)), score: re.score};}))});
+        myInfo: await getMyPositionInRank(player_id, ranking, dbi),
+        ranking: await Promise.all(ranking.map( async function(re) { return {player:(((await dbi.getProfile(re.player_id)))?? {nick: null}).nick, score: re.score};}))});
     }
     catch (error) {
         console.log(error);
@@ -125,11 +136,11 @@ router.post('/friendRanking', async (req, res, next) => {
     }
 })
 
-function getMyPositionInRank(player_id, rank) {
+async function getMyPositionInRank(player_id, rank, dbi) {
     for (const index in rank) {
         const rankEntry = rank[index]
         if (rankEntry.player_id === player_id) {
-            return parseInt(index) + 1
+            return {position: parseInt(index) + 1, score: rankEntry.score, nick: (((await dbi.getProfile(player_id)))?? {nick: null}).nick}
         }
     }
     return null;
