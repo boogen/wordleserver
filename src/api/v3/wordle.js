@@ -3,8 +3,8 @@ const joi = require('@hapi/joi');
 const router = express.Router();
 const { id } = require('@hapi/joi/lib/base');
 
-const WORD_VALIDITY = 600;
-const GLOBAL_TIME_START = 1647644400;
+const WORD_VALIDITY = 86400;
+const GLOBAL_TIME_START = 1647774000;
 const dbi = require('../../DBI.js').createDBI();
 const authIdSchema = joi.object({
     authId: joi.string().trim().required()
