@@ -169,6 +169,9 @@ async function validateGuess(guess, word, word_id, tries, timestamp, player_id) 
         }
     }
     for (var i = 0; i < guess.length; i++) {
+        if (result[i] > 0) {
+            continue;
+        }
         for (var j = 0; j < word.length; j++) {
             if (word[j] === guess[i] && !usedLetters[j]) {
                 result[i] = 1;
