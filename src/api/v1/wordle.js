@@ -13,7 +13,6 @@ const player_tries = db.get('player_tries');
 const player_auth = db.get('player_auth');
 const player_counter = db.get("player_id_counter");
 
-player_word.createIndex({id: 1}, {unique:true});
 player_auth.createIndex({auth_id: 1}, {unique: true});
 const drawSchema = joi.object({
     id: joi.string().trim().required()
