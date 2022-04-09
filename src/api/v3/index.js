@@ -15,6 +15,6 @@ router.get('/', (req, res) => {
 router.use('/wordle', wordle);
 router.use('/player', player);
 router.use('/friend', friend);
-router.use('/challenge', challenge)
+router.use('/classic', challenge)
 
 module.exports = router;
