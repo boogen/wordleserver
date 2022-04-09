@@ -63,7 +63,7 @@ router.post('/validate', async (req, res, next) => {
         console.log("Player id: %s", player_id);
         const word = wordEntry.word;
         
-        const t = await dbi.getPlayerChallengeTriesForWord(player_id, wordEntry.word_id);
+        const t = await dbi.getPlayerChallengeTries(player_id, wordEntry.word_id);
         var tries = t.guesses.length;
         if (t.guesses.includes(guess) || tries >=6) {
             res.json({isWord: false, guess: guess, answer: [], isGuessed: guess == word});
