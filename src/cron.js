@@ -6,7 +6,7 @@ const notification = {
     included_segments: ['Subscribed Users']
   };
 
-cron.schedule('0 12 0 * * *', sendNotifications);
+cron.schedule('0 0 13 * * *', sendNotifications);
 
 
 function sendNotifications() {
