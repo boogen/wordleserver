@@ -27,13 +27,13 @@ class WordleDBI {
     constructor() {
         _friend_codes.createIndex({friend_code: 1}, {unique:true})
         _friend_codes.createIndex({player_id: 1}, {unique:true})
-        _player_word.createIndex({word_id: 1}), 
+        _player_word.createIndex({word_id: 1}),
         _player_auth.createIndex({auth_id: 1}, {unique: true});
         _player_profile.createIndex({id: 1}, {unique: true});
         _global_word.createIndex({validity: 1}, {unique: true});
         _global_word.createIndex({word_id : 1}, {unique: true});
 //        _player_tries.createIndex({word_id:1, id: 1}, {unique: true});
-        _player_challenge_tries.createIndex({word_id:1, player_id:1}, {unique: true});
+        _player_challenge_tries.createIndex({word_id:1, id:1}, {unique: true});
     }
 
     async getNextSequenceValue(sequenceName){
