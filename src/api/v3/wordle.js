@@ -73,6 +73,11 @@ router.post('/validate', async (req, res, next) => {
         
         const t = await dbi.getPlayerTriesForWord(player_id, wordEntry.word_id);
         var tries = t.guesses.length;
+        if (t.guesses.includes(guess) || tries >=6) {
+            res.json({isWord: false, guess: guess, answer: [], isGuessed: guess == word});
+            return;
+        }
+        
 
         const guessResult = await validateGuess(guess, word, wordEntry.word_id, tries + 1, timestamp, player_id);
 
@@ -156,27 +161,29 @@ async function validateGuess(guess, word, word_id, tries, timestamp, player_id) 
     console.log("Guessed word: %s, actual word: %s", guess, word)
 
     var result = [];
-    var usedLetters = [];
-    for (var i = 0; i < guess.length; i++) {
-        result.push(0);
-        usedLetters.push(false);
-    }
+    if (isWord) {
+        var usedLetters = [];
+        for (var i = 0; i < guess.length; i++) {
+            result.push(0);
+            usedLetters.push(false);
+        }
 
-    for (var i = 0; i < guess.length; i++) {
-        if (guess.charAt(i) == word.charAt(i)) {
-            result[i] = 2;
-            usedLetters[i] = true;
+        for (var i = 0; i < guess.length; i++) {
+            if (guess.charAt(i) == word.charAt(i)) {
+                result[i] = 2;
+                usedLetters[i] = true;
+            }
         }
-    }
-    for (var i = 0; i < guess.length; i++) {
-        if (result[i] > 0) {
-            continue;
-        }
-        for (var j = 0; j < word.length; j++) {
-            if (word[j] === guess[i] && !usedLetters[j]) {
-                result[i] = 1;
-                usedLetters[j] = true;
-                break;
+        for (var i = 0; i < guess.length; i++) {
+            if (result[i] > 0) {
+                continue;
+            }
+            for (var j = 0; j < word.length; j++) {
+                if (word[j] === guess[i] && !usedLetters[j]) {
+                    result[i] = 1;
+                    usedLetters[j] = true;
+                    break;
+                }
             }
         }
     }
