@@ -17,10 +17,10 @@ router.post('/mock', async (req, res, next) => {
                 result.push("-")
             }
             else {
-                result.push(null);
+                result.push(" ");
             }
         }
-        grid.push(result)
+        grid.push(result.join(""))
     }
     res.json({
         message:'ok',
