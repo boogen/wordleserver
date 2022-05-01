@@ -3,6 +3,7 @@ const wordle = require('./wordle');
 const friend = require('./friend')
 const player = require('./player')
 const challenge = require('./wordle_challenge')
+const crossword = require('./crossword')
 
 const router = express.Router();
 
@@ -15,6 +16,7 @@ router.get('/', (req, res) => {
 router.use('/wordle', wordle);
 router.use('/player', player);
 router.use('/friend', friend);
-router.use('/classic', challenge)
+router.use('/classic', challenge);
+router.use('/crossword', crossword);
 
 module.exports = router;

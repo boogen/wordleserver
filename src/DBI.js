@@ -10,6 +10,7 @@ const _counters = _db.get("counters")
 const _friend_codes = _db.get("friend_codes")
 const _player_profile = _db.get("player_profile")
 const _global_word = _db.get("global_word")
+const _possible_crosswords = _db.get("possible_crosswords")
 
 class WordleDBI {
     db() { return _db;}
@@ -23,6 +24,7 @@ class WordleDBI {
     friend_codes() {return _friend_codes}
     player_profile() {return _player_profile}
     global_word() {return _global_word}
+    possible_crosswords() {return _possible_crosswords}
 
     constructor() {
         _friend_codes.createIndex({friend_code: 1}, {unique:true})
@@ -170,6 +172,16 @@ class WordleDBI {
     async addFriendCode(player_id, friend_code) {
         try {
             return (await this.friend_codes().findOneAndUpdate({player_id: player_id}, {$setOnInsert:{player_id: player_id, friend_code: friend_code}}, {upsert:true})).friend_code;
+        }
+        catch(error) {
+            console.log(error)
+            return null;
+        }
+    }
+
+    async getFirstCrossword() {
+        try {
+            return (await this.possible_crosswords().find())[0];
         }
         catch(error) {
             console.log(error)
