@@ -11,6 +11,7 @@ const _friend_codes = _db.get("friend_codes")
 const _player_profile = _db.get("player_profile")
 const _global_word = _db.get("global_word")
 const _possible_crosswords = _db.get("possible_crosswords")
+const _player_crossword_state = _db.get("player_crossword_state")
 
 class WordleDBI {
     db() { return _db;}
@@ -25,6 +26,7 @@ class WordleDBI {
     player_profile() {return _player_profile}
     global_word() {return _global_word}
     possible_crosswords() {return _possible_crosswords}
+    player_crossword_state() {return _player_crossword_state}
 
     constructor() {
         _friend_codes.createIndex({friend_code: 1}, {unique:true})
@@ -36,6 +38,7 @@ class WordleDBI {
         _global_word.createIndex({word_id : 1}, {unique: true});
 //        _player_tries.createIndex({word_id:1, id: 1}, {unique: true});
         _player_challenge_tries.createIndex({word_id:1, id:1}, {unique: true});
+        _player_crossword_state.createIndex({player_id: 1}, {unique: true});
     }
 
     async getNextSequenceValue(sequenceName){
@@ -167,6 +170,30 @@ class WordleDBI {
     async friendList(player_id) {
         const friends =  this.db().get("friends.plr#" + player_id);
         return (await friends.find()).map(f => f.id)
+    }
+
+    async getCrossword(crossword_id) {
+        return this.possible_crosswords().findOne({crossword_id: crossword_id})
+    }
+
+    async getCrosswordState(playerId) {
+        try {
+            const state = this.player_crossword_state().findOne({player_id: playerId});
+            return state;
+        }
+        catch(error) {
+            console.log(error);
+            return null;
+        }
+    }
+
+    async setCrosswordState(player_id, words, guessed_words, grid, crossword_id) {
+        try {
+            this.player_crossword_state().findOneAndUpdate({player_id: player_id}, {$set:{words:words, grid: grid, guessed_words: guessed_words, crossword_id: crossword_id}}, {upsert: true});
+        }
+        catch(error) {
+            console.log(error);
+        }
     }
 
     async addFriendCode(player_id, friend_code) {

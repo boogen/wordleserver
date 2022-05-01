@@ -66,6 +66,7 @@ def placeWord(word, coords, direction):
 file1 = open(sys.argv[1], 'r')
 lines = file1.readlines()
 dbname = get_database()
+crosswordId = 1
 possible_crosswords_db = dbname["possible_crosswords"]
 possible_crosswords_db.drop()
 for line in lines:
@@ -120,7 +121,8 @@ for line in lines:
             minMeaningful = i
             break
     grid = grid[minMeaningful:]
-
+    for (word, (x, y)) in processedWords.items():
+        processedWords[word] = (x - minMeaningful, y)
 
     maxMeaningful = len(grid)
     for i in range(len(grid) -1, -1, -1):
@@ -135,6 +137,8 @@ for line in lines:
         minMeaningful = min(next(index for index in range(0, len(grid[i])) if grid[i][index] is not None), minMeaningful)
     for i in range(0, len(grid)):
         grid[i] = grid[i][minMeaningful:]
+    for (word, (x, y)) in processedWords.items():
+        processedWords[word] = (x, y - minMeaningful)
 
     maxMeaningful = 0;
     for i in range(0, len(grid)):
@@ -161,4 +165,7 @@ for line in lines:
         #             lineString += grid[i][j]
         #     if shouldPrint:
         #         print(lineString)
-        possible_crosswords_db.insert_one({'word_list': list(processedWords.keys()), 'letter_grid': grid})
+        possible_crosswords_db.insert_one({'crossword_id':crosswordId, 'word_list': processedWords, 'letter_grid': grid})
+        crosswordId += 1
+
+possible_crosswords_db.create_index('crossword_id', unique = True)
