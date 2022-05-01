@@ -24,7 +24,7 @@ router.post('/mock', async (req, res, next) => {
     }
     res.json({
         message:'ok',
-        letterList:Array.from(letterList),
+        letters:Array.from(letterList),
         grid: grid
     })
 });
