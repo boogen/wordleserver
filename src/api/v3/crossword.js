@@ -8,7 +8,7 @@ const dbi = require('../../DBI.js').createDBI();
 router.post('/mock', async (req, res, next) => {
     const crossword = await dbi.getFirstCrossword();
     letterList = new Set(crossword.word_list.join(""))
-    console.log(letterList)
+    console.log(crossword.letter_grid)
     grid = []
     for(var i = 0; i < crossword.letter_grid.length; i++) {
         var result = []
@@ -26,8 +26,8 @@ router.post('/mock', async (req, res, next) => {
         message:'ok',
         letters:Array.from(letterList),
         grid: [].concat.apply([], grid),
-        width: grid.length,
-        height: grid[0].length
+        height: grid.length,
+        width: grid[0].length
 
     })
 });
