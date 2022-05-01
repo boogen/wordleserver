@@ -20,12 +20,15 @@ router.post('/mock', async (req, res, next) => {
                 result.push(" ");
             }
         }
-        grid.push(result.join(""))
+        grid.push(result)
     }
     res.json({
         message:'ok',
         letters:Array.from(letterList),
-        grid: grid
+        grid: grid.flat(),
+        width: grid.length,
+        height: grid[0].length
+
     })
 });
 
