@@ -25,7 +25,7 @@ router.post('/mock', async (req, res, next) => {
     res.json({
         message:'ok',
         letters:Array.from(letterList),
-        grid: grid.flat(),
+        grid: [].concat.apply([], grid),
         width: grid.length,
         height: grid[0].length
 
