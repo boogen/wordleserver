@@ -122,6 +122,9 @@ router.post('/init', async (req, res, next) => {
     }
 
     const state = (await stateToReply(grid, word_list))
+    const crossword = await dbi.getCrossword(crossword_id)
+    state.width = crossword.letter_grid[0].length
+    state.height = crossword.letter_grid.height
     res.json({
         message:'ok',
         state: state
