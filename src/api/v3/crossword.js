@@ -31,12 +31,12 @@ function convertGrid(grid, isNew=true) {
     return flatten_grid
 }
 
-async function stateToReply(grid, word_list) {
+async function stateToReply(grid, word_list, crossword) {
     letterList = new Set(word_list.join(""))
     return {letters:Array.from(letterList),
         grid: [].concat.apply([], grid),
-        height: grid.length,
-        width: grid[0].length}
+        height: crossword.letter_grid.length,
+        width: crossword.letter_grid[0].length}
 }
 
 router.post('/mock', async (req, res, next) => {
@@ -121,8 +121,8 @@ router.post('/init', async (req, res, next) => {
         crossword_id = crosswordState.crossword_id
     }
 
-    const state = (await stateToReply(grid, word_list))
     const crossword = await dbi.getCrossword(crossword_id)
+    const state = (await stateToReply(grid, word_list, crossword))
     res.json({
         message:'ok',
         state: state

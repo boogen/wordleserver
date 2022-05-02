@@ -206,6 +206,10 @@ class WordleDBI {
         }
     }
 
+    async getRandomCrossword() {
+        return this.possible_crosswords().aggregate([{ $sample: { size: 1 } }]);
+    }
+
     async getFirstCrossword() {
         try {
             return (await this.possible_crosswords().find())[0];
