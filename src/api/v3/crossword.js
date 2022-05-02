@@ -110,7 +110,7 @@ router.post('/init', async (req, res, next) => {
     var word_list = []
     var crossword_id = -1
     if (crosswordState == null || crosswordState.guessed_words.length == crosswordState.words.length) {
-        const crossword = await dbi.getFirstCrossword();
+        const crossword = await dbi.getRandomCrossword();
         grid = convertGrid(crossword.letter_grid)
         word_list = Object.keys(crossword.word_list)
         crossword_id = crossword.crossword_id
@@ -123,8 +123,6 @@ router.post('/init', async (req, res, next) => {
 
     const state = (await stateToReply(grid, word_list))
     const crossword = await dbi.getCrossword(crossword_id)
-    state.width = crossword.letter_grid[0].length
-    state.height = crossword.letter_grid.height
     res.json({
         message:'ok',
         state: state
