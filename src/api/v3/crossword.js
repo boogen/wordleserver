@@ -72,33 +72,39 @@ router.post('/guess', async (req, res, next) => {
     const isWord = await dbi.isWordValid(value.word);
     var crosswordState = await dbi.getCrosswordState(playerId);
     var grid = crosswordState.grid;
-    var guessed_words = crosswordState.guessed_words
-    if (!isWord) {
-        res.json({isWord:false, guessed_word: false, state: (await stateToReply(grid, crosswordState.word_list))})
-        return
-    }
-
+    var guessed_words = new Set(crosswordState.guessed_words)
     const crossword = await dbi.getCrossword(crosswordState.crossword_id)
+    // if (!isWord) {
+    //     res.json({isWord:false, guessed_word: false, state: (await stateToReply(grid, crosswordState.words, crossword))})
+    //     return
+    // }
+
+    
     const original_grid = crossword.letter_grid
     const guessed_word = crosswordState.words.includes(value.word)
     grid = convertGrid(original_grid)
     if (guessed_word) {
-        guessed_words.push(value.word)
-        var coordinates = crossword.word_list[value.word];
-        if (original_grid[coordinates[0]].slice(coordinates[1], coordinates[1] + value.word.length).join("") == value.word) {
-            for (var i = 0; i < value.word.length; i++) {
-                grid[coordinates[0]][coordinates[1] + i] = value.word[i] 
+        guessed_words.add(value.word)
+    }
+    const guessed_words_array = Array.from(guessed_words)
+    for (var z = 0; z < guessed_words_array.length; z++) {
+        const word = guessed_words_array[z];
+        console.log(word);
+        var coordinates = crossword.word_list[word];
+        if (original_grid[coordinates[0]].slice(coordinates[1], coordinates[1] + word.length).join("") == word) {
+            for (var i = 0; i < word.length; i++) {
+                grid[coordinates[0]][coordinates[1] + i] = word[i] 
             }
         }
         else {
-            for (var i = 0; i < value.word.length; i++) {
-                grid[coordinates[0] + i][coordinates[1]] = value.word[i] 
+            for (var i = 0; i < word.length; i++) {
+                grid[coordinates[0] + i][coordinates[1]] = word[i] 
             }
         }
     }
 
-    dbi.setCrosswordState(playerId, crosswordState.words, guessed_words, grid, crosswordState.crossword_id)
-    res.json({isWord:true, guessed_word: guessed_word, state: (await stateToReply(grid, crosswordState.words))})
+    dbi.setCrosswordState(playerId, crosswordState.words, guessed_words_array, grid, crosswordState.crossword_id)
+    res.json({isWord:true, guessed_word: guessed_word, state: (await stateToReply(grid, crosswordState.words, crossword))})
 });
 
 
