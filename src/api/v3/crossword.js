@@ -85,9 +85,9 @@ router.post('/guess', async (req, res, next) => {
     const convertedOriginalGrid = convertGrid(original_grid)
     tries = new Set(crosswordState.tries)
     var indexToFill = undefined
-    for (var i = 0; i < original_grid.length; i++) {
-        for (var j = 0; j < original_grid[i].length; j++) {
-            convertedOriginalGrid[i][j] = original_grid[i][j]
+    for (var i = 0; i < convertedOriginalGrid.length; i++) {
+        for (var j = 0; j < convertedOriginalGrid[i].length; j++) {
+            convertedOriginalGrid[i][j] = grid[i * convertedOriginalGrid.length + j]
         }
     }
     if (guessed_word) {
