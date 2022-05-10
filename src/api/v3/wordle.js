@@ -35,7 +35,7 @@ router.post('/getState', async (req, res, next) => {
         //     existing = await dbi.addNewPlayerWord(player_id, word, timestamp + WORD_VALIDITY);
         // }
         const existing = await dbi.getOrCreateGlobalWord(timestamp, new_validity_timestamp, word);
-        const tries = await dbi.getPlayerTries(player_id, existing.word_id);
+        const tries = await dbi.getPlayerTries(player_id, existing.word_id, timestamp);
         if (tries.length == 0) {
             console.log(req.ip)
             var locationInfo = geoip.lookup(req.ip);

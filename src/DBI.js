@@ -74,8 +74,8 @@ class WordleDBI {
         })
     }
 
-    async getPlayerTries(player_id, word_id) {
-        return this.player_tries().findOneAndUpdate({id:player_id, word_id:word_id}, {$setOnInsert:{guesses:[]}}, {upsert:true});
+    async getPlayerTries(player_id, word_id, timestamp) {
+        return this.player_tries().findOneAndUpdate({id:player_id, word_id:word_id}, {$setOnInsert:{guesses:[], start_timestamp: timestamp}}, {upsert:true});
     }
 
     async getPlayerChallengeTries(player_id, word_id) {
