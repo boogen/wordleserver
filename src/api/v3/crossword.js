@@ -87,7 +87,7 @@ router.post('/guess', async (req, res, next) => {
     var indexToFill = undefined
     for (var i = 0; i < convertedOriginalGrid.length; i++) {
         for (var j = 0; j < convertedOriginalGrid[i].length; j++) {
-            convertedOriginalGrid[i][j] = grid[i * convertedOriginalGrid.length + j]
+            convertedOriginalGrid[i][j] = grid[i][j]
         }
     }
     if (guessed_word) {
@@ -104,8 +104,7 @@ router.post('/guess', async (req, res, next) => {
                     }
                 }
             }
-            console.log(placesToFill.length);
-            const index = Math.floor(Math.random() % placesToFill.length)
+            const index = Math.floor(Math.random() * placesToFill.length)
             indexToFill = placesToFill[index]
         }
     }
@@ -125,10 +124,9 @@ router.post('/guess', async (req, res, next) => {
         }
     }
     if (indexToFill) {
-        console.log(indexToFill);
         convertedOriginalGrid[indexToFill.x][indexToFill.y] = original_grid[indexToFill.x][indexToFill.y]
     }
-
+    console.log(guessed_words_array)
     dbi.setCrosswordState(playerId, crosswordState.words, guessed_words_array, convertedOriginalGrid, crosswordState.crossword_id, Array.from(tries))
     res.json({isWord:true, guessed_word: guessed_word, state: (await stateToReply(convertedOriginalGrid, crosswordState.words, crossword))})
 });
@@ -142,6 +140,10 @@ router.post('/init', async (req, res, next) => {
     var word_list = []
     var tries = []
     var crossword_id = -1
+    var guessed_words = []
+    if (crosswordState != null) {
+        console.log(crosswordState.guessed_words.length + " " + crosswordState.words.length)
+    }
     if (crosswordState == null || crosswordState.guessed_words.length == crosswordState.words.length) {
         const crossword = (await dbi.getRandomCrossword())[0];
         grid = convertGrid(crossword.letter_grid)
@@ -155,6 +157,7 @@ router.post('/init', async (req, res, next) => {
         if (crosswordState.tries) {
             tries = crosswordState.tries
         }
+        guessed_words = crosswordState.guessed_words
     }
 
     const crossword = await dbi.getCrossword(crossword_id)
@@ -163,7 +166,7 @@ router.post('/init', async (req, res, next) => {
         message:'ok',
         state: state
     })
-    dbi.setCrosswordState(playerId, word_list, [], state.grid, crossword_id, tries)
+    dbi.setCrosswordState(playerId, word_list, guessed_words, grid, crossword_id, tries)
 });
 
 module.exports = router;
