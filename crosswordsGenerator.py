@@ -6,6 +6,20 @@ grid = []
 processedWords = dict()
 directions = dict()
 
+def get_database():
+    from pymongo import MongoClient
+    import pymongo
+
+    # Provide the mongodb atlas url to connect python to mongodb using pymongo
+    CONNECTION_STRING = "localhost"
+
+    # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
+    from pymongo import MongoClient
+    client = MongoClient(CONNECTION_STRING)
+
+    # Create the database for our example (we will use the same database throughout the tutorial
+    return client[sys.argv[2]]
+
 def placeWord(word, coords, direction):
     try:
         (x, y) = coords
@@ -51,7 +65,10 @@ def placeWord(word, coords, direction):
 
 file1 = open(sys.argv[1], 'r')
 lines = file1.readlines()
-
+dbname = get_database()
+crosswordId = 1
+possible_crosswords_db = dbname["possible_crosswords"]
+possible_crosswords_db.drop()
 for line in lines:
     grid = []
     processedWords = dict()
@@ -98,16 +115,57 @@ for line in lines:
                 break
         if placed:
             continue
-    if len(processedWords) > 20:
-        for i in range(0, len(grid)):
-            lineString = ""
-            shouldPrint = False
-            for j in range(0, len(grid[i])):
+    minMeaningful = 0
+    for i in range(0, len(grid)):
+        if any(grid[i]):
+            minMeaningful = i
+            break
+    grid = grid[minMeaningful:]
+    for (word, (x, y)) in processedWords.items():
+        processedWords[word] = (x - minMeaningful, y)
 
-                if grid[i][j] is None:
-                    lineString += " "
-                else:
-                    shouldPrint = True
-                    lineString += grid[i][j]
-            if shouldPrint:
-                print(lineString)
+    maxMeaningful = len(grid)
+    for i in range(len(grid) -1, -1, -1):
+        if any(grid[i]):
+            maxMeaningful = i + 1
+            break
+    grid = grid[:maxMeaningful]
+
+
+    minMeaningful = 1000;
+    for i in range(0, len(grid)):
+        minMeaningful = min(next(index for index in range(0, len(grid[i])) if grid[i][index] is not None), minMeaningful)
+    for i in range(0, len(grid)):
+        grid[i] = grid[i][minMeaningful:]
+    for (word, (x, y)) in processedWords.items():
+        processedWords[word] = (x, y - minMeaningful)
+
+    maxMeaningful = 0;
+    for i in range(0, len(grid)):
+        maxMeaningful = max(next(index for index in range(len(grid[i]) - 1, -1, -1) if grid[i][index] is not None), maxMeaningful)
+    for i in range(0, len(grid)):
+        grid[i] = grid[i][:maxMeaningful + 1]
+
+    valid = False
+    if len(grid) < 11:
+        valid = len(grid[0]) < 15
+    if len(grid) < 15:
+        valid = len(grid[0]) < 11
+
+    if len(processedWords) > 4 and valid:
+        # for i in range(0, len(grid)):
+        #     lineString = ""
+        #     shouldPrint = False
+        #     for j in range(0, len(grid[i])):
+
+        #         if grid[i][j] is None:
+        #             lineString += " "
+        #         else:
+        #             shouldPrint = True
+        #             lineString += grid[i][j]
+        #     if shouldPrint:
+        #         print(lineString)
+        possible_crosswords_db.insert_one({'crossword_id':crosswordId, 'word_list': processedWords, 'letter_grid': grid})
+        crosswordId += 1
+
+possible_crosswords_db.create_index('crossword_id', unique = True)
