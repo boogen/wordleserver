@@ -131,7 +131,7 @@ router.post('/guess', async (req, res, next) => {
     }
     console.log(guessed_words_array)
     dbi.setCrosswordState(playerId, crosswordState.words, guessed_words_array, convertedOriginalGrid, crosswordState.crossword_id, Array.from(tries))
-    res.json({isWord:true, guessed_word: guessed_word, state: (await stateToReply(convertedOriginalGrid, crosswordState.words, crossword, guessed_words.length == crosswordState.words.length))})
+    res.json({isWord:true, guessed_word: guessed_word, state: (await stateToReply(convertedOriginalGrid, crosswordState.words, crossword, guessed_words_array.length == crosswordState.words.length))})
 });
 
 
