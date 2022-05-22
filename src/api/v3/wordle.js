@@ -86,6 +86,10 @@ router.post('/validate', async (req, res, next) => {
             tries += 1;
         }
 
+        if (guessResult.isGuessed) {
+            await dbi.increaseRank(player_id, wordEntry.word_id, tries, timestamp - t.start_timestamp)
+        }
+
         console.log("tries: " + tries);
         if (tries == 6) {
             guessResult.correctWord = word;
@@ -186,9 +190,6 @@ async function validateGuess(guess, word, word_id, tries, timestamp, player_id) 
                 }
             }
         }
-    }
-    if (guessed) {
-        await dbi.increaseRank(player_id, word_id, tries, timestamp)
     }
     return {isWord: isWord, guess: guess, answer: result, isGuessed: guessed};
 }
