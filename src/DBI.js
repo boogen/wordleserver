@@ -189,7 +189,7 @@ class WordleDBI {
 
     async setCrosswordState(player_id, words, guessed_words, grid, crossword_id, tries) {
         try {
-            this.player_crossword_state().findOneAndUpdate({player_id: player_id}, {$set:{words:words, grid: grid, guessed_words: guessed_words, crossword_id: crossword_id, tries: tries}}, {upsert: true});
+            return this.player_crossword_state().findOneAndUpdate({player_id: player_id}, {$set:{words:words, grid: grid, guessed_words: guessed_words, crossword_id: crossword_id, tries: tries}}, {upsert: true});
         }
         catch(error) {
             console.log(error);
