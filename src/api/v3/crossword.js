@@ -177,12 +177,13 @@ router.post('/init', async (req, res, next) => {
     }
 
     const crossword = await dbi.getCrossword(crossword_id)
-    const state = (await stateToReply(grid, word_list, crossword, isFinished(crosswordState)))
+    const newState = await dbi.setCrosswordState(playerId, word_list, guessed_words, grid, crossword_id, tries)
+    const state = (await stateToReply(grid, word_list, crossword, isFinished(newState)))
     res.json({
         message:'ok',
         state: state
     })
-    dbi.setCrosswordState(playerId, word_list, guessed_words, grid, crossword_id, tries)
+    
 });
 
 module.exports = router;
