@@ -3,7 +3,8 @@ const wordle = require('./wordle');
 const friend = require('./friend')
 const player = require('./player')
 const challenge = require('./wordle_challenge')
-const crossword = require('./crossword')
+const crossword = require('./crossword');
+const { route } = require('./crossword');
 
 const router = express.Router();
 

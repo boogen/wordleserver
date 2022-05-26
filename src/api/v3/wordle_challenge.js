@@ -2,7 +2,7 @@ const express = require('express');
 const joi = require('@hapi/joi');
 const router = express.Router();
 const { id } = require('@hapi/joi/lib/base');
-
+const Sentry = require('@sentry/node');
 const dbi = require('../../DBI.js').createDBI();
 const authIdSchema = joi.object({
     authId: joi.string().trim().required()
@@ -47,6 +47,7 @@ router.post('/getState', async (req, res, next) => {
     } catch (error) {
         console.log(error);
         next(error);
+        Sentry.captureException(error);
     }
 
 });
@@ -92,6 +93,7 @@ router.post('/validate', async (req, res, next) => {
     } catch (error) {
         console.log(error);
         next(error);
+        Sentry.captureException(error);
     }
 })
 
