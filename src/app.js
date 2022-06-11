@@ -2,8 +2,10 @@ const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
+const Sentry = require('@sentry/node');
 
 require('dotenv').config();
+Sentry.init({dsn: process.env.sentry_dsn});
 
 const middlewares = require('./middlewares');
 const api = require('./api/v1');
@@ -21,6 +23,17 @@ app.get('/', (req, res) => {
   res.json({
     message: '🦄🌈✨👋🌎🌍🌏✨🌈🦄'
   });
+});
+
+app.get("/error", (req, res) => {
+  try {
+    throw "aaa";
+  }
+  catch (error) {
+    Sentry.captureException(error);
+  };
+  res.status(500);
+  res.send("error");
 });
 
 app.use('/api/v1', api);

@@ -2,7 +2,7 @@ const express = require('express');
 const joi = require('@hapi/joi');
 const router = express.Router();
 const { id } = require('@hapi/joi/lib/base');
-
+const Sentry = require('@sentry/node');
 const WORD_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
 const dbi = require('../../DBI.js').createDBI();
@@ -55,6 +55,7 @@ router.post('/getState', async (req, res, next) => {
     } catch (error) {
         console.log(error);
         next(error);
+        Sentry.captureException(error);
     }
 
 });
@@ -99,6 +100,7 @@ router.post('/validate', async (req, res, next) => {
     } catch (error) {
         console.log(error);
         next(error);
+        Sentry.captureException(error);
     }
 })
 
@@ -121,6 +123,7 @@ router.post('/ranking', async (req, res, next) => {
     catch (error) {
         console.log(error);
         next(error);
+        Sentry.captureException(error);
     }
 })
 
@@ -145,6 +148,7 @@ router.post('/friendRanking', async (req, res, next) => {
     catch (error) {
         console.log(error);
         next(error);
+        Sentry.captureException(error);
     }
 })
 
@@ -193,7 +197,6 @@ async function validateGuess(guess, word, word_id, tries, timestamp, player_id) 
     }
     return {isWord: isWord, guess: guess, answer: result, isGuessed: guessed};
 }
-
 
 router.post('/word', (req, res, next) => {
     res.json({
