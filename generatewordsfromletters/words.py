@@ -23,7 +23,7 @@ for line in lines:
 letters = ['a','ą','b','c','ć','d','e','ę','f','g','h','i','j','k','l','ł','m','n','ń','o','ó','p','r','s','ś','t','u','w','y','z','ż','ź']
 
 
-combinations = list(itertools.combinations((letters), 6))
+combinations = list(itertools.combinations((letters), 7))
 crosswords = []
 
 avg = 0
@@ -32,8 +32,9 @@ for c in combinations:
     result = []
     four_letters = list(itertools.combinations(c, 4))
     five_letters = list(itertools.combinations(c, 5))
+    six_letters = list(itertools.combinations(c, 6))    
 
-    all_combinations = four_letters + five_letters + [c]
+    all_combinations = four_letters + five_letters + six_letters + [c]
 
     for combination in all_combinations:
         joined = ''.join(combination)
