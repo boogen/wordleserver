@@ -4,6 +4,7 @@ const friend = require('./friend')
 const player = require('./player')
 const challenge = require('./wordle_challenge')
 const crossword = require('./crossword');
+const spellingBee = require('./spelling_bee');
 const { route } = require('./crossword');
 
 const router = express.Router();
@@ -19,5 +20,6 @@ router.use('/player', player);
 router.use('/friend', friend);
 router.use('/classic', challenge);
 router.use('/crossword', crossword);
+router.use('/spelling_bee', spellingBee);
 
 module.exports = router;

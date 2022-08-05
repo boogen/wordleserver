@@ -12,6 +12,8 @@ const _player_profile = _db.get("player_profile")
 const _global_word = _db.get("global_word")
 const _possible_crosswords = _db.get("possible_crosswords")
 const _player_crossword_state = _db.get("player_crossword_state")
+const _global_bee = _db.get("global_bee")
+const _guessed_words_bee = _db.get("guessed_words_bee")
 
 class WordleDBI {
     db() { return _db;}
@@ -27,6 +29,8 @@ class WordleDBI {
     global_word() {return _global_word}
     possible_crosswords() {return _possible_crosswords}
     player_crossword_state() {return _player_crossword_state}
+    global_bee() { return _global_bee}
+    guessed_words_bee() { return _guessed_words_bee}
 
     constructor() {
         _friend_codes.createIndex({friend_code: 1}, {unique:true})
@@ -39,7 +43,12 @@ class WordleDBI {
 //        _player_tries.createIndex({word_id:1, id: 1}, {unique: true});
         _player_challenge_tries.createIndex({word_id:1, id:1}, {unique: true});
         _player_crossword_state.createIndex({player_id: 1}, {unique: true});
+        _global_bee.createIndex({validity: 1}, {unique: true});
+        _global_bee.createIndex({bee_id: 1}, {unique: true})
+        _guessed_words_bee.createIndex({player_id:1, bee_id:1}, {unique: true})
     }
+
+    //SEQ
 
     async getNextSequenceValue(sequenceName){
         var sequenceDocument = await this.counters().findOneAndUpdate({id: sequenceName},
@@ -48,6 +57,8 @@ class WordleDBI {
         return sequenceDocument.sequence_value;
     }
 
+    //PLAYER
+
     async addPlayerToAuthMap(authId, playerId) {
         return await this.player_auth().insert({auth_id: authId, player_id: playerId});
     }
@@ -55,90 +66,6 @@ class WordleDBI {
     async resolvePlayerId(auth_id) {
         const authEntry = await this.player_auth().findOne({auth_id: auth_id});
         return authEntry === null?null:authEntry.player_id;
-    }
-
-    async getWord() {
-        return this.words().aggregate([{ $sample: { size: 1 } }]);
-    }
-
-    async getPlayerLastWord(player_id) {
-        const value = await this.player_word().find({player_id:player_id}, {limit:1, sort:{word_id: -1}});
-        if (value === null) {
-            return null;
-        }
-        return value[0];
-    }
-
-    async addNewPlayerWord(player_id, word, expiration) {
-        const wordId = await this.getNextSequenceValue("player#" + player_id + "_word");
-        return this.player_word().insert({
-            player_id: player_id,
-            word_id:wordId,
-            word: word,
-            expiration: expiration
-        })
-    }
-
-    async getPlayerTries(player_id, word_id, timestamp) {
-        return this.player_tries().findOneAndUpdate({id:player_id, word_id:word_id}, {$setOnInsert:{guesses:[], start_timestamp: timestamp}}, {upsert:true});
-    }
-
-    async getPlayerChallengeTries(player_id, word_id) {
-        return this.player_challenge_tries().findOneAndUpdate({id:player_id, word_id:word_id}, {$setOnInsert:{guesses:[]}}, {upsert:true});
-    }
-
-    async getOrCreateGlobalWord(timestamp, new_validity, new_word) {
-        var new_word_id = await this.getNextSequenceValue("global_word")
-        return this.global_word().findOneAndUpdate({validity:{$gt: timestamp}}, {$setOnInsert: {word:new_word, validity: new_validity, word_id: new_word_id}}, {upsert: true})
-    }
-
-    async increaseRank(player_id, word_id, tries, timestamp) {
-        const rank =  this.db().get("word#" + word_id + "_ranking");
-        rank.createIndex({player_id: 1})
-        rank.createIndex({score: 1});
-        return rank.findOneAndUpdate({player_id: player_id}, {$setOnInsert:{score: tries, time: timestamp}}, {upsert:true})
-    }
-
-    async getRanking(word_id) {
-        const rank =  this.db().get("word#" + word_id + "_ranking");
-        rank.createIndex({player_id: 1})
-        rank.createIndex({score: 1});
-        return rank.find({}, {sort: {score:1, time: 1}, limit:100})
-    }
-
-    async getRankingWithFilter(word_id, friends) {
-        const rank =  this.db().get("word#" + word_id + "_ranking");
-        rank.createIndex({player_id: 1})
-        rank.createIndex({score: 1});
-        return rank.find({playerId:{$in: friends}}, {sort: {score:1, time: 1}, limit:100})
-    }
-
-    async getGlobalWord(timestamp) {
-        return this.global_word().findOne({validity:{$gt: timestamp}})
-    }
-
-    async getGlobalWordById(word_id) {
-        return this.global_word().findOne({word_id:word_id})
-    }
-
-    async isWordValid(word) {
-        return this.possible_words().findOne({word:word}).then(value => {return value != null});
-    }
-
-    async getPlayerTriesForWord(player_id, word_id) {
-        return this.player_tries().findOne({id:player_id, word_id:word_id });
-    }
-
-    async getPlayerChallengeTriesForWord(player_id, word_id) {
-        return this.player_challenge_tries().findOne({id:player_id, word_id:word_id });
-    }
-
-    async addChallengeGuess(player_id, word_id, guess) {
-        return this.player_challenge_tries().findOneAndUpdate({id:player_id, word_id:word_id }, { $push: { guesses: guess} });
-    }
-
-    async addGuess(player_id, word_id, guess) {
-        return this.player_tries().findOneAndUpdate({id:player_id, word_id:word_id }, { $push: { guesses: guess} });
     }
 
     async setNick(playerId, nick) {
@@ -172,9 +99,149 @@ class WordleDBI {
         return (await friends.find()).map(f => f.id)
     }
 
+    async addFriendCode(player_id, friend_code) {
+        try {
+            return (await this.friend_codes().findOneAndUpdate({player_id: player_id}, {$setOnInsert:{player_id: player_id, friend_code: friend_code}}, {upsert:true})).friend_code;
+        }
+        catch(error) {
+            console.log(error)
+            return null;
+        }
+    }
+
+    //MODEL
+
+    async getWord() {
+        return this.words().aggregate([{ $sample: { size: 1 } }]);
+    }
+
+    async isWordValid(word) {
+        return this.possible_words().findOne({word:word}).then(value => {return value != null});
+    }
+
     async getCrossword(crossword_id) {
         return this.possible_crosswords().findOne({crossword_id: crossword_id})
     }
+
+    async getRandomCrossword() {
+        return this.possible_crosswords().aggregate([{ $sample: { size: 1 } }]);
+    }
+
+    async getFirstCrossword() {
+        try {
+            return (await this.possible_crosswords().find())[0];
+        }
+        catch(error) {
+            console.log(error)
+            return null;
+        }
+    }
+
+    //BEE
+
+    async wordExists(word) {
+        return true;
+    }
+
+    async getLettersForBee(timestamp) {
+        return this.global_bee().findOne({validity:{$gt: timestamp}});
+    }
+
+    async createLettersForBee(validityTimestamp, mainLetter, letters) {
+        const bee_id = await this.getNextSequenceValue("global_bee");
+        return this.global_bee().insert({validity: validityTimestamp, mainLetter: mainLetter, letters: letters, bee_id: bee_id})
+    }
+
+    async getBeeState(playerId, bee_id) {
+        return this.guessed_words_bee().findOne({playerId: playerId, bee_id: bee_id});
+    }
+
+    async addBeeGuess(playerId, bee_id, guess) {
+        return this.guessed_words_bee().findOneAndUpdate({playerId: playerId, bee_id: bee_id}, {$push: {guesses: guess}}, {upsert:true})
+    }
+
+
+    //CLASSIC WORDLE
+    async getOrCreateGlobalWord(timestamp, new_validity, new_word) {
+        var new_word_id = await this.getNextSequenceValue("global_word")
+        return this.global_word().findOneAndUpdate({validity:{$gt: timestamp}}, {$setOnInsert: {word:new_word, validity: new_validity, word_id: new_word_id}}, {upsert: true})
+    }
+
+    async getGlobalWord(timestamp) {
+        return this.global_word().findOne({validity:{$gt: timestamp}})
+    }
+
+    async getGlobalWordById(word_id) {
+        return this.global_word().findOne({word_id:word_id})
+    }
+
+    async getPlayerTries(player_id, word_id, timestamp) {
+        return this.player_tries().findOneAndUpdate({id:player_id, word_id:word_id}, {$setOnInsert:{guesses:[], start_timestamp: timestamp}}, {upsert:true});
+    }
+
+    async getPlayerTriesForWord(player_id, word_id) {
+        return this.player_tries().findOne({id:player_id, word_id:word_id });
+    }
+
+    async addGuess(player_id, word_id, guess) {
+        return this.player_tries().findOneAndUpdate({id:player_id, word_id:word_id }, { $push: { guesses: guess} });
+    }
+
+    //CONTINOUS WORDLE
+    async addNewPlayerWord(player_id, word, expiration) {
+        const wordId = await this.getNextSequenceValue("player#" + player_id + "_word");
+        return this.player_word().insert({
+            player_id: player_id,
+            word_id:wordId,
+            word: word,
+            expiration: expiration
+        })
+    }
+
+    async getPlayerChallengeTriesForWord(player_id, word_id) {
+        return this.player_challenge_tries().findOne({id:player_id, word_id:word_id });
+    }
+
+    async addChallengeGuess(player_id, word_id, guess) {
+        return this.player_challenge_tries().findOneAndUpdate({id:player_id, word_id:word_id }, { $push: { guesses: guess} });
+    }
+
+    async getPlayerChallengeTries(player_id, word_id) {
+        return this.player_challenge_tries().findOneAndUpdate({id:player_id, word_id:word_id}, {$setOnInsert:{guesses:[]}}, {upsert:true});
+    }
+
+    async getPlayerLastWord(player_id) {
+        const value = await this.player_word().find({player_id:player_id}, {limit:1, sort:{word_id: -1}});
+        if (value === null) {
+            return null;
+        }
+        return value[0];
+    }
+
+    //RANK
+
+    async increaseRank(player_id, word_id, tries, timestamp) {
+        const rank =  this.db().get("word#" + word_id + "_ranking");
+        rank.createIndex({player_id: 1})
+        rank.createIndex({score: 1});
+        return rank.findOneAndUpdate({player_id: player_id}, {$setOnInsert:{score: tries, time: timestamp}}, {upsert:true})
+    }
+
+    async getRanking(word_id) {
+        const rank =  this.db().get("word#" + word_id + "_ranking");
+        rank.createIndex({player_id: 1})
+        rank.createIndex({score: 1});
+        return rank.find({}, {sort: {score:1, time: 1}, limit:100})
+    }
+
+    async getRankingWithFilter(word_id, friends) {
+        const rank =  this.db().get("word#" + word_id + "_ranking");
+        rank.createIndex({player_id: 1})
+        rank.createIndex({score: 1});
+        return rank.find({playerId:{$in: friends}}, {sort: {score:1, time: 1}, limit:100})
+    }
+
+    //CROSSWORD
 
     async getCrosswordState(playerId) {
         try {
@@ -196,29 +263,6 @@ class WordleDBI {
         }
     }
 
-    async addFriendCode(player_id, friend_code) {
-        try {
-            return (await this.friend_codes().findOneAndUpdate({player_id: player_id}, {$setOnInsert:{player_id: player_id, friend_code: friend_code}}, {upsert:true})).friend_code;
-        }
-        catch(error) {
-            console.log(error)
-            return null;
-        }
-    }
-
-    async getRandomCrossword() {
-        return this.possible_crosswords().aggregate([{ $sample: { size: 1 } }]);
-    }
-
-    async getFirstCrossword() {
-        try {
-            return (await this.possible_crosswords().find())[0];
-        }
-        catch(error) {
-            console.log(error)
-            return null;
-        }
-    }
 }
 
 function createDBI() {
