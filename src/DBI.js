@@ -140,7 +140,10 @@ class WordleDBI {
     //BEE
 
     async wordExists(word) {
-        return true;
+        return ["agonia",  "angina",  "anion",  "gang",  "ganiać",  "ganić",  "gnać",  "gnić",  "gnoić",  "gong",  "gonić",  
+        "naćpać",  "nagana",  "naganiać",  "nagi",  "naginać",  "nago",  "nagonić",  "napić",  "napinać",  "napoić",  "niania",  
+        "noga",  "oganiać",  "ogon",  "onania",  "opinać",  "opinia",  "opona",  "pagina",  "panna",  "piana",  "pianino",  "ping",  "pinia",  "pion",  
+        "poganiać",  "poganin",  "pognać",  "pogonić",  "ponoć"].includes(word);
     }
 
     async getLettersForBee(timestamp) {

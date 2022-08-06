@@ -28,7 +28,7 @@ router.post('/getState', async (req, res, next) => {
         }
         var letters = await dbi.getLettersForBee(timestamp);
         if (null === letters) {
-            letters = await dbi.createLettersForBee(new_validity_timestamp, "n", ["a", "m", "z", "t", "u", "p"]);
+            letters = await dbi.createLettersForBee(new_validity_timestamp, "n", ["p", "o", "g", "ć", "i", "a"]);
         }
         var state = await dbi.getBeeState(player_id, letters.bee_id);
         if (state === null) {
