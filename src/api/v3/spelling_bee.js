@@ -17,13 +17,17 @@ const guessSchema = joi.object({
 })
 
 function wordPoints(word, letters) {
-    var points = word.length - 3;
-    for (var letter in letters) {
-        if (!word.includes(letter)) {
-            return points;
-        }
+    if (word.length == 4) {
+        return 1
     }
-    return points + 7;
+    return word.length
+    // var points = word.length - 3;
+    // for (var letter in letters) {
+    //     if (!word.includes(letter)) {
+    //         return points;
+    //     }
+    // }
+    // return points + 7;
 }
 
 
@@ -95,6 +99,7 @@ router.post('/guess', async (req, res, next) => {
         }
         state = await dbi.addBeeGuess(player_id, letters.bee_id, guess)
         var points = wordPoints(guess, letters.letters)
+        await dbi.increaseBeeRank(player_id, letters.bee_id, points)
         res.json({
             message: 'ok',
             main_letter: letters.mainLetter,
@@ -108,6 +113,37 @@ router.post('/guess', async (req, res, next) => {
         Sentry.captureException(error);
     }
 });
+
+router.post('/ranking', async (req, res, next) => {
+    try {
+        const value = await authIdSchema.validateAsync(req.body);
+        const player_id = await dbi.resolvePlayerId(value.authId);
+        const timestamp = Date.now() / 1000;
+        const bee = await dbi.getLettersForBee(timestamp);
+        if (bee === null) {
+            res.json({message: 'ok', ranking:[]})
+            return
+        }
+        const ranking = await dbi.getBeeRanking(bee.bee_id)
+        res.json({message:'ok',
+        myInfo:await getMyPositionInRank(player_id, ranking, dbi),
+        ranking: await Promise.all(ranking.map( async function(re) { return {player:(((await dbi.getProfile(re.player_id))) || {nick: null}).nick, score: re.score};}))});
+    } catch (error) {
+        console.log(error);
+        next(error);
+        Sentry.captureException(error);
+    }
+})
+
+async function getMyPositionInRank(player_id, rank, dbi) {
+    for (const index in rank) {
+        const rankEntry = rank[index]
+        if (rankEntry.player_id === player_id) {
+            return {position: parseInt(index) + 1, score: rankEntry.score, nick: (((await dbi.getProfile(player_id)))|| {nick: null}).nick}
+        }
+    }
+    return null;
+}
 
 
 module.exports = router;

@@ -164,6 +164,21 @@ class WordleDBI {
         return this.guessed_words_bee().findOneAndUpdate({player_id: player_id, bee_id: bee_id}, {$push: {guesses: guess}}, {upsert:true})
     }
 
+    //BEE RANKING
+    async increaseBeeRank(player_id, bee_id, points) {
+        const rank =  this.db().get("bee#" + bee_id + "_ranking");
+        rank.createIndex({player_id: 1})
+        rank.createIndex({score: 1});
+        return rank.findOneAndUpdate({player_id: player_id}, {$inc:{score: points}}, {upsert:true})
+    }
+
+    async getBeeRanking(bee_id) {
+        const rank =  this.db().get("bee#" + bee_id + "_ranking");
+        rank.createIndex({player_id: 1})
+        rank.createIndex({score: 1});
+        return rank.find({}, {sort: {score:1}, limit:100})
+    }
+
 
     //CLASSIC WORDLE
     async getOrCreateGlobalWord(timestamp, new_validity, new_word) {
