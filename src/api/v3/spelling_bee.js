@@ -16,6 +16,16 @@ const guessSchema = joi.object({
     word: joi.string().trim().required()
 })
 
+function wordPoints(word, letters) {
+    var points = word.length - 3;
+    for (var letter in letters) {
+        if (!word.includes(letter)) {
+            return points;
+        }
+    }
+    return points + 7;
+}
+
 
 router.post('/getState', async (req, res, next) => {
     try {
@@ -28,7 +38,7 @@ router.post('/getState', async (req, res, next) => {
         }
         var letters = await dbi.getLettersForBee(timestamp);
         if (null === letters) {
-            letters = await dbi.createLettersForBee(new_validity_timestamp, "n", ["p", "o", "g", "ć", "i", "a"]);
+            letters = await dbi.createLettersForBee(new_validity_timestamp);
         }
         var state = await dbi.getBeeState(player_id, letters.bee_id);
         if (state === null) {
@@ -74,7 +84,7 @@ router.post('/guess', async (req, res, next) => {
             })
             return;
         }
-        if (!(await dbi.wordExists(guess, letters.bee_id))) {
+        if (!(await dbi.wordExists(guess, letters.bee_model_id))) {
             res.json({
                 message: 'wrong_word',
                 main_letter: letters.mainLetter,
@@ -84,10 +94,12 @@ router.post('/guess', async (req, res, next) => {
             return
         }
         state = await dbi.addBeeGuess(player_id, letters.bee_id, guess)
+        var points = wordPoints(guess, letters.letters)
         res.json({
             message: 'ok',
             main_letter: letters.mainLetter,
             other_letters: letters.letters,
+            pointsForWord: points,
             guessed_words: state.guesses
         })
     } catch (error) {

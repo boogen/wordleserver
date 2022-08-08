@@ -14,6 +14,7 @@ const _possible_crosswords = _db.get("possible_crosswords")
 const _player_crossword_state = _db.get("player_crossword_state")
 const _global_bee = _db.get("global_bee")
 const _guessed_words_bee = _db.get("guessed_words_bee")
+const _bees = db.get("bees")
 
 class WordleDBI {
     db() { return _db;}
@@ -31,6 +32,7 @@ class WordleDBI {
     player_crossword_state() {return _player_crossword_state}
     global_bee() { return _global_bee}
     guessed_words_bee() { return _guessed_words_bee}
+    bees() {return _bees}
 
     constructor() {
         _friend_codes.createIndex({friend_code: 1}, {unique:true})
@@ -46,6 +48,7 @@ class WordleDBI {
         _global_bee.createIndex({validity: 1}, {unique: true});
         _global_bee.createIndex({bee_id: 1}, {unique: true})
         _guessed_words_bee.createIndex({player_id:1, bee_id:1}, {unique: true})
+        _bees.createIndex({id:1}, {unique: true});
     }
 
     //SEQ
@@ -139,20 +142,18 @@ class WordleDBI {
 
     //BEE
 
-    async wordExists(word) {
-        return ["agonia",  "angina",  "anion",  "gang",  "ganiać",  "ganić",  "gnać",  "gnić",  "gnoić",  "gong",  "gonić",  
-        "naćpać",  "nagana",  "naganiać",  "nagi",  "naginać",  "nago",  "nagonić",  "napić",  "napinać",  "napoić",  "niania",  
-        "noga",  "oganiać",  "ogon",  "onania",  "opinać",  "opinia",  "opona",  "pagina",  "panna",  "piana",  "pianino",  "ping",  "pinia",  "pion",  
-        "poganiać",  "poganin",  "pognać",  "pogonić",  "ponoć"].includes(word);
+    async wordExists(word, bee_model_id) {
+        return this.bees().findOne({id: bee_model_id}).words.includes(word);
     }
 
     async getLettersForBee(timestamp) {
         return this.global_bee().findOne({validity:{$gt: timestamp}});
     }
 
-    async createLettersForBee(validityTimestamp, mainLetter, letters) {
+    async createLettersForBee(validityTimestamp) {
+        var bee = this.bees().aggregate([{ $sample: { size: 1 } }]);
         const bee_id = await this.getNextSequenceValue("global_bee");
-        return this.global_bee().insert({validity: validityTimestamp, mainLetter: mainLetter, letters: letters, bee_id: bee_id})
+        return this.global_bee().insert({validity: validityTimestamp, mainLetter: bee.main_letter, letters: bee.other_letters, bee_id: bee_id, bee_model_id: bee.id})
     }
 
     async getBeeState(playerId, bee_id) {
