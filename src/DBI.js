@@ -176,7 +176,7 @@ class WordleDBI {
         const rank =  this.db().get("bee#" + bee_id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
-        return rank.find({}, {sort: {score:1}, limit:100})
+        return rank.find({}, {sort: {score:2}, limit:100})
     }
 
 
