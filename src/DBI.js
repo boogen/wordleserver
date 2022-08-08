@@ -156,12 +156,12 @@ class WordleDBI {
         return this.global_bee().insert({validity: validityTimestamp, mainLetter: bee.main_letter, letters: bee.other_letters, bee_id: bee_id, bee_model_id: bee.id})
     }
 
-    async getBeeState(playerId, bee_id) {
-        return this.guessed_words_bee().findOne({playerId: playerId, bee_id: bee_id});
+    async getBeeState(player_id, bee_id) {
+        return this.guessed_words_bee().findOne({player_id: player_id, bee_id: bee_id});
     }
 
-    async addBeeGuess(playerId, bee_id, guess) {
-        return this.guessed_words_bee().findOneAndUpdate({playerId: playerId, bee_id: bee_id}, {$push: {guesses: guess}}, {upsert:true})
+    async addBeeGuess(player_id, bee_id, guess) {
+        return this.guessed_words_bee().findOneAndUpdate({player_id: player_id, bee_id: bee_id}, {$push: {guesses: guess}}, {upsert:true})
     }
 
 
