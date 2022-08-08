@@ -14,7 +14,7 @@ const _possible_crosswords = _db.get("possible_crosswords")
 const _player_crossword_state = _db.get("player_crossword_state")
 const _global_bee = _db.get("global_bee")
 const _guessed_words_bee = _db.get("guessed_words_bee")
-const _bees = db.get("bees")
+const _bees = _db.get("bees")
 
 class WordleDBI {
     db() { return _db;}
@@ -143,7 +143,7 @@ class WordleDBI {
     //BEE
 
     async wordExists(word, bee_model_id) {
-        return this.bees().findOne({id: bee_model_id}).words.includes(word);
+        return (await this.bees().findOne({id: bee_model_id})).words.includes(word);
     }
 
     async getLettersForBee(timestamp) {
@@ -151,7 +151,7 @@ class WordleDBI {
     }
 
     async createLettersForBee(validityTimestamp) {
-        var bee = this.bees().aggregate([{ $sample: { size: 1 } }]);
+        var bee = (await this.bees().aggregate([{ $sample: { size: 1 } }]))[0]
         const bee_id = await this.getNextSequenceValue("global_bee");
         return this.global_bee().insert({validity: validityTimestamp, mainLetter: bee.main_letter, letters: bee.other_letters, bee_id: bee_id, bee_model_id: bee.id})
     }
