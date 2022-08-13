@@ -174,16 +174,20 @@ class WordleDBI {
     }
 
     async getBeeRanking(bee_id) {
+	console.log(bee_id)
         const rank =  this.db().get("bee#" + bee_id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
-        const score100Array = rank.find({}, {sort: {score:-1}, $slice:100})
-        var score100 = score100Array[score100Array.length - 1]
-        const rawRank = rank.find({}, {sort: {score:-1}, score: {$gt: score100}})
+
+        const score100Array = await rank.aggregate([{ $sample: { size: 1 } }])
+
+        var score100 = score100Array[score100Array.length - 1].score
+        const rawRank = await rank.find({}, {sort: {score:-1}, score: {$gt: score100}})
         var returnValue = []
         var position = 0
         var score = 0
-        for (entry in rawRank) {
+	console.log(rawRank)
+        for (var entry of rawRank) {
             if (score != entry.score) {
                 score = entry.score
                 position += 1

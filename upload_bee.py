@@ -10,7 +10,7 @@ def get_database():
     client = MongoClient(CONNECTION_STRING)
 
     # Create the database for our example (we will use the same database throughout the tutorial
-    return client['wordle']
+    return client['wordle_dev']
 
 # This is added so that many files can reuse the function get_database()
 if __name__ == "__main__":
@@ -36,6 +36,7 @@ if __name__ == "__main__":
             if all(map(lambda w: letter in w, words)):
                 main_letter = letter
                 unique_letters.remove(main_letter)
+                continue
         if main_letter is None:
             raise "Couldn't find main letter"
         bees_db.insert_one({'id': id, 'words':words, 'main_letter': main_letter, 'other_letters': unique_letters})
