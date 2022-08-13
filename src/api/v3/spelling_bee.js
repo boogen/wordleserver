@@ -65,7 +65,7 @@ router.post('/getState', async (req, res, next) => {
             main_letter: letters.mainLetter,
             other_letters: letters.letters,
             guessed_words: guesses,
-            maxPoints:getMaxPoints(letters.words)
+            maxPoints:getMaxPoints(dbi.getBeeWords(letters.bee_model_id))
         })
     } catch (error) {
         console.log(error);
@@ -94,7 +94,7 @@ router.post('/guess', async (req, res, next) => {
                 main_letter: letters.mainLetter,
                 other_letters: letters.letters,
                 guessed_words: guesses,
-                maxPoints:getMaxPoints(letters.words)
+                maxPoints:getMaxPoints(dbi.getBeeWords(letters.bee_model_id))
             })
             return;
         }
@@ -104,7 +104,7 @@ router.post('/guess', async (req, res, next) => {
                 main_letter: letters.mainLetter,
                 other_letters: letters.letters,
                 guessed_words: guesses,
-                maxPoints:getMaxPoints(letters.words)
+                maxPoints:getMaxPoints(dbi.getBeeWords(letters.bee_model_id))
             })
             return
         }
@@ -117,7 +117,7 @@ router.post('/guess', async (req, res, next) => {
             other_letters: letters.letters,
             pointsForWord: points,
             guessed_words: state.guesses,
-            maxPoints:getMaxPoints(letters.words)
+            maxPoints:getMaxPoints(dbi.getBeeWords(letters.bee_model_id))
         })
     } catch (error) {
         console.log(error);
