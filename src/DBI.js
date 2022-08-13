@@ -1,3 +1,4 @@
+const { entry } = require('@hapi/joi/lib/validator');
 const monk = require('monk');
 const _db = monk(process.env.MONGO_URI);
 const _words = _db.get("words");
@@ -176,7 +177,21 @@ class WordleDBI {
         const rank =  this.db().get("bee#" + bee_id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
-        return rank.find({}, {sort: {score:-1}, limit:100})
+        const score100Array = rank.find({}, {sort: {score:-1}, $slice:100})
+        var score100 = score100Array[score100Array.length - 1]
+        const rawRank = rank.find({}, {sort: {score:-1}, score: {$gt: score100}})
+        var returnValue = []
+        var position = 0
+        var score = 0
+        for (entry in rawRank) {
+            if (score != entry.score) {
+                score = entry.score
+                position += 1
+            }
+            returnValue.push({score: score, position: position, player_id: entry.player_id})
+        }
+        return returnValue;
+
     }
 
 

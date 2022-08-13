@@ -16,6 +16,14 @@ const guessSchema = joi.object({
     word: joi.string().trim().required()
 })
 
+function getMaxPoints(words, letters) {
+    var sum = 0;
+    for (var word in words) {
+        sum += wordPoints(word)
+    }
+    return sum
+}
+
 function wordPoints(word, letters) {
     if (word.length == 4) {
         return 1
@@ -56,7 +64,8 @@ router.post('/getState', async (req, res, next) => {
             message: 'ok',
             main_letter: letters.mainLetter,
             other_letters: letters.letters,
-            guessed_words: guesses
+            guessed_words: guesses,
+            maxPoints:getMaxPoints(letters.words)
         })
     } catch (error) {
         console.log(error);
@@ -84,7 +93,8 @@ router.post('/guess', async (req, res, next) => {
                 message: 'already_guessed',
                 main_letter: letters.mainLetter,
                 other_letters: letters.letters,
-                guessed_words: guesses
+                guessed_words: guesses,
+                maxPoints:getMaxPoints(letters.words)
             })
             return;
         }
@@ -93,7 +103,8 @@ router.post('/guess', async (req, res, next) => {
                 message: 'wrong_word',
                 main_letter: letters.mainLetter,
                 other_letters: letters.letters,
-                guessed_words: guesses
+                guessed_words: guesses,
+                maxPoints:getMaxPoints(letters.words)
             })
             return
         }
@@ -105,7 +116,8 @@ router.post('/guess', async (req, res, next) => {
             main_letter: letters.mainLetter,
             other_letters: letters.letters,
             pointsForWord: points,
-            guessed_words: state.guesses
+            guessed_words: state.guesses,
+            maxPoints:getMaxPoints(letters.words)
         })
     } catch (error) {
         console.log(error);
@@ -113,6 +125,8 @@ router.post('/guess', async (req, res, next) => {
         Sentry.captureException(error);
     }
 });
+
+
 
 router.post('/ranking', async (req, res, next) => {
     try {
@@ -127,7 +141,7 @@ router.post('/ranking', async (req, res, next) => {
         const ranking = await dbi.getBeeRanking(bee.bee_id)
         res.json({message:'ok',
         myInfo:await getMyPositionInRank(player_id, ranking, dbi),
-        ranking: await Promise.all(ranking.map( async function(re) { return {player:(((await dbi.getProfile(re.player_id))) || {nick: null}).nick, score: re.score};}))});
+        ranking: await Promise.all(ranking.map( async function(re) { return {player:(((await dbi.getProfile(re.player_id))) || {nick: null}).nick, score: re.score, position: re.position};}))});
     } catch (error) {
         console.log(error);
         next(error);
@@ -139,7 +153,7 @@ async function getMyPositionInRank(player_id, rank, dbi) {
     for (const index in rank) {
         const rankEntry = rank[index]
         if (rankEntry.player_id === player_id) {
-            return {position: parseInt(index) + 1, score: rankEntry.score, nick: (((await dbi.getProfile(player_id)))|| {nick: null}).nick}
+            return {position: rankEntry.position, score: rankEntry.score, nick: (((await dbi.getProfile(player_id)))|| {nick: null}).nick}
         }
     }
     return null;
