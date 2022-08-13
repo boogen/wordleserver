@@ -151,8 +151,8 @@ class WordleDBI {
         return this.global_bee().findOne({validity:{$gt: timestamp}});
     }
 
-    getBeeWords(bee_model_id) {
-        return (await this.bees()/findOne({id: bee_model_id}).words)
+    async getBeeWords(bee_model_id) {
+        return (await this.bees().findOne({id: bee_model_id})).words
     }
 
     async createLettersForBee(validityTimestamp) {
