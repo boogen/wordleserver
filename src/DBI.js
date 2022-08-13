@@ -177,6 +177,13 @@ class WordleDBI {
         return rank.findOneAndUpdate({player_id: player_id}, {$inc:{score: points}}, {upsert:true})
     }
 
+    async getBeePlayerPoints(player_id, bee_id) {
+        const rank =  this.db().get("bee#" + bee_id + "_ranking");
+        rank.createIndex({player_id: 1})
+        rank.createIndex({score: 1});
+        return (await rank.findOne({player_id: player_id})).points
+    }
+
     async getBeeRanking(bee_id) {
 	console.log(bee_id)
         const rank =  this.db().get("bee#" + bee_id + "_ranking");

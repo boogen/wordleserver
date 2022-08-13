@@ -28,14 +28,13 @@ function wordPoints(word, letters) {
     if (word.length == 4) {
         return 1
     }
-    return word.length
-    // var points = word.length - 3;
-    // for (var letter in letters) {
-    //     if (!word.includes(letter)) {
-    //         return points;
-    //     }
-    // }
-    // return points + 7;
+    var points = word.length;
+    for (var letter in letters) {
+        if (!word.includes(letter)) {
+            return points;
+        }
+    }
+    return points + 7;
 }
 
 
@@ -65,7 +64,8 @@ router.post('/getState', async (req, res, next) => {
             main_letter: letters.mainLetter,
             other_letters: letters.letters,
             guessed_words: guesses,
-            maxPoints:getMaxPoints(dbi.getBeeWords(letters.bee_model_id))
+            max_points:getMaxPoints(dbi.getBeeWords(letters.bee_model_id)),
+            player_points:(await dbi.getBeePlayerPoints(player_id, letters.bee_id))
         })
     } catch (error) {
         console.log(error);
@@ -94,7 +94,8 @@ router.post('/guess', async (req, res, next) => {
                 main_letter: letters.mainLetter,
                 other_letters: letters.letters,
                 guessed_words: guesses,
-                maxPoints:getMaxPoints(dbi.getBeeWords(letters.bee_model_id))
+                max_points:getMaxPoints(dbi.getBeeWords(letters.bee_model_id)),
+                player_points:(await dbi.getBeePlayerPoints(player_id, letters.bee_id))
             })
             return;
         }
@@ -104,7 +105,8 @@ router.post('/guess', async (req, res, next) => {
                 main_letter: letters.mainLetter,
                 other_letters: letters.letters,
                 guessed_words: guesses,
-                maxPoints:getMaxPoints(dbi.getBeeWords(letters.bee_model_id))
+                max_points:getMaxPoints(dbi.getBeeWords(letters.bee_model_id)),
+                player_points:(await dbi.getBeePlayerPoints(player_id, letters.bee_id))
             })
             return
         }
@@ -117,7 +119,8 @@ router.post('/guess', async (req, res, next) => {
             other_letters: letters.letters,
             pointsForWord: points,
             guessed_words: state.guesses,
-            maxPoints:getMaxPoints(dbi.getBeeWords(letters.bee_model_id))
+            max_points:getMaxPoints(dbi.getBeeWords(letters.bee_model_id)),
+            player_points:(await dbi.getBeePlayerPoints(player_id, letters.bee_id))
         })
     } catch (error) {
         console.log(error);
