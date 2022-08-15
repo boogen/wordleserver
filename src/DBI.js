@@ -260,10 +260,7 @@ class WordleDBI {
     }
 
     async getRanking(word_id) {
-        const rank =  this.db().get("word#" + word_id + "_ranking");
-        rank.createIndex({player_id: 1})
-        rank.createIndex({score: 1});
-        return rank.find({}, {sort: {score:1, time: 1}, limit:100})
+        return await this.getRanking("word", word_id);
     }
 
     async getRankingWithFilter(word_id, friends) {
@@ -276,8 +273,8 @@ class WordleDBI {
     //RANK COMMON
 
 
-    async getRanking(rank_type, bee_id) {
-        const rank =  this.db().get(rank_type + "#" + bee_id + "_ranking");
+    async getRanking(rank_type, id) {
+        const rank =  this.db().get(rank_type + "#" + id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
 
