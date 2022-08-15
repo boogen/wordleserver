@@ -117,7 +117,7 @@ router.post('/ranking', async (req, res, next) => {
         const ranking = await dbi.getWordleRanking(wordEntry.word_id)
         res.json({message:'ok',
         myInfo:await getMyPositionInRank(player_id, ranking, dbi),
-        ranking: await Promise.all(ranking.map( async function(re) { return {player:(((await dbi.getProfile(re.player_id))) || {nick: null}).nick, score: re.score};}))});
+        ranking: await Promise.all(ranking.map( async function(re) { return {player:(((await dbi.getProfile(re.player_id))) || {nick: null}).nick, score: re.score, position: re.position};}))});
     }
     catch (error) {
         console.log(error);
