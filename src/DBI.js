@@ -291,7 +291,7 @@ class WordleDBI {
         else {
             scoreSelector = {$lt: score100}
         }
-        const rawRank = await rank.find({}, {sort: {score:sort}, score: {$gt: score100}})
+        const rawRank = await rank.find({}, {sort: {score:sort}, score: scoreSelector})
         var returnValue = []
         var position = 0
         var score = 0
