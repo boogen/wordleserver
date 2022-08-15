@@ -111,6 +111,7 @@ router.post('/ranking', async (req, res, next) => {
         console.log(player_id)
         const timestamp = Date.now() / 1000;
         const wordEntry = await dbi.getGlobalWord(timestamp);
+        console.log(wordEntry)
         if (wordEntry === null) {
             res.json({message: 'ok', ranking:[]})
             return
