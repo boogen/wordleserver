@@ -181,7 +181,11 @@ class WordleDBI {
         const rank =  this.db().get("bee#" + bee_id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
-        return (await rank.findOne({player_id: player_id})).points
+        const pointsFromRank = (await rank.findOne({player_id: player_id}))
+	if (pointsFromRank === null) {
+	    return 0
+	}
+	return pointsFromRank.score
     }
 
     async getBeeRanking(bee_id) {
@@ -192,6 +196,10 @@ class WordleDBI {
 
         const score100Array = await rank.aggregate([{ $sample: { size: 1 } }])
 
+	if (score100Array.length == 0) {
+	    return []
+	}
+	
         var score100 = score100Array[score100Array.length - 1].score
         const rawRank = await rank.find({}, {sort: {score:-1}, score: {$gt: score100}})
         var returnValue = []
