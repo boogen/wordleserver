@@ -19,7 +19,7 @@ const guessSchema = joi.object({
 function getMaxPoints(words, letters) {
     var sum = 0;
     for (var word of words) {
-        sum += wordPoints(word)
+        sum += wordPoints(word, letters)
     }
     return sum
 }
