@@ -273,7 +273,7 @@ class WordleDBI {
     //RANK COMMON
 
 
-    async getRanking(rank_type, id) {
+    async getRanking(rank_type, id, sort) {
         const rank =  this.db().get(rank_type + "#" + id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
@@ -285,7 +285,13 @@ class WordleDBI {
         }
         
         var score100 = score100Array[score100Array.length - 1].score
-        const rawRank = await rank.find({}, {sort: {score:-1}, score: {$gt: score100}})
+        if (sort == -1) {
+            scoreSelector = {$gt: score100}
+        }
+        else {
+            scoreSelector = {$lt: score100}
+        }
+        const rawRank = await rank.find({}, {sort: {score:sort}, score: {$gt: score100}})
         var returnValue = []
         var position = 0
         var score = 0
