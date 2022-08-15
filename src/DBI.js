@@ -259,7 +259,7 @@ class WordleDBI {
         return rank.findOneAndUpdate({player_id: player_id}, {$setOnInsert:{score: tries, time: timestamp}}, {upsert:true})
     }
 
-    async getRanking(word_id) {
+    async getWordleRanking(word_id) {
         const rank =  this.db().get("word#" + word_id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
