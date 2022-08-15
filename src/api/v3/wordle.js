@@ -108,10 +108,10 @@ router.post('/ranking', async (req, res, next) => {
     try {
         const value = await authIdSchema.validateAsync(req.body);
         const player_id = await dbi.resolvePlayerId(value.authId);
-        console.log(player_id)
+        console.log(player_id + " " + timestamp)
         const timestamp = Date.now() / 1000;
         const wordEntry = await dbi.getGlobalWord(timestamp);
-        console.log(wordEntry)
+        console.log("entry: " + wordEntry)
         if (wordEntry === null) {
             res.json({message: 'ok', ranking:[]})
             return
