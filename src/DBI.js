@@ -189,7 +189,7 @@ class WordleDBI {
         }
 
     async getBeeRanking(bee_id) {
-        return await this.getRanking("bee", bee_id, -1);
+        return await this.getRanking("bee", bee_id);
     }
 
 
@@ -260,7 +260,15 @@ class WordleDBI {
     }
 
     async getRanking(word_id) {
-        return await this.getRanking("word", word_id, 1);
+        const rank =  this.db().get("word#" + word_id + "_ranking");
+        rank.createIndex({player_id: 1})
+        rank.createIndex({score: 1});
+        var rawRank = rank.find({}, {sort: {score:1, time: 1}, limit:100})
+        var position = 0
+        for (var entry of rawRank) {
+            position += 1
+            returnValue.push({score: entry.score, position: position, player_id: entry.player_id})
+        }
     }
 
     async getRankingWithFilter(word_id, friends) {
@@ -273,25 +281,19 @@ class WordleDBI {
     //RANK COMMON
 
 
-    async getRanking(rank_type, id, sort) {
-        const rank =  this.db().get(rank_type + "#" + id + "_ranking");
+    async getRanking(rank_type, bee_id) {
+        const rank =  this.db().get(rank_type + "#" + bee_id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
 
-        const score100Array = await rank.aggregate([{ $sample: { size: 100 } }])
+        const score100Array = await rank.aggregate([{ $sample: { size: 1 } }])
 
         if (score100Array.length == 0) {
             return []
         }
         
         var score100 = score100Array[score100Array.length - 1].score
-        if (sort == -1) {
-            scoreSelector = {$gt: score100}
-        }
-        else {
-            scoreSelector = {$lt: score100}
-        }
-        const rawRank = await rank.find({}, {sort: {score:sort}, score: scoreSelector})
+        const rawRank = await rank.find({}, {sort: {score:-1}, score: {$gt: score100}})
         var returnValue = []
         var position = 0
         var score = 0
