@@ -278,7 +278,7 @@ class WordleDBI {
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
 
-        const score100Array = await rank.aggregate([{ $sample: { size: 1 } }])
+        const score100Array = await rank.aggregate([{ $sample: { size: 100 } }])
 
         if (score100Array.length == 0) {
             return []
