@@ -189,7 +189,7 @@ class WordleDBI {
         }
 
     async getBeeRanking(bee_id) {
-        return await this.getRanking("bee", bee_id);
+        return await this.getRanking("bee", bee_id, -1);
     }
 
 
@@ -260,7 +260,7 @@ class WordleDBI {
     }
 
     async getRanking(word_id) {
-        return await this.getRanking("word", word_id);
+        return await this.getRanking("word", word_id, 1);
     }
 
     async getRankingWithFilter(word_id, friends) {
