@@ -264,6 +264,7 @@ class WordleDBI {
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
         var rawRank = rank.find({}, {sort: {score:1, time: 1}, limit:100})
+        console.log(rawRank)
         var returnValue = []
         var position = 0
         for (var entry of rawRank) {
