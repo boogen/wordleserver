@@ -264,11 +264,13 @@ class WordleDBI {
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
         var rawRank = rank.find({}, {sort: {score:1, time: 1}, limit:100})
+        var returnValue = []
         var position = 0
         for (var entry of rawRank) {
             position += 1
             returnValue.push({score: entry.score, position: position, player_id: entry.player_id})
         }
+        return returnValue
     }
 
     async getRankingWithFilter(word_id, friends) {
