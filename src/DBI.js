@@ -182,39 +182,14 @@ class WordleDBI {
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
         const pointsFromRank = (await rank.findOne({player_id: player_id}))
-	if (pointsFromRank === null) {
-	    return 0
-	}
-	return pointsFromRank.score
-    }
+        if (pointsFromRank === null) {
+            return 0
+        }
+        return pointsFromRank.score
+        }
 
     async getBeeRanking(bee_id) {
-	console.log(bee_id)
-        const rank =  this.db().get("bee#" + bee_id + "_ranking");
-        rank.createIndex({player_id: 1})
-        rank.createIndex({score: 1});
-
-        const score100Array = await rank.aggregate([{ $sample: { size: 1 } }])
-
-	if (score100Array.length == 0) {
-	    return []
-	}
-	
-        var score100 = score100Array[score100Array.length - 1].score
-        const rawRank = await rank.find({}, {sort: {score:-1}, score: {$gt: score100}})
-        var returnValue = []
-        var position = 0
-        var score = 0
-	console.log(rawRank)
-        for (var entry of rawRank) {
-            if (score != entry.score) {
-                score = entry.score
-                position += 1
-            }
-            returnValue.push({score: score, position: position, player_id: entry.player_id})
-        }
-        return returnValue;
-
+        return await this.getRanking("bee", bee_id);
     }
 
 
@@ -297,6 +272,37 @@ class WordleDBI {
         rank.createIndex({score: 1});
         return rank.find({playerId:{$in: friends}}, {sort: {score:1, time: 1}, limit:100})
     }
+
+    //RANK COMMON
+
+
+    async getRanking(rank_type, bee_id) {
+        const rank =  this.db().get(rank_type + "#" + bee_id + "_ranking");
+        rank.createIndex({player_id: 1})
+        rank.createIndex({score: 1});
+
+        const score100Array = await rank.aggregate([{ $sample: { size: 1 } }])
+
+        if (score100Array.length == 0) {
+            return []
+        }
+        
+        var score100 = score100Array[score100Array.length - 1].score
+        const rawRank = await rank.find({}, {sort: {score:-1}, score: {$gt: score100}})
+        var returnValue = []
+        var position = 0
+        var score = 0
+        for (var entry of rawRank) {
+            if (score != entry.score) {
+                score = entry.score
+                position += 1
+            }
+            returnValue.push({score: score, position: position, player_id: entry.player_id})
+        }
+        return returnValue;
+
+    }
+
 
     //CROSSWORD
 
