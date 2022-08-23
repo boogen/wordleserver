@@ -156,8 +156,8 @@ class WordleDBI {
     }
 
     async createLettersForBee(validityTimestamp) {
-        var bee = (await this.bees().aggregate([{ $sample: { size: 1 } }]))[0]
         const bee_id = await this.getNextSequenceValue("global_bee");
+        var bee = (await this.bees().findOne({id: bee_id}))
         return this.global_bee().insert({validity: validityTimestamp, mainLetter: bee.main_letter, letters: bee.other_letters, bee_id: bee_id, bee_model_id: bee.id})
     }
 
