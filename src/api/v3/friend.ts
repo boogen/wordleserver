@@ -1,23 +1,17 @@
-const express = require('express');
-const joi = require('@hapi/joi');
+import express from 'express';
+import utils from '../../utils';
+import Sentry from '@sentry/node';
+import WordleDBI from '../../DBI';
+import AuthIdRequest from '../../types/AuthIdRequest';
+import AddFriendRequest from '../../types/AddFriendRequest';
+
 const router = express.Router();
-const { id } = require('@hapi/joi/lib/base');
-const dbi = require('../../DBI.js').createDBI();
-const utils = require('./utils');
-const Sentry = require('@sentry/node');
+const dbi = new WordleDBI();
 
-const addFriendSchema = joi.object({
-    authId: joi.string().trim().required(),
-    friendCode: joi.string().trim().required()
-});
-
-const authIdSchema = joi.object({
-    authId: joi.string().trim().required()
-});
 
 router.post('/code', async (req, res, next) => {
     try {
-        const value = await authIdSchema.validateAsync(req.body);
+        const value = new AuthIdRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
         var friend_code = null;
         var generated_friend_code = null;
@@ -39,7 +33,7 @@ router.post('/code', async (req, res, next) => {
 
 router.post('/add', async (req, res, next) => {
     try {
-        const value = await addFriendSchema.validateAsync(req.body);
+        const value = new AddFriendRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
         if (await dbi.addFriend(player_id, value.friendCode)) {
             res.json({
@@ -61,7 +55,7 @@ router.post('/add', async (req, res, next) => {
 
 router.post('/list', async (req, res, next) => {
     try {
-        const value = await authIdSchema.validateAsync(req.body);
+        const value =new AuthIdRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
         var friendList = await dbi.friendList(player_id);
         res.json({

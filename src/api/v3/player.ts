@@ -1,22 +1,16 @@
-const express = require('express');
-const joi = require('@hapi/joi');
+import express from 'express';
+import Sentry from '@sentry/node';
+import AuthIdRequest from '../../types/AuthIdRequest';
+import SetNickRequest from '../../types/SetNickRequest';
+import Utils from '../../utils';
+import WordleDBI from '../../DBI';
+
 const router = express.Router();
-const { id } = require('@hapi/joi/lib/base');
-const dbi = require('../../DBI.js').createDBI();
-const utils = require('./utils');
-var geoip = require('geoip-lite');
-const Sentry = require('@sentry/node');
-const setNickSchema = joi.object({
-    authId: joi.string().trim().required(),
-    nick: joi.string().trim().required()
-});
 
-const authIdSchema = joi.object({
-    authId: joi.string().trim().required()
-});
+const dbi = new WordleDBI();
 
-function makeid() {
-    return utils.randomString(36);
+function makeid():string {
+    return Utils.randomString(36);
 }
 
 router.post("/register", async (req, res, next) => {
@@ -38,12 +32,12 @@ router.post("/register", async (req, res, next) => {
 
 router.post("/setNick", async (req, res, next) => {
     try {
-        const value = await setNickSchema.validateAsync(req.body);
+        const value = new SetNickRequest(req);
         console.log(value.authId)
-        const player_id = await dbi.resolvePlayerId(value.authId);
+        const player_id:number = (await dbi.resolvePlayerId(value.authId));
 
-        const profile = await dbi.setNick(player_id, value.nick)
-        res.json({message:'ok', profile: {nick: profile.nick}})
+        dbi.setNick(player_id, value.nick, (nick:string) => res.json({message:'ok', profile: {nick: nick}}));
+        
     }
     catch(error) {
         console.log(error);
@@ -52,9 +46,9 @@ router.post("/setNick", async (req, res, next) => {
     }
 });
 
-router.post("/getProfile", async (req, res, next) => {
+router.post("/getProfile", async (req:express.Request, res:express.Response, next) => {
     try {
-        const value = await authIdSchema.validateAsync(req.body);
+        const value = new AuthIdRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
         const profile = await dbi.getProfile(player_id);
         if (profile === null) {

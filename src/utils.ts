@@ -1,5 +1,5 @@
-class Utils {
-    static randomString(length) {
+export default class Utils {
+    static randomString(length:number):string {
         var text = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     
@@ -9,5 +9,3 @@ class Utils {
         return text;
     }
 }
-
-module.exports = Utils;

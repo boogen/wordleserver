@@ -1,4 +1,5 @@
-const express = require('express');
+import express, {Request,Response,Application} from 'express';
+
 const morgan = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -7,10 +8,10 @@ const Sentry = require('@sentry/node');
 require('dotenv').config();
 Sentry.init({dsn: process.env.sentry_dsn});
 
-const middlewares = require('./middlewares');
-const api = require('./api/v1');
-const apiv2 = require('./api/v2');
-const apiv3 = require('./api/v3');
+const middlewares = require('../out/middlewares');
+const api = require('../out/api/v1');
+const apiv2 = require('../out/api/v2');
+const apiv3 = require('../out/api/v3');
 
 const app = express();
 
@@ -19,13 +20,13 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
+app.get('/', (req:Request, res:Response) => {
   res.json({
     message: '🦄🌈✨👋🌎🌍🌏✨🌈🦄'
   });
 });
 
-app.get("/error", (req, res) => {
+app.get("/error", (req:Request, res:Response) => {
   try {
     throw "aaa";
   }
