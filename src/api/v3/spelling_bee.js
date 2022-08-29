@@ -110,6 +110,30 @@ router.post('/guess', async (req, res, next) => {
             })
             return
         }
+        if (!word.includes(letters.mainLetter)) {
+            res.json({
+                message: 'no_main_letter',
+                main_letter: letters.mainLetter,
+                other_letters: letters.letters,
+                guessed_words: guesses,
+                max_points:getMaxPoints((await dbi.getBeeWords(letters.bee_model_id)), letters.letters),
+                player_points:(await dbi.getBeePlayerPoints(player_id, letters.bee_id))
+            })
+            return
+        }
+        for (singleLetter of word) {
+            if (singleLetter != letters.mainLetter && !letters.letters.includes(singleLetter)) {
+                res.json({
+                    message: 'invalid_letter_used',
+                    main_letter: letters.mainLetter,
+                    other_letters: letters.letters,
+                    guessed_words: guesses,
+                    max_points:getMaxPoints((await dbi.getBeeWords(letters.bee_model_id)), letters.letters),
+                    player_points:(await dbi.getBeePlayerPoints(player_id, letters.bee_id))
+                })
+                return
+            }
+        }
         state = await dbi.addBeeGuess(player_id, letters.bee_id, guess)
         var points = wordPoints(guess, letters.letters)
         await dbi.increaseBeeRank(player_id, letters.bee_id, points)

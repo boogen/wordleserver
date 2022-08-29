@@ -149,7 +149,7 @@ class WordleDBI {
     }
 
     async wordExists(word, bee_model_id) {
-        return (await this.bees().findOne({id: bee_model_id})).words.includes(word)// || this.existsInFallback(word)
+        return (await this.bees().findOne({id: bee_model_id})).words.includes(word) || this.existsInFallback(word)
     }
 
     async getLettersForBee(timestamp) {
