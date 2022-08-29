@@ -1,5 +1,5 @@
-const app = require('../out/app');
-require('../out/cron')
+import {app} from "./app"
+require('./cron')
 const port = process.env.PORT || 5000;
 
 app.listen(port, () => {

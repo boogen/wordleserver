@@ -5,11 +5,11 @@ import WordleDBI from '../../DBI';
 import AuthIdRequest from '../../types/AuthIdRequest';
 import AddFriendRequest from '../../types/AddFriendRequest';
 
-const router = express.Router();
+export const friend = express.Router();
 const dbi = new WordleDBI();
 
 
-router.post('/code', async (req, res, next) => {
+friend.post('/code', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
@@ -31,7 +31,7 @@ router.post('/code', async (req, res, next) => {
     }
 })
 
-router.post('/add', async (req, res, next) => {
+friend.post('/add', async (req, res, next) => {
     try {
         const value = new AddFriendRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
@@ -53,7 +53,7 @@ router.post('/add', async (req, res, next) => {
     }
 })
 
-router.post('/list', async (req, res, next) => {
+friend.post('/list', async (req, res, next) => {
     try {
         const value =new AuthIdRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
@@ -69,5 +69,3 @@ router.post('/list', async (req, res, next) => {
         Sentry.captureException(error);
     }
 })
-
-module.exports = router;

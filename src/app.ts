@@ -1,19 +1,17 @@
 import express, {Request,Response,Application} from 'express';
 
-const morgan = require('morgan');
-const helmet = require('helmet');
-const cors = require('cors');
-const Sentry = require('@sentry/node');
+import morgan from 'morgan';
+import helmet from 'helmet';
+import cors from 'cors';
+// import Sentry from '@sentry/node';
 
 require('dotenv').config();
-Sentry.init({dsn: process.env.sentry_dsn});
+// Sentry.init({dsn: process.env.sentry_dsn});
 
-const middlewares = require('../out/middlewares');
-const api = require('../out/api/v1');
-const apiv2 = require('../out/api/v2');
-const apiv3 = require('../out/api/v3');
+import {notFound, errorHandler} from './middlewares';
+import { apiV3 } from './api/v3';
 
-const app = express();
+export const app = express();
 
 app.use(morgan('dev'));
 app.use(helmet());
@@ -31,17 +29,14 @@ app.get("/error", (req:Request, res:Response) => {
     throw "aaa";
   }
   catch (error) {
-    Sentry.captureException(error);
+    // Sentry.captureException(error);
   };
   res.status(500);
   res.send("error");
 });
 
-app.use('/api/v1', api);
-app.use('/api/v2', apiv2);
-app.use('/api/v3', apiv3)
+app.use('/api/v3', apiV3)
 
-app.use(middlewares.notFound);
-app.use(middlewares.errorHandler);
+app.use(notFound);
+app.use(errorHandler);
 
-module.exports = app;

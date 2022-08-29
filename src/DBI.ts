@@ -14,7 +14,7 @@ export class PlayerWord {
 }
 
 export class PlayerTries {
-    constructor(public id:number, public word_id: number, public guesses: string[], public id_?: ObjectId) {}
+    constructor(public id:number, public word_id: number, public guesses: string[], public start_timestamp:number, public id_?: ObjectId) {}
 }
 
 export class PlayerAuth {
@@ -42,15 +42,19 @@ export class CrosswordWord {
 }
 
 export class PossibleCrossword {
-    constructor(public crossword_id: number, public word_list: CrosswordWord, public letter_grid: String[][], public id?: ObjectId) {}
+    constructor(public crossword_id: number, public word_list: CrosswordWord[], public letter_grid: String[][], public id?: ObjectId) {}
 }
 
 export class PlayerCrosswordState {
-    constructor(public player_id: number, public crossword_id: number, public grid: String[][], public guessed_words:string[], public tries:number, public words:string[], public id?: ObjectId) {}
+    constructor(public player_id: number, public crossword_id: number, public grid: String[][], public guessed_words:string[], public tries:string[], public words:string[], public id?: ObjectId) {}
 }
 
 export class GlobalBee {
-    constructor(public bee_id:number, public bee_model_id: number, public validity: number, public letters:string[], public main_letter?:string, mainLetter?:string, public id?: ObjectId) {
+    public main_letter:string = "";
+    constructor(public bee_id:number, public bee_model_id: number, public validity: number, public letters:string[], main_letter?:string, mainLetter?:string, public id?: ObjectId) {
+        if (main_letter !== undefined) {
+            this.main_letter = main_letter;
+        }
         if (mainLetter !== undefined) {
             this.main_letter = mainLetter;
         }
@@ -65,8 +69,14 @@ export class GuessedWordsBee {
     }
 }
 
-export class RankingEntry {
+export class RawRankingEntry {
     constructor(public player_id:number, public score:number, public id?:ObjectId){};
+}
+
+export class RankingEntry extends RawRankingEntry {
+    constructor(public player_id:number, public score:number, public position:number, public id?:ObjectId){
+        super(player_id, score, id);
+    };
 }
 
 export class Bee {
@@ -74,58 +84,42 @@ export class Bee {
 }
 
 const _db:IMonkManager = monk(process.env.MONGO_URI!);
-const _words:ICollection<Word> = _db.get("words");
-const _player_word:ICollection<PlayerWord> = _db.get("player_word");
-const _possible_words:ICollection<Word> = _db.get("possible_words")
-const _player_tries:ICollection<PlayerTries> = _db.get("player_tries")
-const _player_challenge_tries:ICollection<PlayerTries> = _db.get("player_challenge_tries")
-const _player_auth:ICollection<PlayerAuth> = _db.get("player_auth")
-const _counters:ICollection<Counter> = _db.get("counters")
-const _friend_codes:ICollection<FriendCode> = _db.get("friend_codes")
-const _player_profile:ICollection<PlayerProfile> = _db.get("player_profile")
-const _global_word:ICollection<GlobalWord> = _db.get("global_word")
-const _possible_crosswords:ICollection<PossibleCrossword> = _db.get("possible_crosswords")
-const _player_crossword_state:ICollection<PlayerCrosswordState> = _db.get("player_crossword_state")
-const _global_bee:ICollection<GlobalBee> = _db.get("global_bee")
-const _guessed_words_bee:ICollection<GuessedWordsBee> = _db.get("guessed_words_bee")
-const _bees:ICollection<Bee> = _db.get("bees")
-const _extra_bee_words:ICollection<Word> = _db.get("extra_bee_words");
 
 export default class WordleDBI {
     db() { return _db;}
-    words() { return _words}
-    player_word() { return _player_word}
-    possible_words() { return _possible_words}
-    player_tries() { return _player_tries}
-    player_challenge_tries() { return _player_challenge_tries}
-    player_auth() { return _player_auth}
-    counters() { return _counters}
-    friend_codes() {return _friend_codes}
-    player_profile() {return _player_profile}
-    global_word() {return _global_word}
-    possible_crosswords() {return _possible_crosswords}
-    player_crossword_state() {return _player_crossword_state}
-    global_bee() { return _global_bee}
-    guessed_words_bee() { return _guessed_words_bee}
-    bees() {return _bees}
-    extra_bee_words() {return _extra_bee_words}
+    words():ICollection<Word> { return _db.get("words")}
+    player_word():ICollection<PlayerWord> { return _db.get("player_word")}
+    possible_words():ICollection<Word> { return  _db.get("possible_words")}
+    player_tries():ICollection<PlayerTries> { return _db.get("player_tries")}
+    player_challenge_tries():ICollection<PlayerTries> { return _db.get("player_challenge_tries")}
+    player_auth():ICollection<PlayerAuth> { return _db.get("player_auth")}
+    counters():ICollection<Counter> { return  _db.get("counters") }
+    friend_codes():ICollection<FriendCode> {return _db.get("friend_codes")}
+    player_profile():ICollection<PlayerProfile> {return _db.get("player_profile")}
+    global_word():ICollection<GlobalWord> {return _db.get("global_word")}
+    possible_crosswords():ICollection<PossibleCrossword> {return _db.get("possible_crosswords")}
+    player_crossword_state():ICollection<PlayerCrosswordState> {return _db.get("player_crossword_state")}
+    global_bee():ICollection<GlobalBee> { return _db.get("global_bee")}
+    guessed_words_bee():ICollection<GuessedWordsBee> { return _db.get("guessed_words_bee")}
+    bees():ICollection<Bee> {return _db.get("bees")}
+    extra_bee_words():ICollection<Word> {return _db.get("extra_bee_words")}
 
     constructor() {
-        _friend_codes.createIndex({friend_code: 1}, {unique:true})
-        _friend_codes.createIndex({player_id: 1}, {unique:true})
-        _player_word.createIndex({word_id: 1}),
-        _player_auth.createIndex({auth_id: 1}, {unique: true});
-        _player_profile.createIndex({id: 1}, {unique: true});
-        _global_word.createIndex({validity: 1}, {unique: true});
-        _global_word.createIndex({word_id : 1}, {unique: true});
+        this.friend_codes().createIndex({friend_code: 1}, {unique:true})
+        this.friend_codes().createIndex({player_id: 1}, {unique:true})
+        this.player_word().createIndex({word_id: 1}),
+        this.player_auth().createIndex({auth_id: 1}, {unique: true});
+        this.player_profile().createIndex({id: 1}, {unique: true});
+        this.global_word().createIndex({validity: 1}, {unique: true});
+        this.global_word().createIndex({word_id : 1}, {unique: true});
 //        _player_tries.createIndex({word_id:1, id: 1}, {unique: true});
-        _player_challenge_tries.createIndex({word_id:1, id:1}, {unique: true});
-        _player_crossword_state.createIndex({player_id: 1}, {unique: true});
-        _global_bee.createIndex({validity: 1}, {unique: true});
-        _global_bee.createIndex({bee_id: 1}, {unique: true})
-        _guessed_words_bee.createIndex({player_id:1, bee_id:1}, {unique: true})
-        _bees.createIndex({id:1}, {unique: true});
-        _extra_bee_words.createIndex({word: 1}, {unique: true})
+        this.player_challenge_tries().createIndex({word_id:1, id:1}, {unique: true});
+        this.player_crossword_state().createIndex({player_id: 1}, {unique: true});
+        this.global_bee().createIndex({validity: 1}, {unique: true});
+        this.global_bee().createIndex({bee_id: 1}, {unique: true})
+        this.guessed_words_bee().createIndex({player_id:1, bee_id:1}, {unique: true})
+        this.bees().createIndex({id:1}, {unique: true});
+        this.extra_bee_words().createIndex({word: 1}, {unique: true})
     }
 
     //SEQ
@@ -268,7 +262,7 @@ export default class WordleDBI {
         return pointsFromRank.score
         }
 
-    async getBeeRanking(bee_id:number) {
+    async getBeeRanking(bee_id:number):Promise<RankingEntry[]> {
         return await this.getRanking("bee", bee_id);
     }
 
@@ -288,7 +282,7 @@ export default class WordleDBI {
     }
 
     async getPlayerTries(player_id:number, word_id:number, timestamp:number):Promise<FindOneResult<PlayerTries>> {
-        return this.player_tries().findOneAndUpdate({id:player_id, word_id:word_id}, {$setOnInsert:new PlayerTries(player_id, word_id, [])}, {upsert:true});
+        return this.player_tries().findOneAndUpdate({id:player_id, word_id:word_id}, {$setOnInsert:new PlayerTries(player_id, word_id, [], timestamp)}, {upsert:true});
     }
 
     async getPlayerTriesForWord(player_id:number, word_id:number):Promise<FindOneResult<PlayerTries>> {
@@ -353,7 +347,7 @@ export default class WordleDBI {
         return returnValue
     }
 
-    async getRankingWithFilter(word_id:number, friends:string[]) {
+    async getRankingWithFilter(word_id:number, friends:number[]) {
         const rank =  this.db().get("word#" + word_id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
@@ -363,8 +357,8 @@ export default class WordleDBI {
     //RANK COMMON
 
 
-    async getRanking(rank_type:string, bee_id:number) {
-        const rank:ICollection<RankingEntry> =  this.db().get(rank_type + "#" + bee_id + "_ranking");
+    async getRanking(rank_type:string, bee_id:number):Promise<RankingEntry[]> {
+        const rank:ICollection<RawRankingEntry> =  this.db().get(rank_type + "#" + bee_id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
 
@@ -376,7 +370,7 @@ export default class WordleDBI {
         
         var score100:number = score100Array[score100Array.length - 1].score
         const rawRank = await rank.find({sort: {score:-1}, score: {$gt: score100}})
-        var returnValue = []
+        var returnValue:RankingEntry[] = []
         var position = 0
         var score = 0
         for (var entry of rawRank) {
@@ -384,7 +378,7 @@ export default class WordleDBI {
                 score = entry.score
                 position += 1
             }
-            returnValue.push({score: score, position: position, player_id: entry.player_id})
+            returnValue.push(new RankingEntry(entry.player_id, entry.score, position, entry.id))
         }
         return returnValue;
 
@@ -404,7 +398,7 @@ export default class WordleDBI {
         }
     }
 
-    async setCrosswordState(player_id:number, words:string[], guessed_words:string[], grid:string[][], crossword_id:number, tries:number):Promise<FindOneResult<PlayerCrosswordState>> {
+    async setCrosswordState(player_id:number, words:string[], guessed_words:string[], grid:String[][], crossword_id:number, tries:string[]):Promise<FindOneResult<PlayerCrosswordState>> {
         try {
             return this.player_crossword_state().findOneAndUpdate({player_id: player_id}, {$set:new PlayerCrosswordState(player_id, crossword_id, grid, guessed_words, tries, words)}, {upsert: true});
         }
