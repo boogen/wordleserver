@@ -1,3 +1,4 @@
+const { exist } = require('@hapi/joi');
 const { entry } = require('@hapi/joi/lib/validator');
 const monk = require('monk');
 const _db = monk(process.env.MONGO_URI);
@@ -143,8 +144,12 @@ class WordleDBI {
 
     //BEE
 
+    async existsInFallback(word) {
+        return this.db.get("bees_fallback").findOne({word:word}).then(value => {return value != null});
+    }
+
     async wordExists(word, bee_model_id) {
-        return (await this.bees().findOne({id: bee_model_id})).words.includes(word);
+        return (await this.bees().findOne({id: bee_model_id})).words.includes(word) || existsInFallback(word);
     }
 
     async getLettersForBee(timestamp) {
