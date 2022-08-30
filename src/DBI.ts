@@ -62,7 +62,7 @@ export class GlobalBee {
 }
 
 export class GuessedWordsBee {
-    constructor(public bee_id:number, public guesses:String[], public player_id?:number, playerId?:number, public id?: ObjectId) {
+    constructor(public bee_id:number, public guesses:string[], public player_id?:number, playerId?:number, public id?: ObjectId) {
         if (playerId !== undefined) {
             this.player_id = playerId;
         }
@@ -97,7 +97,7 @@ export default class WordleDBI {
     friend_codes():ICollection<FriendCode> {return _db.get("friend_codes")}
     player_profile():ICollection<PlayerProfile> {return _db.get("player_profile")}
     global_word():ICollection<GlobalWord> {return _db.get("global_word")}
-    possible_crosswords():ICollection<PossibleCrossword> {return _db.get("possible_crosswords")}
+    possible_crosswords():ICollection<PossibleCrossword> {return _db.get("possible_crosswords_v2")}
     player_crossword_state():ICollection<PlayerCrosswordState> {return _db.get("player_crossword_state")}
     global_bee():ICollection<GlobalBee> { return _db.get("global_bee")}
     guessed_words_bee():ICollection<GuessedWordsBee> { return _db.get("guessed_words_bee")}
