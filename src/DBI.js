@@ -2,55 +2,42 @@ const { exist } = require('@hapi/joi');
 const { entry } = require('@hapi/joi/lib/validator');
 const monk = require('monk');
 const _db = monk(process.env.MONGO_URI);
-const _words = _db.get("words");
-const _player_word = _db.get("player_word");
-const _possible_words = _db.get("possible_words")
-const _player_tries = _db.get("player_tries")
-const _player_challenge_tries = _db.get("player_challenge_tries")
-const _player_auth = _db.get("player_auth")
-const _counters = _db.get("counters")
-const _friend_codes = _db.get("friend_codes")
-const _player_profile = _db.get("player_profile")
-const _global_word = _db.get("global_word")
-const _possible_crosswords = _db.get("possible_crosswords")
-const _player_crossword_state = _db.get("player_crossword_state")
-const _global_bee = _db.get("global_bee")
-const _guessed_words_bee = _db.get("guessed_words_bee")
-const _bees = _db.get("bees")
 
 class WordleDBI {
     db() { return _db;}
-    words() { return _words}
-    player_word() { return _player_word}
-    possible_words() { return _possible_words}
-    player_tries() { return _player_tries}
-    player_challenge_tries() { return _player_challenge_tries}
-    player_auth() { return _player_auth}
-    counters() { return _counters}
-    friend_codes() {return _friend_codes}
-    player_profile() {return _player_profile}
-    global_word() {return _global_word}
-    possible_crosswords() {return _possible_crosswords}
-    player_crossword_state() {return _player_crossword_state}
-    global_bee() { return _global_bee}
-    guessed_words_bee() { return _guessed_words_bee}
-    bees() {return _bees}
+    words() { return _db.get("words")}
+    player_word() { return _db.get("player_word")}
+    possible_words()  { return  _db.get("possible_words")}
+    player_tries()  { return _db.get("player_tries")}
+    player_challenge_tries()  { return _db.get("player_challenge_tries")}
+    player_auth()  { return _db.get("player_auth")}
+    counters()  { return  _db.get("counters") }
+    friend_codes()  {return _db.get("friend_codes")}
+    player_profile() {return _db.get("player_profile")}
+    global_word()  {return _db.get("global_word")}
+    possible_crosswords()  {return _db.get("possible_crosswords_v2")}
+    player_crossword_state()  {return _db.get("player_crossword_state")}
+    global_bee()  { return _db.get("global_bee")}
+    guessed_words_bee()  { return _db.get("guessed_words_bee")}
+    bees() {return _db.get("bees")}
+    extra_bee_words() {return _db.get("extra_bee_words")}
 
     constructor() {
-        _friend_codes.createIndex({friend_code: 1}, {unique:true})
-        _friend_codes.createIndex({player_id: 1}, {unique:true})
-        _player_word.createIndex({word_id: 1}),
-        _player_auth.createIndex({auth_id: 1}, {unique: true});
-        _player_profile.createIndex({id: 1}, {unique: true});
-        _global_word.createIndex({validity: 1}, {unique: true});
-        _global_word.createIndex({word_id : 1}, {unique: true});
+        this.friend_codes().createIndex({friend_code: 1}, {unique:true})
+        this.friend_codes().createIndex({player_id: 1}, {unique:true})
+        this.player_word().createIndex({word_id: 1}),
+        this.player_auth().createIndex({auth_id: 1}, {unique: true});
+        this.player_profile().createIndex({id: 1}, {unique: true});
+        this.global_word().createIndex({validity: 1}, {unique: true});
+        this.global_word().createIndex({word_id : 1}, {unique: true});
 //        _player_tries.createIndex({word_id:1, id: 1}, {unique: true});
-        _player_challenge_tries.createIndex({word_id:1, id:1}, {unique: true});
-        _player_crossword_state.createIndex({player_id: 1}, {unique: true});
-        _global_bee.createIndex({validity: 1}, {unique: true});
-        _global_bee.createIndex({bee_id: 1}, {unique: true})
-        _guessed_words_bee.createIndex({player_id:1, bee_id:1}, {unique: true})
-        _bees.createIndex({id:1}, {unique: true});
+        this.player_challenge_tries().createIndex({word_id:1, id:1}, {unique: true});
+        this.player_crossword_state().createIndex({player_id: 1}, {unique: true});
+        this.global_bee().createIndex({validity: 1}, {unique: true});
+        this.global_bee().createIndex({bee_id: 1}, {unique: true})
+        this.guessed_words_bee().createIndex({player_id:1, bee_id:1}, {unique: true})
+        this.bees().createIndex({id:1}, {unique: true});
+        this.extra_bee_words().createIndex({word: 1}, {unique: true})
     }
 
     //SEQ
