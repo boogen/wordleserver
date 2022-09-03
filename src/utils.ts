@@ -9,3 +9,11 @@ export default class Utils {
         return text;
     }
 }
+
+export class MinMax {
+    constructor(public min:number, public max:number){}
+
+    get_random():number {
+        return Math.random() * (this.max - this.min) + this.max
+    }
+}

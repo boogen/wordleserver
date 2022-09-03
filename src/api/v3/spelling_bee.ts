@@ -1,9 +1,9 @@
 import express from 'express';
 import Sentry from '@sentry/node';
-import WordleDBI, { RankingEntry } from '../../DBI'
+import WordleDBI, { Bee, RankingEntry } from '../../DBI'
 import AuthIdRequest from '../../types/AuthIdRequest';
 import SpellingBeeGuessRequest from '../../types/SpellingBeeGuessRequest';
-import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply } from './spelling_bee_common';
+import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess } from './spelling_bee_common';
 import { get_ranking, RankingReply } from './ranking_common';
 
 export const spelling_bee = express.Router();
@@ -60,6 +60,7 @@ spelling_bee.post('/guess', async (req, res, next) => {
         const player_id = await dbi.resolvePlayerId(request.authId);
         const timestamp = Date.now() / 1000;
         const letters = await dbi.getLettersForBee(timestamp);
+        const bee_model:Bee|null = await dbi.getBeeById(letters!.bee_model_id);
         var state = await dbi.getBeeState(player_id, letters!.bee_id)
         var guesses:string[];
         if (state === null) {
@@ -68,22 +69,7 @@ spelling_bee.post('/guess', async (req, res, next) => {
         else {
             guesses = state.guesses
         }
-        var message = SpellingBeeReplyEnum.ok;
-        if (guesses.includes(guess)) {
-            message = SpellingBeeReplyEnum.already_guessed
-        }
-        if (!(await dbi.wordExists(guess, letters!.bee_model_id))) {
-            message = SpellingBeeReplyEnum.wrong_word
-        }
-        if (!guess.includes(letters!.main_letter)) {
-            message = SpellingBeeReplyEnum.no_main_letter
-        }
-        for (var singleLetter of guess) {
-            if (singleLetter != letters!.main_letter && !letters!.letters.includes(singleLetter)) {
-                message = SpellingBeeReplyEnum.invalid_letter_used
-                break
-            }
-        }
+        var message = await checkSpellingBeeGuess(guess, guesses, bee_model!, dbi)
         if (message != SpellingBeeReplyEnum.ok) {
             res.json(new GlobalSpellingBeeStateReply(message,
                 letters!.main_letter,
@@ -124,7 +110,7 @@ spelling_bee.post('/ranking', async (req, res, next) => {
             return
         }
         const ranking = await dbi.getBeeRanking(bee.bee_id)
-        get_ranking(player_id, ranking, dbi, res.json)
+        res.json(get_ranking(player_id, ranking, dbi))
     } catch (error) {
         console.log(error);
         next(error);
