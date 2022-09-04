@@ -82,6 +82,7 @@ router.post('/guess', async (req, res, next) => {
         const timestamp = Date.now() / 1000;
         const letters = await dbi.getLettersForBee(timestamp);
         var state = await  dbi.getBeeState(player_id, letters.bee_id)
+        var guesses = []
         if (state === null) {
             guesses = []
         }
