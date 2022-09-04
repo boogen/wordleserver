@@ -35,7 +35,7 @@ export class GlobalWord {
 }
 
 export class GridCoordinates {
-    constructor(public row:number, public column:number) {}
+    constructor(public column:number, public row:number) {}
 }
 
 export class CrosswordWord {
@@ -89,18 +89,25 @@ export class SpellingBeeDuellGuess {
 }
 
 export class SpellingBeeDuel {
-    getPlayerGuesses(player_id: number): SpellingBeeDuellGuess[] {
-        var index = this.players.indexOf(player_id);
-        return this.guesses[index];
+    getPlayerGuesses(): SpellingBeeDuellGuess[] {
+        return this.guesses[0];
     }
-    getPlayerGuessesAsString(player_id:number) {
-        return this.getPlayerGuesses(player_id).map(g => g.word);
+    getOpponentGuesses(): SpellingBeeDuellGuess[] {
+        return this.guesses[1];
     }
-    getPlayerPoints(player_id: number): number {
-        var index = this.players.indexOf(player_id);
-        return this.points[index];
+    getPlayerGuessesAsString() {
+        return this.getPlayerGuesses().map(g => g.word);
     }
-    constructor(public bee_duel_id:number, public bee_id:number, public players:number[], public guesses:SpellingBeeDuellGuess[][], public points:number[], public letters:string[], public main_letter:string, public start_timestamp:number, public id?:ObjectId) {}
+    getOpponentGuessesAsString() {
+        return this.getPlayerGuesses().map(g => g.word);
+    }
+    getPlayerPoints(): number {
+        return this.points[0];
+    }
+    getOpponentPoints(): number {
+        return this.points[0];
+    }
+    constructor(public bee_duel_id:number, public bee_id:number, public player_id:number, public opponent_id:number, public guesses:SpellingBeeDuellGuess[][], public points:number[], public letters:string[], public main_letter:string, public start_timestamp:number, public finished:boolean, public id?:ObjectId) {}
 }
 
 const _db:IMonkManager = monk(process.env.MONGO_URI!);
@@ -141,6 +148,9 @@ export default class WordleDBI {
         this.guessed_words_bee().createIndex({player_id:1, bee_id:1}, {unique: true})
         this.bees().createIndex({id:1}, {unique: true});
         this.extra_bee_words().createIndex({word: 1}, {unique: true})
+        this.spelling_bee_duels().createIndex({player_id: 1})
+        this.spelling_bee_duels().createIndex({bee_id: 1})
+        this.spelling_bee_duels().createIndex({bee_duel_id: 1}, {unique:true})
     }
 
     //SEQ
@@ -224,7 +234,7 @@ export default class WordleDBI {
     }
 
     async getRandomCrossword():Promise<PossibleCrossword> {
-        return (await this.possible_crosswords().aggregate([{ $sample: { size: 1 } }]))[0];
+        return (await this.possible_crosswords().aggregate([{ $sample: { size: 1 } }]));
     }
 
     async getFirstCrossword():Promise<PossibleCrossword|null> {
@@ -286,25 +296,34 @@ export default class WordleDBI {
     async startDuel(bee_model:Bee, player_id: number, opponent_id:number, opponent_guesses:SpellingBeeDuellGuess[], opponent_points:number, timestamp: number):Promise<SpellingBeeDuel> {
         var return_value = new SpellingBeeDuel((await this.getNextSequenceValue("spelling_bee_duel_id")),
             bee_model.id,
-            [player_id, opponent_id],
+            player_id,
+            opponent_id,
             [[], opponent_guesses],
             [0, opponent_points],
             bee_model.other_letters,
             bee_model.main_letter,
-            timestamp
+            timestamp,
+            false
             );
             this.spelling_bee_duels().insert(return_value);
         return return_value;
     }
     async checkForExistingDuel(player_id:number, timestamp:number, duel_duration:number):Promise<FindOneResult<SpellingBeeDuel>> {
-        return this.spelling_bee_duels().findOne({players:player_id, start_time: {$lt: timestamp, $gt: timestamp - duel_duration}})
+        return this.spelling_bee_duels().findOne({player_id:player_id, start_time: {$lt: timestamp, $gt: timestamp - duel_duration}})
+    }
+
+    async checkForUnfinishedDuel(player_id:number, timestamp:number, duel_duration:number):Promise<FindOneResult<SpellingBeeDuel>> {
+        return this.spelling_bee_duels().findOne({player_id:player_id, start_timestamp:{$lt:timestamp - duel_duration}, finished:false});
+    }
+
+    async markDuelAsFinished(bee_duel_id:number) {
+        this.spelling_bee_duels().findOneAndUpdate({bee_duel_id:bee_duel_id}, {finished:true});
     }
 
     async addPlayerGuessInSpellingBeeDuel(duel_id:number, player_id:number, guess:string, points:number, current_duel:SpellingBeeDuel, timestamp:number):Promise<SpellingBeeDuel|null> {
-        var player_index = current_duel.players.indexOf(player_id)
         var updater:any = {}
-        updater['guesses$[' + player_id + ']'] = new SpellingBeeDuellGuess(guess, timestamp - current_duel.start_timestamp, current_duel.getPlayerPoints(player_id) + points);
-        updater['guesses$[' + player_id + ']'] = points;
+        updater['guesses$[0]'] = new SpellingBeeDuellGuess(guess, timestamp - current_duel.start_timestamp, current_duel.getPlayerPoints() + points);
+        updater['guesses$[0]'] = points;
         return this.spelling_bee_duels().findOneAndUpdate({bee_duel_id:duel_id}, {$push:updater})
     }
 
