@@ -1,5 +1,5 @@
 import express from 'express';
-import Sentry from '@sentry/node';
+import * as Sentry from "@sentry/node"
 import WordleDBI from '../../DBI';
 import AuthIdRequest from '../../types/AuthIdRequest';
 import BaseGuessRequest from '../../types/BaseGuessRequest';

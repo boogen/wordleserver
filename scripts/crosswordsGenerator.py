@@ -140,7 +140,7 @@ def generate_crosswords(crosswords_file, dbname):
         if len(processedWords) > 4 and valid:
             word_list = []
             for word in processedWords:
-                word_list.append({'word':word, 'coordinates':{'column':x, 'row':y}})
+                word_list.append({'word':word, 'coordinates':{'row':processedWords[word][0], 'column':processedWords[word][1]}})
             possible_crosswords_db.insert_one({'crossword_id':crosswordId, 'word_list': word_list, 'letter_grid': grid})
             crosswordId += 1
 

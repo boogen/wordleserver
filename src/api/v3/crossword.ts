@@ -1,5 +1,5 @@
 import express from 'express';
-import Sentry from '@sentry/node';
+import * as Sentry from "@sentry/node"
 import WordleDBI, { PlayerCrosswordState, PossibleCrossword } from '../../DBI';
 import BaseGuessRequest from '../../types/BaseGuessRequest';
 import AuthIdRequest from '../../types/AuthIdRequest';
@@ -131,7 +131,7 @@ crossword.post('/guess', async (req, res, next) => {
         const guessed_words_array = Array.from(guessed_words)
         for (var z = 0; z < guessed_words_array.length; z++) {
             const word:string = guessed_words_array[z];
-            var coordinates = crossword!.word_list.find(e => e.word == word)?.coordinates;
+            var coordinates = crossword!.word_list.find(e => e.word === word)?.coordinates;
             if (original_grid[coordinates!.row].slice(coordinates!.column, coordinates!.column + word.length).join("") == word) {
                 for (var i = 0; i < word.length; i++) {
                     convertedOriginalGrid[coordinates!.row][coordinates!.column + i] = word[i] 
@@ -146,7 +146,7 @@ crossword.post('/guess', async (req, res, next) => {
         if (indexToFill) {
             convertedOriginalGrid[indexToFill.x][indexToFill.y] = original_grid[indexToFill.x][indexToFill.y]
         }
-        console.log(guessed_words_array)
+
         const newState = await dbi.setCrosswordState(playerId, crosswordState!.words, guessed_words_array, convertedOriginalGrid, crosswordState!.crossword_id, Array.from(tries))
         res.json({isWord:true, guessed_word: guessed_word, state: (await stateToReply(convertedOriginalGrid, crosswordState!.words, crossword!, isFinished(newState!)))})
     }
@@ -171,8 +171,10 @@ crossword.post('/init', async (req, res, next) => {
 
         if (crosswordState == null || isFinished(crosswordState)) {
             const crossword = await dbi.getRandomCrossword();
+            console.log(crossword)
+            console.log(crossword.letter_grid)
             grid = convertGrid(crossword.letter_grid)
-            word_list = Object.keys(crossword.word_list)
+            word_list = Object.values(crossword.word_list).map(w => w.word)
             crossword_id = crossword.crossword_id
         }
         else {

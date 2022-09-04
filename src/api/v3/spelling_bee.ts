@@ -1,5 +1,5 @@
 import express from 'express';
-import Sentry from '@sentry/node';
+import * as Sentry from "@sentry/node"
 import WordleDBI, { Bee, RankingEntry } from '../../DBI'
 import AuthIdRequest from '../../types/AuthIdRequest';
 import SpellingBeeGuessRequest from '../../types/SpellingBeeGuessRequest';
@@ -12,13 +12,13 @@ const BEE_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
 
 class GlobalSpellingBeeStateReply extends SpellingBeeStateReply {
-    constructor(public message:SpellingBeeReplyEnum, public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number, maxPoints:number) {
+    constructor(public message:SpellingBeeReplyEnum, public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number, public max_points:number) {
         super(message, main_letter, other_letters, guessed_words, player_points);
     }
 }
 
 class SuccessfullGlobalSpellingBeeStateReply extends SuccessfullSpellingBeeStateReply {
-    constructor(public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number, maxPoints:number, pointsForWord:number) {
+    constructor(public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number, public max_points:number, pointsForWord:number) {
         super(SpellingBeeReplyEnum.ok, main_letter, other_letters, guessed_words, player_points, pointsForWord);
     }
 }

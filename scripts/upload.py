@@ -51,7 +51,7 @@ def upload_bees(bees_file, dbname):
             if all(map(lambda w: letter in w, words)):
                 main_letter = letter
                 unique_letters.remove(main_letter)
-                continue
+                break
         if main_letter is None:
             raise "Couldn't find main letter"
         bees_db.insert_one({'id': id, 'words':words, 'main_letter': main_letter, 'other_letters': unique_letters})

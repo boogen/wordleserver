@@ -3,10 +3,11 @@ import express, {Request,Response,Application} from 'express';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import cors from 'cors';
-// import Sentry from '@sentry/node';
+import * as Sentry from "@sentry/node"
 
 require('dotenv').config();
-// Sentry.init({dsn: process.env.sentry_dsn});
+
+Sentry.init({dsn: process.env.sentry_dsn});
 
 import {notFound, errorHandler} from './middlewares';
 import { apiV3 } from './api/v3';
