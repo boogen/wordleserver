@@ -41,3 +41,9 @@ if __name__ == "__main__":
             raise "Couldn't find main letter"
         bees_db.insert_one({'id': id, 'words':words, 'main_letter': main_letter, 'other_letters': unique_letters})
         id += 1
+
+    f = open("fallback_bee", "r")
+    fallback_db = dbname["bees_fallback"]
+    for line in f.readlines():
+        line = line.strip()
+        fallback_db.insert_one({'word': line})
