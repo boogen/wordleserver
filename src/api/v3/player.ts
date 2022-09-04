@@ -16,7 +16,7 @@ function makeid():string {
 player.post("/register", async (req, res, next) => {
     try {
         var authId = makeid();
-        while (await dbi.resolvePlayerId(authId)) {
+        while (await dbi.isAuthIdUsed(authId)) {
             authId = makeid();
         }
         const playerId = await dbi.getNextSequenceValue("player_id");

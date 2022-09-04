@@ -74,6 +74,20 @@ def upload_words(words_file, dbname):
         words_db.insert_one({'word': word})
     print()
 
+def upload_fallback_bees(fallback_bee_file, dbname):
+    f = open(fallback_bee_file, "r")
+    fallback_db = dbname["bees_fallback"]
+    fallback_db.drop()
+    counting_index = 1
+    lines = f.readlines()
+    for line in lines:
+        print("Uploading fallback bees: " + str(counting_index) + "/" + str(len(lines)), end="\r")
+        counting_index += 1
+        line = line.strip()
+        fallback_db.insert_one({'word': line})
+    print()
+
+
 # This is added so that many files can reuse the function get_database()
 if __name__ == "__main__":
     argParser = ArgumentParser(prog="Slowka model uploader")
@@ -82,7 +96,8 @@ if __name__ == "__main__":
     argParser.add_argument("-p", "--wordle-possible-words-file")
     argParser.add_argument("-w", "--wordle-words-file")
     argParser.add_argument("-b", "--bees-file")
-    # Get the database
+    argParser.add_argument("-f", "--fallback-bees-file")
+
     args = argParser.parse_args()
 
     db = get_database(args.db_name)
@@ -96,12 +111,13 @@ if __name__ == "__main__":
         print("No confirmation, aborting...")
         exit(-1)
 
-    if 'crosswords_file' in args:
+    if args.crosswords_file is not None:
         generate_crosswords(args.crosswords_file, db)
-    if 'wordle_possible_words_file' in args:
+    if args.wordle_possible_words_file is not None:
         upload_possible_words(args.wordle_possible_words_file, db)
-    if 'wordle_words_file' in args:
+    if args.wordle_words_file is not None:
         upload_words(args.wordle_words_file, db)
-    if 'bees_file' in args:
+    if args.bees_file is not None:
         upload_bees(args.bees_file, db)
-    # Create a new collection
+    if args.fallback_bees_file is not None:
+        upload_fallback_bees(args.fallback_bees_file, db)

@@ -122,7 +122,7 @@ export default class WordleDBI {
     global_bee():ICollection<GlobalBee> { return _db.get("global_bee")}
     guessed_words_bee():ICollection<GuessedWordsBee> { return _db.get("guessed_words_bee")}
     bees():ICollection<Bee> {return _db.get("bees")}
-    extra_bee_words():ICollection<Word> {return _db.get("extra_bee_words")}
+    extra_bee_words():ICollection<Word> {return _db.get("bees_fallback")}
     spelling_bee_duels():ICollection<SpellingBeeDuel> {return _db.get("spelling_bee_duels")}
 
     constructor() {
@@ -161,6 +161,11 @@ export default class WordleDBI {
     async resolvePlayerId(auth_id:string):Promise<number> {
         const authEntry = await this.player_auth().findOne({auth_id: auth_id});
         return authEntry!.player_id;
+    }
+
+    async isAuthIdUsed(auth_id:string):Promise<boolean> {
+        const authEntry = await this.player_auth().findOne({auth_id:auth_id})
+        return authEntry !== null
     }
 
     async setNick(playerId:number, nick:string, callback:CallableFunction) {
