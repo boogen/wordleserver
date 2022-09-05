@@ -10,7 +10,8 @@ import { string } from '@hapi/joi';
 
 const DUEL_DURATION:number = 150;
 
-const BOT_THRESHOLD:MinMax = new MinMax(0.15, 0.4);
+//const BOT_THRESHOLD:MinMax = new MinMax(0.15, 0.4);
+const BOT_THRESHOLD:MinMax = new MinMax(0.001, 0.1);
 
 export const spelling_bee_duel = express.Router();
 const dbi = new WordleDBI()
@@ -136,7 +137,7 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
         const bee_model:Bee|null = await dbi.getBeeById(duel!.bee_id)
         var message = await checkSpellingBeeGuess(guess, duel!.player_guesses.map(g => g.word), bee_model!, dbi)
         if (message !== SpellingBeeReplyEnum.ok) {
-            res.json(new SpellingBeeStateReply(message.toString(), duel!.main_letter, duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points));
+            res.json(new SpellingBeeGuessReply(new SpellingBeeDuelStateReply(message.toString(), duel!.main_letter, duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points,Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp)), 0));
             return;
         }
         var points:number = wordPoints(guess, bee_model!.other_letters)
