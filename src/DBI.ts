@@ -89,25 +89,19 @@ export class SpellingBeeDuellGuess {
 }
 
 export class SpellingBeeDuel {
-    getPlayerGuesses(): SpellingBeeDuellGuess[] {
-        return this.guesses[0];
-    }
-    getOpponentGuesses(): SpellingBeeDuellGuess[] {
-        return this.guesses[1];
-    }
-    getPlayerGuessesAsString() {
-        return this.getPlayerGuesses().map(g => g.word);
-    }
-    getOpponentGuessesAsString() {
-        return this.getPlayerGuesses().map(g => g.word);
-    }
-    getPlayerPoints(): number {
-        return this.points[0];
-    }
-    getOpponentPoints(): number {
-        return this.points[0];
-    }
-    constructor(public bee_duel_id:number, public bee_id:number, public player_id:number, public opponent_id:number, public guesses:SpellingBeeDuellGuess[][], public points:number[], public letters:string[], public main_letter:string, public start_timestamp:number, public finished:boolean, public id?:ObjectId) {}
+    constructor(public bee_duel_id:number,
+        public bee_id:number,
+        public player_id:number,
+        public opponent_id:number,
+        public player_guesses:SpellingBeeDuellGuess[],
+        public opponent_guesses:SpellingBeeDuellGuess[],
+        public player_points:number,
+        public opponent_points:number,
+        public letters:string[],
+        public main_letter:string,
+        public start_timestamp:number,
+        public finished:boolean,
+        public _id?:ObjectId) {}
 }
 
 const _db:IMonkManager = monk(process.env.MONGO_URI!);
@@ -298,8 +292,8 @@ export default class WordleDBI {
             bee_model.id,
             player_id,
             opponent_id,
-            [[], opponent_guesses],
-            [0, opponent_points],
+            [], opponent_guesses,
+            0, opponent_points,
             bee_model.other_letters,
             bee_model.main_letter,
             timestamp,
@@ -309,22 +303,27 @@ export default class WordleDBI {
         return return_value;
     }
     async checkForExistingDuel(player_id:number, timestamp:number, duel_duration:number):Promise<FindOneResult<SpellingBeeDuel>> {
-        return this.spelling_bee_duels().findOne({player_id:player_id, start_time: {$lt: timestamp, $gt: timestamp - duel_duration}})
+        return this.spelling_bee_duels().findOne({player_id:player_id, start_timestamp:{$lt: timestamp, $gt: timestamp - duel_duration}})
     }
 
     async checkForUnfinishedDuel(player_id:number, timestamp:number, duel_duration:number):Promise<FindOneResult<SpellingBeeDuel>> {
+        console.log({player_id:player_id, start_timestamp:{$lt:timestamp - duel_duration}});
         return this.spelling_bee_duels().findOne({player_id:player_id, start_timestamp:{$lt:timestamp - duel_duration}, finished:false});
     }
 
     async markDuelAsFinished(bee_duel_id:number) {
-        this.spelling_bee_duels().findOneAndUpdate({bee_duel_id:bee_duel_id}, {finished:true});
+        this.spelling_bee_duels().findOneAndUpdate({bee_duel_id:bee_duel_id}, {$set: {finished:true}});
+    }
+
+    async markOldDuelsAsFinished(player_id:number) {
+        this.spelling_bee_duels().update({player_id:player_id, finished:false}, {$set:{finished:true}})
     }
 
     async addPlayerGuessInSpellingBeeDuel(duel_id:number, player_id:number, guess:string, points:number, current_duel:SpellingBeeDuel, timestamp:number):Promise<SpellingBeeDuel|null> {
-        var updater:any = {}
-        updater['guesses$[0]'] = new SpellingBeeDuellGuess(guess, timestamp - current_duel.start_timestamp, current_duel.getPlayerPoints() + points);
-        updater['guesses$[0]'] = points;
-        return this.spelling_bee_duels().findOneAndUpdate({bee_duel_id:duel_id}, {$push:updater})
+        return this.spelling_bee_duels().findOneAndUpdate({bee_duel_id:duel_id},
+            {$set:{player_points:current_duel.player_points + points},
+            $push:{player_guesses: new SpellingBeeDuellGuess(guess, timestamp, current_duel.player_points + points)}
+        })
     }
 
     //BEE RANKING

@@ -46,11 +46,15 @@ export class SpellingBeeGuessReply {
 }
 
 export enum SpellingBeeReplyEnum {
-    ok, already_guessed, wrong_word, no_main_letter, invalid_letter_used
+    ok = "ok",
+    already_guessed = "already_guessed",
+    wrong_word="wrong_word",
+    no_main_letter="no_main_letter",
+    invalid_letter_used="invalid_letter_used"
 }
 
 export class SpellingBeeStateReply {
-    constructor(public message:SpellingBeeReplyEnum, public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number) {}
+    constructor(public message:string, public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number) {}
 }
 
 export class SuccessfullSpellingBeeStateReply {

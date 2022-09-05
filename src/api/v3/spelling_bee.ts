@@ -12,8 +12,8 @@ const BEE_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
 
 class GlobalSpellingBeeStateReply extends SpellingBeeStateReply {
-    constructor(public message:SpellingBeeReplyEnum, public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number, public max_points:number) {
-        super(message, main_letter, other_letters, guessed_words, player_points);
+    constructor(public messageEnum:SpellingBeeReplyEnum, public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number, public max_points:number) {
+        super(messageEnum.toString(), main_letter, other_letters, guessed_words, player_points);
     }
 }
 
