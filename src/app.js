@@ -4,7 +4,9 @@ const helmet = require('helmet');
 const cors = require('cors');
 const Sentry = require('@sentry/node');
 
+
 require('dotenv').config();
+const dbi = require('./DBI.js').createDBI();
 Sentry.init({dsn: process.env.sentry_dsn});
 
 const middlewares = require('./middlewares');
@@ -36,6 +38,12 @@ app.get("/error", (req, res) => {
   res.send("error");
 });
 
+app.use((req, res, next) => {
+  var d = new Date();
+  d.setHours(0,0,0,0);
+  dbi.increase_request_counter(req.path, d.getTime()/1000);
+  next()
+})
 app.use('/api/v1', api);
 app.use('/api/v2', apiv2);
 app.use('/api/v3', apiv3)

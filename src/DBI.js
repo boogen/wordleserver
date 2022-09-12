@@ -325,6 +325,11 @@ class WordleDBI {
         }
     }
 
+    async increase_request_counter(path, last_midnisght) {
+        const stats =  this.db().get("request_stats_" + last_midnisght);
+        stats.findOneAndUpdate({path:path}, {$inc:{no_of_requests: 1}}, {upsert:true})
+    }
+
 }
 
 function createDBI() {
