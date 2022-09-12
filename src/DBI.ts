@@ -421,7 +421,7 @@ export default class WordleDBI {
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
         var rawRank = (await rank.find({}, {sort: {score:1, time: 1}, limit:100}))
-        var returnValue = []
+        var returnValue:RankingEntry[] = []
         var position = 0
         for (var entry of rawRank) {
             position += 1
@@ -489,6 +489,11 @@ export default class WordleDBI {
             console.log(error);
             return null;
         }
+    }
+
+    async increase_request_counter(path:string, last_midnight:number) {
+        const stats =  this.db().get("request_stats_" + last_midnight);
+        stats.findOneAndUpdate({path:path}, {$inc:{no_of_requests: 1}}, {upsert:true})
     }
 
 }

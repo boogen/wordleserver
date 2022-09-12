@@ -148,9 +148,9 @@ async function validateGuess(guess:string, word:string) {
    
     console.log("Guessed word: %s, actual word: %s", guess, word)
 
-    var result = [];
+    var result:number[] = [];
     if (isWord) {
-        var usedLetters = [];
+        var usedLetters:boolean[] = [];
         for (var i = 0; i < guess.length; i++) {
             result.push(0);
             usedLetters.push(false);

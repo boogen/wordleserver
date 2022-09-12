@@ -23,17 +23,20 @@ enum DuelResult {
     error = "error"
 }
 
+export class SpellingBeeDuelGuessReply {
+    constructor(public state:SpellingBeeDuelStateReply, public points:number) {}
+}
+
 class SpellingBeeDuelStart {
-    constructor(public opponent_nick:string, public opponent_moves:SpellingBeeDuellGuess[], public state:SpellingBeeStateReply) {}
+    constructor(public opponent_nick:string, public opponent_moves:SpellingBeeDuellGuess[], public state:SpellingBeeDuelStateReply) {}
 }
 
 class SpelllingBeeDuelEnd {
     constructor(public result:DuelResult, public player_points:number, public opponent_points:number, public time_left?:number) {}
 }
 
-class SpellingBeeDuelStateReply extends SpellingBeeStateReply {
-    constructor(public message:string, public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number, public time_left:number) {
-        super(message, main_letter, other_letters, guessed_words, player_points);
+class SpellingBeeDuelStateReply {
+    constructor(public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number, public time_left:number, public round_time:number) {
     }
 }
 
@@ -117,7 +120,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
         res
         .status(200)
         .json(new SpellingBeeDuelStart((await get_nick(opponent_id, dbi)).nick, opponent_guesses,
-            new SpellingBeeDuelStateReply(SpellingBeeReplyEnum.ok.toString(), duel!.main_letter, duel!.letters, duel!.player_guesses.map(guess => guess.word), duel!.player_points, Math.floor(duel.start_timestamp + DUEL_DURATION - timestamp)))
+            new SpellingBeeDuelStateReply(duel!.main_letter, duel!.letters, duel!.player_guesses.map(guess => guess.word), duel!.player_points, Math.floor(duel.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION))
         )
     }
     catch (error) {
@@ -137,12 +140,12 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
         const bee_model:Bee|null = await dbi.getBeeById(duel!.bee_id)
         var message = await checkSpellingBeeGuess(guess, duel!.player_guesses.map(g => g.word), bee_model!, dbi)
         if (message !== SpellingBeeReplyEnum.ok) {
-            res.json(new SpellingBeeGuessReply(new SpellingBeeDuelStateReply(message.toString(), duel!.main_letter, duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points,Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp)), 0));
+            res.json(new SpellingBeeDuelGuessReply(new SpellingBeeDuelStateReply(duel!.main_letter, duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points,Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION), 0));
             return;
         }
         var points:number = wordPoints(guess, bee_model!.other_letters)
         duel = await dbi.addPlayerGuessInSpellingBeeDuel(duel!.bee_duel_id, player_id, guess, points, duel!, timestamp);
-        res.json(new SpellingBeeGuessReply(new SpellingBeeDuelStateReply(message.toString(), duel!.main_letter, duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points, Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp)), points));
+        res.json(new SpellingBeeDuelGuessReply(new SpellingBeeDuelStateReply(duel!.main_letter, duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points, Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION), points));
     }
     catch(error) {
         console.log(error)

@@ -11,6 +11,7 @@ Sentry.init({dsn: process.env.sentry_dsn});
 
 import {notFound, errorHandler} from './middlewares';
 import { apiV3 } from './api/v3';
+import WordleDBI from './DBI';
 
 export const app = express();
 
@@ -35,6 +36,15 @@ app.get("/error", (req:Request, res:Response) => {
   res.status(500);
   res.send("error");
 });
+
+const dbi = new WordleDBI();
+
+app.use((req, res, next) => {
+  var d = new Date();
+  d.setHours(0,0,0,0);
+  dbi.increase_request_counter(req.path, d.getTime()/1000);
+  next()
+})
 
 app.use('/api/v3', apiV3)
 
