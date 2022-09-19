@@ -77,7 +77,9 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
         var opponent_id:number = -1
         if (duel === null) {
             var spelling_bee_model:Bee|null = (await dbi.getRandomDuelBee(player_id));
+            console.log(spelling_bee_model!.id)
             var past_duels:SpellingBeeDuel[] = (await dbi.getDuelsForGivenBee(spelling_bee_model!.id, timestamp));
+            console.log(past_duels)
             var player_ids:Set<number> = new Set(past_duels.map(d => d.player_id));
             console.log(player_ids)
             var ids_to_delete:number[] = [];
