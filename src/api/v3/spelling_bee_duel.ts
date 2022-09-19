@@ -69,8 +69,10 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
         const request = new AuthIdRequest(req);
         const player_id = await dbi.resolvePlayerId(request.authId);
         const timestamp:number = Date.now() / 1000;
-        await dbi.markOldDuelsAsFinished(player_id)
-        var duel:SpellingBeeDuel|null = (await dbi.checkForExistingDuel(player_id, timestamp, DUEL_DURATION));
+        var duel:SpellingBeeDuel|null = await dbi.checkForUnfinishedDuel(player_id, timestamp, DUEL_DURATION);
+        if (duel === null) {
+            duel = (await dbi.checkForExistingDuel(player_id, timestamp, DUEL_DURATION));
+        }
         var opponent_guesses:SpellingBeeDuellGuess[] = []
         var opponent_id:number = -1
         if (duel === null) {
@@ -153,6 +155,7 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
         Sentry.captureException(error)
     }
 })
+
 
 spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, next:NextFunction) => {
     try {
