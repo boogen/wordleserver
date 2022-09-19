@@ -78,7 +78,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
         if (duel === null) {
             var spelling_bee_model:Bee|null = (await dbi.getRandomDuelBee(player_id));
             console.log(spelling_bee_model!.id)
-            var past_duels:SpellingBeeDuel[] = (await dbi.getDuelsForGivenBee(spelling_bee_model!.id, timestamp));
+            var past_duels:SpellingBeeDuel[] = (await dbi.getDuelsForGivenBee(spelling_bee_model!.id, timestamp, DUEL_DURATION));
             console.log(past_duels)
             var player_ids:Set<number> = new Set(past_duels.map(d => d.player_id));
             console.log(player_ids)

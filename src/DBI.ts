@@ -295,8 +295,8 @@ export default class WordleDBI {
         }
     }
 
-    async getDuelsForGivenBee(bee_model_id:number, timestamp:number):Promise<FindResult<SpellingBeeDuel>> {
-        return this.spelling_bee_duels().find({bee_id:bee_model_id, validity:{$lt:timestamp}})
+    async getDuelsForGivenBee(bee_model_id:number, timestamp:number, duelDuration:number):Promise<FindResult<SpellingBeeDuel>> {
+        return this.spelling_bee_duels().find({bee_id:bee_model_id, start_timestamp:{$lt:timestamp - duelDuration}})
     }
 
     async startDuel(bee_model:Bee, player_id: number, opponent_id:number, opponent_guesses:SpellingBeeDuellGuess[], opponent_points:number, timestamp: number):Promise<SpellingBeeDuel> {
