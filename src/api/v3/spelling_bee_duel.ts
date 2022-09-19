@@ -24,7 +24,7 @@ enum DuelResult {
 }
 
 export class SpellingBeeDuelGuessReply {
-    constructor(public state:SpellingBeeDuelStateReply, public points:number) {}
+    constructor(public message:SpellingBeeReplyEnum, public state:SpellingBeeDuelStateReply, public points:number) {}
 }
 
 class SpellingBeeDuelStart {
@@ -76,7 +76,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
         if (duel === null) {
             var spelling_bee_model:Bee = (await dbi.getRandomBee());
             var past_duels:SpellingBeeDuel[] = (await dbi.getDuelsForGivenBee(spelling_bee_model.id, timestamp));
-            var player_ids:Set<number> = new Set(past_duels.flatMap(d => d.player_id));
+            var player_ids:Set<number> = new Set(past_duels.map(d => d.player_id));
             var ids_to_delete:number[] = [];
             player_ids.forEach(element => {
                 if (element < 0) {
@@ -140,12 +140,12 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
         const bee_model:Bee|null = await dbi.getBeeById(duel!.bee_id)
         var message = await checkSpellingBeeGuess(guess, duel!.player_guesses.map(g => g.word), bee_model!, dbi)
         if (message !== SpellingBeeReplyEnum.ok) {
-            res.json(new SpellingBeeDuelGuessReply(new SpellingBeeDuelStateReply(duel!.main_letter, duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points,Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION), 0));
+            res.json(new SpellingBeeDuelGuessReply(message, new SpellingBeeDuelStateReply(duel!.main_letter, duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points,Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION), 0));
             return;
         }
         var points:number = wordPoints(guess, bee_model!.other_letters)
         duel = await dbi.addPlayerGuessInSpellingBeeDuel(duel!.bee_duel_id, player_id, guess, points, duel!, timestamp);
-        res.json(new SpellingBeeDuelGuessReply(new SpellingBeeDuelStateReply(duel!.main_letter, duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points, Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION), points));
+        res.json(new SpellingBeeDuelGuessReply(message, new SpellingBeeDuelStateReply(duel!.main_letter, duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points, Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION), points));
     }
     catch(error) {
         console.log(error)
