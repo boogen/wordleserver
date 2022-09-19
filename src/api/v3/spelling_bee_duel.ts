@@ -113,8 +113,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
                     }
                     return previous_duel;
                 }, null)
-                best_duel!.player_guesses.forEach(g => g.word = "");
-                opponent_guesses = opponent_guesses.concat(best_duel!.player_guesses);
+                opponent_guesses = opponent_guesses.concat(best_duel!.player_guesses.map(g => new SpellingBeeDuellGuess("", g.timestamp - best_duel!.start_timestamp, g.points_after_guess)));
             }
 
             duel = (await dbi.startDuel(spelling_bee_model!, player_id, opponent_id, opponent_guesses, opponent_guesses[opponent_guesses.length - 1].points_after_guess, timestamp));
