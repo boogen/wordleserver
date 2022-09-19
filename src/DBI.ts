@@ -285,13 +285,13 @@ export default class WordleDBI {
 
 
     async getRandomDuelBee(playerId:number):Promise<Bee|null> {
-        var possibleNotRandom = (await this.spelling_bee_duels().find()).filter(d => d.player_id !== playerId).map(d => d.bee_duel_id);
+        var possibleNotRandom = (await this.spelling_bee_duels().find()).filter(d => d.player_id !== playerId).map(d => d.bee_id);
         const shouldBeRandom:boolean = Math.floor(Math.random() * Math.min(possibleNotRandom.length, 10)) == 0
         if (shouldBeRandom) {
             return this.getRandomBee();
         }
         else {
-            return (await this.getBeeById(possibleNotRandom[possibleNotRandom.length * Math.random()]));
+            return (await this.getBeeById(possibleNotRandom[Math.floor(possibleNotRandom.length * Math.random())]));
         }
     }
 
