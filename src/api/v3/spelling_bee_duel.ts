@@ -79,6 +79,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
             var spelling_bee_model:Bee|null = (await dbi.getRandomDuelBee(player_id));
             var past_duels:SpellingBeeDuel[] = (await dbi.getDuelsForGivenBee(spelling_bee_model!.id, timestamp));
             var player_ids:Set<number> = new Set(past_duels.map(d => d.player_id));
+            console.log(player_ids)
             var ids_to_delete:number[] = [];
             player_ids.forEach(element => {
                 if (element < 0) {
@@ -86,6 +87,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
                 }
             });
             ids_to_delete.forEach(id => player_ids.delete(id))
+            console.log(player_ids)
             if (player_ids.size === 0) {
                 opponent_id = get_bot_id()
                 const bot_guesses = createBotGuesses(spelling_bee_model!);
