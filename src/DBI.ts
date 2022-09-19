@@ -283,6 +283,18 @@ export default class WordleDBI {
 
     //BEE DUEL
 
+
+    async getRandomDuelBee():Promise<Bee|null> {
+        var possibleNotRandom = (await this.spelling_bee_duels().find()).map(d => d.bee_duel_id);
+        const shouldBeRandom:boolean = Math.floor(Math.random() * Math.min(possibleNotRandom.length, 10)) == 0
+        if (shouldBeRandom) {
+            return this.getRandomBee();
+        }
+        else {
+            return (await this.getBeeById(possibleNotRandom[possibleNotRandom.length * Math.random()]));
+        }
+    }
+
     async getDuelsForGivenBee(bee_model_id:number, timestamp:number):Promise<FindResult<SpellingBeeDuel>> {
         return this.spelling_bee_duels().find({bee_id:bee_model_id, validity:{$lt:timestamp}})
     }
