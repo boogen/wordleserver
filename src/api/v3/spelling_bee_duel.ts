@@ -28,7 +28,7 @@ export class SpellingBeeDuelGuessReply {
 }
 
 class SpellingBeeDuelStart {
-    constructor(public opponent_nick:string, public opponent_moves:SpellingBeeDuellGuess[], public state:SpellingBeeDuelStateReply) {}
+    constructor(public opponent_nick:string, public opponent_moves:SpellingBeeDuellGuessMessage[], public state:SpellingBeeDuelStateReply) {}
 }
 
 class SpelllingBeeDuelEnd {
@@ -40,6 +40,9 @@ class SpellingBeeDuelStateReply {
     }
 }
 
+class SpellingBeeDuellGuessMessage {
+    constructor(public word:string, public seconds:number, public points:number){}
+}
 function createBotGuesses(bee_model:Bee):SpellingBeeDuellGuess[] {
     const return_value:SpellingBeeDuellGuess[] = []
     var bot_points:number = BOT_THRESHOLD.get_random() * getMaxPoints(bee_model.words, bee_model.other_letters);
@@ -113,7 +116,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
                     }
                     return previous_duel;
                 }, null)
-                opponent_guesses = opponent_guesses.concat(best_duel!.player_guesses.map(g => new SpellingBeeDuellGuess("", g.timestamp - best_duel!.start_timestamp, g.points_after_guess)));
+                opponent_guesses = opponent_guesses.concat(best_duel!.player_guesses);
             }
 
             duel = (await dbi.startDuel(spelling_bee_model!, player_id, opponent_id, opponent_guesses, opponent_guesses[opponent_guesses.length - 1].points_after_guess, timestamp));
@@ -124,7 +127,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
         }
         res
         .status(200)
-        .json(new SpellingBeeDuelStart((await get_nick(opponent_id, dbi)).nick, opponent_guesses,
+        .json(new SpellingBeeDuelStart((await get_nick(opponent_id, dbi)).nick, opponent_guesses.map(g => new SpellingBeeDuellGuessMessage("", g.timestamp - best_duel!.start_timestamp, g.points_after_guess)),
             new SpellingBeeDuelStateReply(duel!.main_letter, duel!.letters, duel!.player_guesses.map(guess => guess.word), duel!.player_points, Math.floor(duel.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION))
         )
     }
