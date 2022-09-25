@@ -70,7 +70,7 @@ function calculateNewEloRank(playerScore:number, opponentScore:number, result:Du
     return playerScore +  Math.ceil(ELO_COEFFICIENT * (numericalResult - expectedResult));
 }
 
-function createBotGuesses(bee_model:Bee):SpellingBeeDuellGuess[] {
+function createBotGuesses(bee_model:Bee, timestamp:number):SpellingBeeDuellGuess[] {
     const return_value:SpellingBeeDuellGuess[] = []
     var bot_points:number = BOT_THRESHOLD.get_random() * getMaxPoints(bee_model.words, bee_model.other_letters);
     const bot_guesses:string[] = []
@@ -88,7 +88,7 @@ function createBotGuesses(bee_model:Bee):SpellingBeeDuellGuess[] {
         var points_for_guess:number = wordPoints(guess, bee_model.other_letters);
         points += points_for_guess
         return_value.push(new SpellingBeeDuellGuess("", Math.floor(time), points));
-        time += guess_interval;
+        time += guess_interval + timestamp;
     }
     return return_value;
 }
@@ -161,7 +161,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
             ids_to_delete.forEach(id => player_ids.delete(id))
             console.log(player_ids)
             if (player_ids.size === 0) {
-                const bot_guesses = createBotGuesses(spelling_bee_model!);
+                const bot_guesses = createBotGuesses(spelling_bee_model!, timestamp);
                 opponent_guesses = opponent_guesses.concat(bot_guesses);
             }
             else {
