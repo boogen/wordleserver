@@ -110,7 +110,7 @@ spelling_bee.post('/ranking', async (req, res, next) => {
             return
         }
         const ranking = await dbi.getBeeRanking(bee.bee_id)
-        res.json(get_ranking(player_id, ranking, dbi))
+        res.json((await get_ranking(player_id, ranking, dbi)))
     } catch (error) {
         console.log(error);
         next(error);
