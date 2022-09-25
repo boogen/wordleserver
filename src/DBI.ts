@@ -310,7 +310,6 @@ export default class WordleDBI {
     }
 
     async startDuel(bee_model:Bee, player_id: number, opponent_id:number, opponent_guesses:SpellingBeeDuellGuess[], opponent_points:number, timestamp: number):Promise<SpellingBeeDuel> {
-        this.spelling_bee_duel_prematch().findOneAndDelete({player_id:player_id});
         var return_value = new SpellingBeeDuel((await this.getNextSequenceValue("spelling_bee_duel_id")),
             bee_model.id,
             player_id,
@@ -344,7 +343,8 @@ export default class WordleDBI {
         return this.spelling_bee_duels().findOne({player_id:player_id, start_timestamp:{$lt:timestamp - duel_duration}, finished:false});
     }
 
-    async markDuelAsFinished(bee_duel_id:number) {
+    async markDuelAsFinished(bee_duel_id:number, player_id:number) {
+        this.spelling_bee_duel_prematch().findOneAndDelete({player_id:player_id});
         this.spelling_bee_duels().findOneAndUpdate({bee_duel_id:bee_duel_id}, {$set: {finished:true}});
     }
 

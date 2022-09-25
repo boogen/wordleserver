@@ -82,13 +82,13 @@ function createBotGuesses(bee_model:Bee, timestamp:number):SpellingBeeDuellGuess
         }
     }
     const guess_interval:number = (DUEL_DURATION - 20) / bot_guesses.length;
-    var time:number = 10;
+    var time:number = 10 + timestamp;
     var points:number = 0;
     for (var guess of bot_guesses) {
         var points_for_guess:number = wordPoints(guess, bee_model.other_letters);
         points += points_for_guess
         return_value.push(new SpellingBeeDuellGuess("", Math.floor(time), points));
-        time += guess_interval + timestamp;
+        time += guess_interval;
     }
     return return_value;
 }
@@ -237,7 +237,7 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
             }
             return
         }
-        await dbi.markDuelAsFinished(duel.bee_duel_id)
+        await dbi.markDuelAsFinished(duel.bee_duel_id, player_id)
         var result = DuelResult.draw
         if (duel.player_points > duel.opponent_points) {
             result = DuelResult.win
