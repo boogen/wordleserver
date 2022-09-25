@@ -297,15 +297,12 @@ export default class WordleDBI {
     //BEE DUEL
 
 
-    async getRandomDuelBee(playerId:number):Promise<Bee|null> {
-        var possibleNotRandom = (await this.spelling_bee_duels().find()).filter(d => d.player_id !== playerId).map(d => d.bee_id);
-        const shouldBeRandom:boolean = Math.floor(Math.random() * Math.min(possibleNotRandom.length, 10)) == 0
-        if (shouldBeRandom) {
+    async getRandomDuelBee(opponent_id:number):Promise<Bee|null> {
+        if (opponent_id < 0) {
             return this.getRandomBee();
         }
-        else {
-            return (await this.getBeeById(possibleNotRandom[Math.floor(possibleNotRandom.length * Math.random())]));
-        }
+        var possibleNotRandom = (await this.spelling_bee_duels().find()).filter(d => d.player_id === opponent_id).map(d => d.bee_id);
+        return (await this.getBeeById(possibleNotRandom[Math.floor(possibleNotRandom.length * Math.random())]));
     }
 
     async getDuelsForGivenBee(bee_model_id:number, timestamp:number, duelDuration:number):Promise<FindResult<SpellingBeeDuel>> {
