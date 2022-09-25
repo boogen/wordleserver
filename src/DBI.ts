@@ -1,6 +1,7 @@
 import monk, { FindOneResult, FindResult, ICollection, id, IMonkManager } from 'monk';
 import { ObjectId } from 'mongodb';
 import { number } from '@hapi/joi';
+import { DEFAULT_ELO, NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE } from './api/v3/duel_settings';
 
 export class PlayerProfile {
     constructor(public nick: string, public id:number, public _id?: ObjectId) {}
@@ -50,6 +51,10 @@ export class PlayerCrosswordState {
     constructor(public player_id: number, public crossword_id: number, public grid: String[][], public guessed_words:string[], public tries:string[], public words:string[], public id?: ObjectId) {}
 }
 
+export class SpellingBeeDuelEloRankEntry {
+    constructor(public player_id:number, public score:number) {}
+}
+
 export class GlobalBee {
     public main_letter:string = "";
     constructor(public bee_id:number, public bee_model_id: number, public validity: number, public letters:string[], main_letter?:string, mainLetter?:string, public id?: ObjectId) {
@@ -86,6 +91,10 @@ export class Bee {
 
 export class SpellingBeeDuellGuess {
     constructor(public word:string, public timestamp:number, public points_after_guess:number){}
+}
+
+export class SpellingBeeDuelMatch {
+    constructor(public player_id:number, public opponent_id:number) {}
 }
 
 export class SpellingBeeDuel {
@@ -125,6 +134,8 @@ export default class WordleDBI {
     bees():ICollection<Bee> {return _db.get("bees")}
     extra_bee_words():ICollection<Word> {return _db.get("bees_fallback")}
     spelling_bee_duels():ICollection<SpellingBeeDuel> {return _db.get("spelling_bee_duels")}
+    spelling_bee_elo_rank():ICollection<SpellingBeeDuelEloRankEntry> {return _db.get("elo_rank_spelling_bee_duel");}
+    spelling_bee_duel_prematch():ICollection<SpellingBeeDuelMatch> { return _db.get("spelling_bee_duel_prematch");}
 
     constructor() {
         this.friend_codes().createIndex({friend_code: 1}, {unique:true})
@@ -145,6 +156,8 @@ export default class WordleDBI {
         this.spelling_bee_duels().createIndex({player_id: 1})
         this.spelling_bee_duels().createIndex({bee_id: 1})
         this.spelling_bee_duels().createIndex({bee_duel_id: 1}, {unique:true})
+        this.spelling_bee_elo_rank().createIndex({player_id:1}, {unique:true})
+        this.spelling_bee_duel_prematch().createIndex({player_id:1}, {unique:true})
     }
 
     //SEQ
@@ -300,6 +313,7 @@ export default class WordleDBI {
     }
 
     async startDuel(bee_model:Bee, player_id: number, opponent_id:number, opponent_guesses:SpellingBeeDuellGuess[], opponent_points:number, timestamp: number):Promise<SpellingBeeDuel> {
+        this.spelling_bee_duel_prematch().findOneAndDelete({player_id:player_id});
         var return_value = new SpellingBeeDuel((await this.getNextSequenceValue("spelling_bee_duel_id")),
             bee_model.id,
             player_id,
@@ -312,8 +326,18 @@ export default class WordleDBI {
             false
             );
             this.spelling_bee_duels().insert(return_value);
+        
         return return_value;
     }
+
+    async getSpellingBeeDuelMatch(player_id:number):Promise<FindOneResult<SpellingBeeDuelMatch>> {
+        return this.spelling_bee_duel_prematch().findOne({player_id:player_id});
+    }
+
+    async addSpellingBeeDuelMatch(player_id:number, opponent_id:number) {
+        this.spelling_bee_duel_prematch().insert({player_id:player_id, opponent_id:opponent_id})
+    }
+
     async checkForExistingDuel(player_id:number, timestamp:number, duel_duration:number):Promise<FindOneResult<SpellingBeeDuel>> {
         return this.spelling_bee_duels().findOne({player_id:player_id, start_timestamp:{$lt: timestamp, $gt: timestamp - duel_duration}})
     }
@@ -336,6 +360,27 @@ export default class WordleDBI {
             {$set:{player_points:current_duel.player_points + points},
             $push:{player_guesses: new SpellingBeeDuellGuess(guess, timestamp, current_duel.player_points + points)}
         })
+    }
+
+    async getLastSpellingBeeDuelOpponents(player_id:number):Promise<number[]> {
+        return this.spelling_bee_duels().find({player_id:player_id}, {sort:{start_timestamp: -1}, limit:NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE}).then(duelEntries => duelEntries.map(entry => entry.opponent_id))
+    }
+
+    async getOpponentsFromSpellingBeeEloRank(player_id:number, score:number, maxDiff:number):Promise<number[]> {
+        const returnValue = this.spelling_bee_elo_rank().find({score:{$gte: score - maxDiff, $lte:score + maxDiff}, player_id:{$ne:player_id}})
+        return (returnValue.then(r => r.map(entry => entry.player_id)))
+    }
+
+    async getCurrentSpellingBeeElo(player_id:number):Promise<number> {
+        const rankingEntry:SpellingBeeDuelEloRankEntry|null = await this.spelling_bee_elo_rank().findOne({player_id:player_id});
+        if (rankingEntry === null) {
+            return DEFAULT_ELO;
+        }
+        return rankingEntry.score;
+    }
+
+    async updateSpellingBeeEloRank(player_id:number, new_score:number) {
+        this.spelling_bee_elo_rank().findOneAndUpdate({player_id:player_id}, {$set:{score:new_score}}, {upsert:true})
     }
 
     //BEE RANKING

@@ -1,17 +1,11 @@
 import express, { NextFunction } from 'express';
 import Sentry from '@sentry/node';
 import AuthIdRequest from '../../types/AuthIdRequest'
-import { checkSpellingBeeGuess, getMaxPoints, SpellingBeeGuessReply, SpellingBeeReplyEnum, SpellingBeeStateReply, wordPoints } from './spelling_bee_common';
+import { checkSpellingBeeGuess, getMaxPoints, SpellingBeeReplyEnum, wordPoints } from './spelling_bee_common';
 import WordleDBI, { Bee, SpellingBeeDuel, SpellingBeeDuellGuess } from '../../DBI';
 import BaseGuessRequest from '../../types/BaseGuessRequest';
-import { MinMax } from '../../utils';
 import { get_bot_id, get_nick } from './player_common';
-import { string } from '@hapi/joi';
-
-const DUEL_DURATION:number = 150;
-
-//const BOT_THRESHOLD:MinMax = new MinMax(0.15, 0.4);
-const BOT_THRESHOLD:MinMax = new MinMax(0.001, 0.1);
+import { ELO_COEFFICIENT, DUEL_DURATION, BOT_THRESHOLD, MATCH_ELO_DIFF } from './duel_settings';
 
 export const spelling_bee_duel = express.Router();
 const dbi = new WordleDBI()
@@ -43,6 +37,39 @@ class SpellingBeeDuelStateReply {
 class SpellingBeeDuellGuessMessage {
     constructor(public word:string, public seconds:number, public points:number){}
 }
+
+
+class SpellingBeeDuelPrematchPlayerInfo {
+    constructor(public id:number, public nick:string, public elo:number) {}
+}
+
+class SpellingBeeDuelPrematchReply {
+    constructor(public message:string, public player:SpellingBeeDuelPrematchPlayerInfo, public opponent:SpellingBeeDuelPrematchPlayerInfo) {}
+}
+
+
+
+function calculateNewEloRank(playerScore:number, opponentScore:number, result:DuelResult):number {
+    const rankingDiff:number = Math.abs(opponentScore - playerScore);
+    const expectedResult:number = 1/(Math.pow(10, -rankingDiff/400) + 1);
+    var numericalResult:number = 0;
+    switch (result) {
+        case DuelResult.draw:
+            numericalResult = 0.5;
+            break;
+        case DuelResult.lose:
+            numericalResult = 0;
+            break;
+        case DuelResult.win:
+            numericalResult = 1;
+            break;
+        default:
+            throw new Error("Cannot calculate new elo - incorrect result");
+    }
+
+    return playerScore +  Math.ceil(ELO_COEFFICIENT * (numericalResult - expectedResult));
+}
+
 function createBotGuesses(bee_model:Bee):SpellingBeeDuellGuess[] {
     const return_value:SpellingBeeDuellGuess[] = []
     var bot_points:number = BOT_THRESHOLD.get_random() * getMaxPoints(bee_model.words, bee_model.other_letters);
@@ -66,6 +93,45 @@ function createBotGuesses(bee_model:Bee):SpellingBeeDuellGuess[] {
     return return_value;
 }
 
+async function getSpellingBeeDuelPrematchPlayerInfo(id:number):Promise<SpellingBeeDuelPrematchPlayerInfo> {
+    return new SpellingBeeDuelPrematchPlayerInfo(
+        id,
+        (await get_nick(id, dbi)).nick,
+        await dbi.getCurrentSpellingBeeElo(id)
+    )
+}
+
+spelling_bee_duel.post('/prematch', async (req:express.Request, res:express.Response, next:Function) => {
+    try {
+        const request = new AuthIdRequest(req);
+        const player_id = await dbi.resolvePlayerId(request.authId);
+        const timestamp:number = Date.now() / 1000;
+        const existing_duell = await dbi.checkForUnfinishedDuel(player_id, timestamp, DUEL_DURATION);
+        if (existing_duell !== null) {
+            res.json(new SpellingBeeDuelPrematchReply('ok', await getSpellingBeeDuelPrematchPlayerInfo(player_id), await getSpellingBeeDuelPrematchPlayerInfo(existing_duell.opponent_id)))
+            return;
+        }
+        const existing_match = await dbi.getSpellingBeeDuelMatch(player_id);
+        if (existing_match !== null) {
+            res.json(new SpellingBeeDuelPrematchReply('ok', await getSpellingBeeDuelPrematchPlayerInfo(player_id), await getSpellingBeeDuelPrematchPlayerInfo(existing_match.opponent_id)))
+            return;
+        }
+        const opponentsCandidates:number[] = await dbi.getOpponentsFromSpellingBeeEloRank(player_id, (await dbi.getCurrentSpellingBeeElo(player_id)), MATCH_ELO_DIFF)
+        var opponent_id = get_bot_id()
+        if (opponentsCandidates.length !== 0) {
+            var opponent_filter:Set<number> = new Set((await dbi.getLastSpellingBeeDuelOpponents(player_id)));
+            var filtered_candidates:number[] = opponentsCandidates.filter(id => !opponent_filter.has(id));
+            if (filtered_candidates.length !== 0) {
+                opponent_id = filtered_candidates[Math.floor(Math.random() * filtered_candidates.length)];
+            }
+        }
+        await dbi.addSpellingBeeDuelMatch(player_id, opponent_id);
+        res.json(new SpellingBeeDuelPrematchReply('ok', await getSpellingBeeDuelPrematchPlayerInfo(player_id), await getSpellingBeeDuelPrematchPlayerInfo(opponent_id)))
+    }
+    catch (error) {
+        console.log(error);
+    }
+})
 
 spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Response, next:Function) => {
     try {
@@ -187,7 +253,9 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
         if (duel.opponent_points > duel.player_points) {
             result = DuelResult.lose
         }
-        console.log(duel)
+        const currentEloScore:number = await dbi.getCurrentSpellingBeeElo(player_id);
+        const opponentElo:number = await dbi.getCurrentSpellingBeeElo(duel.opponent_id);
+        dbi.updateSpellingBeeEloRank(player_id, calculateNewEloRank(currentEloScore, opponentElo, result));
         res.json(new SpelllingBeeDuelEnd(result, duel.player_points, duel.opponent_points))
     } catch (error) {
         console.log(error)
