@@ -5,4 +5,4 @@ export const DUEL_DURATION:number = 180;
 export const DEFAULT_ELO:number = 1200;
 export const MATCH_ELO_DIFF:number = 400;
 export const NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE:number = 10;
-export const BOT_THRESHOLD:MinMax = new MinMax(0.001, 0.1);
+export const BOT_THRESHOLD:MinMax = new MinMax(0.0001, 0.001);
