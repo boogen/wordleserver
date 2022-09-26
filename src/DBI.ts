@@ -360,6 +360,9 @@ export default class WordleDBI {
     }
 
     async getLastSpellingBeeDuelOpponents(player_id:number):Promise<number[]> {
+        if (NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE === 0) {
+            return [];
+        }
         return this.spelling_bee_duels().find({player_id:player_id}, {sort:{start_timestamp: -1}, limit:NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE}).then(duelEntries => duelEntries.map(entry => entry.opponent_id))
     }
 

@@ -26,7 +26,7 @@ class SpellingBeeDuelStart {
 }
 
 class SpelllingBeeDuelEnd {
-    constructor(public result:DuelResult, public player_points:number, public opponent_points:number, public time_left?:number) {}
+    constructor(public result:DuelResult, public player_points:number, public opponent_points:number, public new_player_elo:number, public player_elo_diff:number, public time_left?:number) {}
 }
 
 class SpellingBeeDuelStateReply {
@@ -232,10 +232,10 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
         if (duel === null) {
             var ongoing_duel:SpellingBeeDuel|null = await dbi.checkForExistingDuel(player_id, timestamp, DUEL_DURATION);
             if (ongoing_duel === null) {
-                res.json(new SpelllingBeeDuelEnd(DuelResult.error, -1, -1))
+                res.json(new SpelllingBeeDuelEnd(DuelResult.error, -1, -1, -1, -1))
             }
             else {
-                res.json(new SpelllingBeeDuelEnd(DuelResult.error, -1, -1, Math.floor(ongoing_duel.start_timestamp + DUEL_DURATION - timestamp)))
+                res.json(new SpelllingBeeDuelEnd(DuelResult.error, -1, -1, Math.floor(ongoing_duel.start_timestamp + DUEL_DURATION - timestamp), -1, -1))
             }
             return
         }
@@ -249,8 +249,9 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
         }
         const currentEloScore:number = await dbi.getCurrentSpellingBeeElo(player_id);
         const opponentElo:number = await dbi.getCurrentSpellingBeeElo(duel.opponent_id);
-        dbi.updateSpellingBeeEloRank(player_id, calculateNewEloRank(currentEloScore, opponentElo, result));
-        res.json(new SpelllingBeeDuelEnd(result, duel.player_points, duel.opponent_points))
+        const new_player_elo:number = calculateNewEloRank(currentEloScore, opponentElo, result);
+        dbi.updateSpellingBeeEloRank(player_id, new_player_elo);
+        res.json(new SpelllingBeeDuelEnd(result, duel.player_points, duel.opponent_points, currentEloScore, new_player_elo - currentEloScore))
     } catch (error) {
         console.log(error)
         next(error)
