@@ -70,7 +70,7 @@ function calculateNewEloRank(playerScore:number, opponentScore:number, result:Du
     return playerScore +  Math.ceil(ELO_COEFFICIENT * (numericalResult - expectedResult));
 }
 
-function createBotGuesses(bee_model:Bee, timestamp:number):SpellingBeeDuellGuess[] {
+function createBotGuesses(bee_model:Bee):SpellingBeeDuellGuess[] {
     const return_value:SpellingBeeDuellGuess[] = []
     var bot_points:number = BOT_THRESHOLD.get_random() * getMaxPoints(bee_model.words, bee_model.other_letters);
     const bot_guesses:string[] = []
@@ -82,7 +82,7 @@ function createBotGuesses(bee_model:Bee, timestamp:number):SpellingBeeDuellGuess
         }
     }
     const guess_interval:number = (DUEL_DURATION - 20) / bot_guesses.length;
-    var time:number = 10 + timestamp;
+    var time:number = 10;
     var points:number = 0;
     for (var guess of bot_guesses) {
         var points_for_guess:number = wordPoints(guess, bee_model.other_letters);
@@ -117,10 +117,12 @@ spelling_bee_duel.post('/prematch', async (req:express.Request, res:express.Resp
             return;
         }
         const opponentsCandidates:number[] = await dbi.getOpponentsFromSpellingBeeEloRank(player_id, (await dbi.getCurrentSpellingBeeElo(player_id)), MATCH_ELO_DIFF)
+        console.log(opponentsCandidates);
         var opponent_id = get_bot_id()
         if (opponentsCandidates.length !== 0) {
             var opponent_filter:Set<number> = new Set((await dbi.getLastSpellingBeeDuelOpponents(player_id)));
             var filtered_candidates:number[] = opponentsCandidates.filter(id => !opponent_filter.has(id));
+            console.log(filtered_candidates);
             if (filtered_candidates.length !== 0) {
                 opponent_id = filtered_candidates[Math.floor(Math.random() * filtered_candidates.length)];
             }
@@ -161,7 +163,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
             ids_to_delete.forEach(id => player_ids.delete(id))
             console.log(player_ids)
             if (player_ids.size === 0) {
-                const bot_guesses = createBotGuesses(spelling_bee_model!, timestamp);
+                const bot_guesses = createBotGuesses(spelling_bee_model!);
                 opponent_guesses = opponent_guesses.concat(bot_guesses);
             }
             else {
@@ -174,7 +176,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
                     }
                     return previous_duel;
                 }, null)
-                opponent_guesses = opponent_guesses.concat(best_duel!.player_guesses);
+                opponent_guesses = opponent_guesses.concat(best_duel!.player_guesses).map(g => g = new SpellingBeeDuellGuess(g.word, g.timestamp - best_duel!.start_timestamp ,g.points_after_guess));
             }
 
             duel = (await dbi.startDuel(spelling_bee_model!, player_id, opponent_id, opponent_guesses, opponent_guesses[opponent_guesses.length - 1].points_after_guess, timestamp));
@@ -185,7 +187,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
         }
         res
         .status(200)
-        .json(new SpellingBeeDuelStart((await get_nick(opponent_id, dbi)).nick, opponent_guesses.map(g => new SpellingBeeDuellGuessMessage("", g.timestamp - duel!.start_timestamp, g.points_after_guess)),
+        .json(new SpellingBeeDuelStart((await get_nick(opponent_id, dbi)).nick, opponent_guesses.map(g => new SpellingBeeDuellGuessMessage("", g.timestamp + duel!.start_timestamp, g.points_after_guess)),
             new SpellingBeeDuelStateReply(duel!.main_letter, duel!.letters, duel!.player_guesses.map(guess => guess.word), duel!.player_points, Math.floor(duel.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION))
         )
     }
