@@ -50,7 +50,7 @@ class SpellingBeeDuelPrematchReply {
 
 
 function calculateNewEloRank(playerScore:number, opponentScore:number, result:DuelResult):number {
-    const rankingDiff:number = Math.abs(opponentScore - playerScore);
+    const rankingDiff:number = opponentScore - playerScore;
     const expectedResult:number = 1/(Math.pow(10, -rankingDiff/400) + 1);
     var numericalResult:number = 0;
     switch (result) {
