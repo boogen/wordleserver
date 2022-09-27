@@ -251,7 +251,7 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
         const opponentElo:number = await dbi.getCurrentSpellingBeeElo(duel.opponent_id);
         const new_player_elo:number = calculateNewEloRank(currentEloScore, opponentElo, result);
         dbi.updateSpellingBeeEloRank(player_id, new_player_elo);
-        res.json(new SpelllingBeeDuelEnd(result, duel.player_points, duel.opponent_points, currentEloScore, new_player_elo - currentEloScore))
+        res.json(new SpelllingBeeDuelEnd(result, duel.player_points, duel.opponent_points, new_player_elo, new_player_elo - currentEloScore))
     } catch (error) {
         console.log(error)
         next(error)
