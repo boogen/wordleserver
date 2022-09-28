@@ -6,6 +6,7 @@ import WordleDBI, { Bee, SpellingBeeDuel, SpellingBeeDuellGuess } from '../../DB
 import BaseGuessRequest from '../../types/BaseGuessRequest';
 import { get_bot_id, get_nick } from './player_common';
 import { ELO_COEFFICIENT, DUEL_DURATION, BOT_THRESHOLD, MATCH_ELO_DIFF } from './duel_settings';
+import { get_ranking } from './ranking_common';
 
 export const spelling_bee_duel = express.Router();
 const dbi = new WordleDBI()
@@ -167,7 +168,9 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
                 opponent_guesses = opponent_guesses.concat(bot_guesses);
             }
             else {
-                var best_duel:SpellingBeeDuel|null = past_duels.reduce((previous_duel:SpellingBeeDuel|null, current_duel:SpellingBeeDuel|null) => {
+                var best_duel:SpellingBeeDuel|null = past_duels
+                .filter(duel => duel.player_id === opponent_id)
+                .reduce((previous_duel:SpellingBeeDuel|null, current_duel:SpellingBeeDuel|null) => {
                     if (previous_duel === null) {
                         return current_duel;
                     }
@@ -257,5 +260,19 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
         next(error)
         Sentry.captureException(error);
     }
+})
+
+spelling_bee_duel.post('/get_elo_rank', async (req:express.Request, res:express.Response, next:NextFunction) => {
+    try {
+        const request = new AuthIdRequest(req);
+        const player_id = await dbi.resolvePlayerId(request.authId);
+        var rank = await dbi.getSpellingBeeEloRank();
+        res.json((await get_ranking(player_id, rank, dbi)));
+    } catch (error) {
+        console.log(error)
+        next(error)
+        Sentry.captureException(error);
+    }
+
 })
 

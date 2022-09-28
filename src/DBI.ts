@@ -383,6 +383,20 @@ export default class WordleDBI {
         this.spelling_bee_elo_rank().findOneAndUpdate({player_id:player_id}, {$set:{score:new_score}}, {upsert:true})
     }
 
+    async getSpellingBeeEloRank():Promise<RankingEntry[]> {
+        var rank:SpellingBeeDuelEloRankEntry[] = await this.spelling_bee_elo_rank().find({}, {sort:{score: -1}});
+        var returnValue:RankingEntry[] = [];
+        var position:number = 1;
+        var previous_score = -1;
+        for (var re of rank) {
+            if (previous_score !== -1 && previous_score != re.score) {
+                position += 1;
+            }
+            returnValue.push(new RankingEntry(re.player_id, re.score, position));
+        }
+        return returnValue;
+    }
+
     //BEE RANKING
     async increaseBeeRank(player_id:number, bee_id:number, points:number) {
         const rank =  this.db().get("bee#" + bee_id + "_ranking");
