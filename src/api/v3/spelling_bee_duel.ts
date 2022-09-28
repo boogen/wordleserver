@@ -149,36 +149,13 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
         const existing_match = await dbi.getSpellingBeeDuelMatch(player_id);
         var opponent_id:number = existing_match!.opponent_id
         if (duel === null) {
-            var spelling_bee_model:Bee|null = (await dbi.getRandomDuelBee(opponent_id));
-            console.log(spelling_bee_model!.id)
-            var past_duels:SpellingBeeDuel[] = (await dbi.getDuelsForGivenBee(spelling_bee_model!.id, timestamp, DUEL_DURATION));
-            console.log(past_duels)
-            var player_ids:Set<number> = new Set(past_duels.map(d => d.player_id));
-            console.log(player_ids)
-            var ids_to_delete:number[] = [player_id];
-            player_ids.forEach(element => {
-                if (element < 0) {
-                    ids_to_delete.push(element)
-                }
-            });
-            ids_to_delete.forEach(id => player_ids.delete(id))
-            console.log(player_ids)
-            if (player_ids.size === 0) {
+            if (opponent_id < 0) {
                 const bot_guesses = createBotGuesses(spelling_bee_model!);
                 opponent_guesses = opponent_guesses.concat(bot_guesses);
             }
             else {
-                var best_duel:SpellingBeeDuel|null = past_duels
-                .filter(duel => duel.player_id === opponent_id)
-                .reduce((previous_duel:SpellingBeeDuel|null, current_duel:SpellingBeeDuel|null) => {
-                    if (previous_duel === null) {
-                        return current_duel;
-                    }
-                    if (previous_duel.player_points < current_duel!.player_points) {
-                        return current_duel;
-                    }
-                    return previous_duel;
-                }, null)
+                var spelling_bee_model:Bee|null = (await dbi.getRandomDuelBee(opponent_id));
+                var best_duel:SpellingBeeDuel|null = (await dbi.getDuelsForGivenBee(spelling_bee_model!.id, opponent_id, timestamp, DUEL_DURATION));
                 opponent_guesses = opponent_guesses.concat(best_duel!.player_guesses).map(g => g = new SpellingBeeDuellGuess(g.word, g.timestamp - best_duel!.start_timestamp ,g.points_after_guess));
             }
             console.log(opponent_guesses);
