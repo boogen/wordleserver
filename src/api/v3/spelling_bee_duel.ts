@@ -149,12 +149,13 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
         const existing_match = await dbi.getSpellingBeeDuelMatch(player_id);
         var opponent_id:number = existing_match!.opponent_id
         if (duel === null) {
+            var spelling_bee_model:Bee|null = await dbi.getRandomBee();
             if (opponent_id < 0) {
-                const bot_guesses = createBotGuesses(spelling_bee_model!);
+                const bot_guesses = createBotGuesses((await dbi.getRandomBee())!);
                 opponent_guesses = opponent_guesses.concat(bot_guesses);
             }
             else {
-                var spelling_bee_model:Bee|null = (await dbi.getRandomDuelBee(opponent_id));
+                spelling_bee_model = (await dbi.getRandomDuelBee(opponent_id));
                 var best_duel:SpellingBeeDuel|null = (await dbi.getDuelsForGivenBee(spelling_bee_model!.id, opponent_id, timestamp, DUEL_DURATION));
                 opponent_guesses = opponent_guesses.concat(best_duel!.player_guesses).map(g => g = new SpellingBeeDuellGuess(g.word, g.timestamp - best_duel!.start_timestamp ,g.points_after_guess));
             }

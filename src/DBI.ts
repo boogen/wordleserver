@@ -514,12 +514,14 @@ export default class WordleDBI {
 
     async getRanking(rank_type:string, bee_id:number):Promise<RankingEntry[]> {
         const rank:ICollection<RawRankingEntry> =  this.db().get(rank_type + "#" + bee_id + "_ranking");
+        console.log(rank_type + "#" + bee_id + "_ranking")
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
 
         const score100Array = await rank.aggregate([{ $sample: { size: 1 } }])
 
         if (score100Array.length == 0) {
+            console.log("Empty")
             return []
         }
         
