@@ -241,7 +241,7 @@ export default class WordleDBI {
     }
 
     async getRandomCrossword():Promise<PossibleCrossword> {
-        return (await this.possible_crosswords().aggregate([{ $sample: { size: 1 } }]));
+        return (await this.possible_crosswords().aggregate([{ $sample: { size: 1 } }]))[0];
     }
 
     async getFirstCrossword():Promise<PossibleCrossword|null> {
