@@ -9,7 +9,7 @@ export async function get_ranking(player_id:number, ranking:RankingEntry[], dbi:
 }
 
 class PositionInRank {
-    constructor(public position:number, public score:number, public nick:string, public player_id:number) {}
+    constructor(public position:number, public score:number, public player:string, public player_id:number) {}
 }
 
 export class RankingReply {
