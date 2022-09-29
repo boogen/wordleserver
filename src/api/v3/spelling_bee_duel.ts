@@ -41,7 +41,7 @@ class SpellingBeeDuellGuessMessage {
 
 
 class SpellingBeeDuelPrematchPlayerInfo {
-    constructor(public id:number, public nick:string, public elo:number) {}
+    constructor(public id:number, public player:string, public elo:number) {}
 }
 
 class SpellingBeeDuelPrematchReply {
