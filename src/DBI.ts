@@ -526,7 +526,8 @@ export default class WordleDBI {
         }
         
         var score100:number = score100Array[score100Array.length - 1].score
-        const rawRank = await rank.find({sort: {score:-1}, score: {$gt: score100}})
+        console.log(score100)
+        const rawRank = await rank.find({sort: {score:-1}, score: {$gte: score100}})
         var returnValue:RankingEntry[] = []
         var position = 0
         var score = 0
