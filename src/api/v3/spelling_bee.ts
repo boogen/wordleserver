@@ -105,11 +105,13 @@ spelling_bee.post('/ranking', async (req, res, next) => {
         const player_id = await dbi.resolvePlayerId(value.authId);
         const timestamp = Date.now() / 1000;
         const bee = await dbi.getLettersForBee(timestamp);
+        console.log("Bee id:" + bee);
         if (bee === null) {
             res.json(new RankingReply(undefined, []))
             return
         }
         const ranking = await dbi.getBeeRanking(bee.bee_id)
+        console.log(ranking);
         res.json((await get_ranking(player_id, ranking, dbi)))
     } catch (error) {
         console.log(error);
