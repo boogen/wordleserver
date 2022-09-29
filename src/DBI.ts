@@ -393,6 +393,7 @@ export default class WordleDBI {
                 position += 1;
             }
             returnValue.push(new RankingEntry(re.player_id, re.score, position));
+            previous_score = re.score;
         }
         return returnValue;
     }
