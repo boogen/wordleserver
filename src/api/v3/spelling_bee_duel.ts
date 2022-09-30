@@ -5,7 +5,7 @@ import { checkSpellingBeeGuess, getMaxPoints, SpellingBeeReplyEnum, wordPoints }
 import WordleDBI, { Bee, SpellingBeeDuel, SpellingBeeDuellGuess } from '../../DBI';
 import BaseGuessRequest from '../../types/BaseGuessRequest';
 import { get_bot_id, get_nick } from './player_common';
-import { ELO_COEFFICIENT, DUEL_DURATION, BOT_THRESHOLD, MATCH_ELO_DIFF } from './duel_settings';
+import { ELO_COEFFICIENT, DUEL_DURATION, BOT_THRESHOLD, MATCH_ELO_DIFF, CHANCE_FOR_BOT } from './duel_settings';
 import { get_ranking } from './ranking_common';
 
 export const spelling_bee_duel = express.Router();
@@ -73,6 +73,7 @@ function calculateNewEloRank(playerScore:number, opponentScore:number, result:Du
 
 function createBotGuesses(bee_model:Bee):SpellingBeeDuellGuess[] {
     const return_value:SpellingBeeDuellGuess[] = []
+    console.log(bee_model)
     var bot_points:number = BOT_THRESHOLD.get_random() * getMaxPoints(bee_model.words, bee_model.other_letters);
     const bot_guesses:string[] = []
     while (bot_points > 0) {
@@ -118,9 +119,8 @@ spelling_bee_duel.post('/prematch', async (req:express.Request, res:express.Resp
             return;
         }
         const opponentsCandidates:number[] = await dbi.getOpponentsFromSpellingBeeEloRank(player_id, (await dbi.getCurrentSpellingBeeElo(player_id)), MATCH_ELO_DIFF)
-        console.log(opponentsCandidates);
         var opponent_id = get_bot_id()
-        if (opponentsCandidates.length !== 0) {
+        if (Math.random() >= CHANCE_FOR_BOT && opponentsCandidates.length !== 0) {
             var opponent_filter:Set<number> = new Set((await dbi.getLastSpellingBeeDuelOpponents(player_id)));
             var filtered_candidates:number[] = opponentsCandidates.filter(id => !opponent_filter.has(id));
             console.log(filtered_candidates);
