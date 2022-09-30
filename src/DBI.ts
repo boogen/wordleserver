@@ -176,6 +176,7 @@ export default class WordleDBI {
     }
 
     async resolvePlayerId(auth_id:string):Promise<number> {
+        console.log(auth_id)
         const authEntry = await this.player_auth().findOne({auth_id: auth_id});
         return authEntry!.player_id;
     }
