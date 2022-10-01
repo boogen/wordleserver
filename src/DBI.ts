@@ -519,16 +519,8 @@ export default class WordleDBI {
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
 
-        const score100Array = await rank.aggregate([{ $sample: { size: 1 } }])
-
-        if (score100Array.length == 0) {
-            console.log("Empty")
-            return []
-        }
+        const rawRank = await rank.find({}, {sort: {score:-1}, limit:100})
         
-        var score100:number = score100Array[score100Array.length - 1].score
-        console.log(score100)
-        const rawRank = await rank.find({score: {$gte: score100}}, {sort: {score:-1}})
         var returnValue:RankingEntry[] = []
         var position = 0
         var score = 0
