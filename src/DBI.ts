@@ -302,7 +302,9 @@ export default class WordleDBI {
         if (opponent_id < 0) {
             return this.getRandomBee();
         }
-        var possibleNotRandom = (await this.spelling_bee_duels().find()).filter(d => d.player_id === opponent_id).map(d => d.bee_id);
+        var possibleNotRandom = (await this.spelling_bee_duels().find({player_id:opponent_id},)).map(d => d.bee_id);
+        possibleNotRandom = Array.from(new Set(possibleNotRandom));
+        
         return (await this.getBeeById(possibleNotRandom[Math.floor(possibleNotRandom.length * Math.random())]));
     }
 
@@ -520,7 +522,7 @@ export default class WordleDBI {
         rank.createIndex({score: 1});
 
         const rawRank = await rank.find({}, {sort: {score:-1}, limit:100})
-        
+
         var returnValue:RankingEntry[] = []
         var position = 0
         var score = 0
