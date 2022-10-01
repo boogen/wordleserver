@@ -18,8 +18,8 @@ class GlobalSpellingBeeStateReply extends SpellingBeeStateReply {
 }
 
 class SuccessfullGlobalSpellingBeeStateReply extends SuccessfullSpellingBeeStateReply {
-    constructor(public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number, public max_points:number, pointsForWord:number) {
-        super(SpellingBeeReplyEnum.ok, main_letter, other_letters, guessed_words, player_points, pointsForWord);
+    constructor(public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number, public max_points:number, points:number) {
+        super(SpellingBeeReplyEnum.ok, main_letter, other_letters, guessed_words, player_points, points);
     }
 }
 
