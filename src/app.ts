@@ -3,6 +3,7 @@ import express, {Request,Response,Application} from 'express';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import cors from 'cors';
+import {metrics} from './metrics'
 import * as Sentry from "@sentry/node"
 
 require('dotenv').config();
@@ -47,6 +48,7 @@ app.use((req, res, next) => {
 })
 
 app.use('/api/v3', apiV3)
+app.use('/', metrics)
 
 app.use(notFound);
 app.use(errorHandler);
