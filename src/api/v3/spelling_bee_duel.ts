@@ -160,7 +160,11 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
                 opponent_guesses = opponent_guesses.concat(best_duel!.player_guesses).map(g => g = new SpellingBeeDuellGuess(g.word, g.timestamp - best_duel!.start_timestamp ,g.points_after_guess));
             }
             console.log(opponent_guesses);
-            duel = (await dbi.startDuel(spelling_bee_model!, player_id, opponent_id, opponent_guesses, opponent_guesses[opponent_guesses.length - 1].points_after_guess, timestamp));
+            var opponent_points = 0;
+            if (opponent_guesses.length > 0) {
+               opponent_points = opponent_guesses[opponent_guesses.length - 1].points_after_guess;
+            }
+            duel = (await dbi.startDuel(spelling_bee_model!, player_id, opponent_id, opponent_guesses, opponent_points, timestamp));
         }
         else {
             opponent_guesses = opponent_guesses.concat(duel.opponent_guesses)
