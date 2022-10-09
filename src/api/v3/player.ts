@@ -4,10 +4,12 @@ import AuthIdRequest from '../../types/AuthIdRequest';
 import SetNickRequest from '../../types/SetNickRequest';
 import Utils from '../../utils';
 import WordleDBI from '../../DBI';
+import {Stats} from '../../WordleStatsDBI'
 
 export const player = express.Router();
 
 const dbi = new WordleDBI();
+const stats:Stats = new Stats();
 
 function makeid():string {
     return Utils.randomString(36);
@@ -21,6 +23,7 @@ player.post("/register", async (req, res, next) => {
         }
         const playerId = await dbi.getNextSequenceValue("player_id");
         await dbi.addPlayerToAuthMap(authId, playerId);
+        await stats.addRegistrationEvent(authId, playerId);
         res.json({message:'ok', authId: authId})
     }
     catch(error) {
@@ -35,9 +38,8 @@ player.post("/setNick", async (req, res, next) => {
         const value = new SetNickRequest(req);
         console.log(value.authId)
         const player_id:number = (await dbi.resolvePlayerId(value.authId));
-
-        dbi.setNick(player_id, value.nick, (nick:string) => res.json({message:'ok', profile: {nick: nick}}));
-        
+        await dbi.setNick(player_id, value.nick, (nick:string) => res.json({message:'ok', profile: {nick: nick}}));
+        await stats.addSetNickEvent(player_id, value.nick);
     }
     catch(error) {
         console.log(error);
