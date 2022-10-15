@@ -7,9 +7,12 @@ import BaseGuessRequest from '../../types/BaseGuessRequest';
 import { get_bot_id, get_nick } from './player_common';
 import { ELO_COEFFICIENT, DUEL_DURATION, BOT_THRESHOLD, MATCH_ELO_DIFF, CHANCE_FOR_BOT } from './duel_settings';
 import { get_ranking } from './ranking_common';
+import { Stats } from '../../WordleStatsDBI';
 
 export const spelling_bee_duel = express.Router();
 const dbi = new WordleDBI()
+
+const stats:Stats = new Stats();
 
 enum DuelResult {
     win = "win",
@@ -145,6 +148,7 @@ spelling_bee_duel.post('/prematch', async (req:express.Request, res:express.Resp
             }
         }
         await dbi.addSpellingBeeDuelMatch(player_id, opponent_id);
+        stats.addSpellingBeeDuelPrematchEvent(player_id, opponent_id);
         res.json(new SpellingBeeDuelPrematchReply('ok', await getSpellingBeeDuelPrematchPlayerInfo(player_id), await getSpellingBeeDuelPrematchPlayerInfo(opponent_id)))
     }
     catch (error) {
@@ -186,6 +190,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
             opponent_guesses = opponent_guesses.concat(duel.opponent_guesses)
             opponent_id = duel.opponent_id
         }
+        stats.addSpellingBeeDuelStartEvent(player_id, opponent_id, duel!.bee_id, duel!.bee_duel_id);
         res
         .status(200)
         .json(new SpellingBeeDuelStart((await get_nick(opponent_id, dbi)).nick, opponent_guesses.map(g => new SpellingBeeDuellGuessMessage("", g.timestamp, g.points_after_guess)),
@@ -214,6 +219,7 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
         }
         var points:number = wordPoints(guess, bee_model!.other_letters)
         duel = await dbi.addPlayerGuessInSpellingBeeDuel(duel!.bee_duel_id, player_id, guess, points, duel!, timestamp);
+        stats.addSpellingBeeDuelGuessEvent(player_id, duel!.bee_duel_id, points, duel!.player_points);
         res.json(new SpellingBeeDuelGuessReply(message, new SpellingBeeDuelStateReply(duel!.main_letter, duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points, Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION), points));
     }
     catch(error) {
@@ -252,6 +258,7 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
         const opponentElo:number = await dbi.getCurrentSpellingBeeElo(duel.opponent_id);
         const new_player_elo:number = calculateNewSimpleRank(currentEloScore, result);
         dbi.updateSpellingBeeEloRank(player_id, new_player_elo);
+        stats.addSpellingBeeDuelEndEvent(player_id, duel!.bee_duel_id, result, currentEloScore, new_player_elo)
         res.json(new SpelllingBeeDuelEnd(result, duel.player_points, duel.opponent_points, new_player_elo, new_player_elo - currentEloScore))
     } catch (error) {
         console.log(error)

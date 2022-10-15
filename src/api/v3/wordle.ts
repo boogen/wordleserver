@@ -4,11 +4,14 @@ import WordleDBI, { RankingEntry } from '../../DBI';
 import AuthIdRequest from '../../types/AuthIdRequest';
 import BaseGuessRequest from '../../types/BaseGuessRequest';
 import { string } from '@hapi/joi';
+import { Stats } from '../../WordleStatsDBI';
 const WORD_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
 
 export const wordle = express.Router();
 const dbi = new WordleDBI();
+
+const stats:Stats = new Stats();
 
 wordle.post('/getState', async (req, res, next) => {
     try {
@@ -29,6 +32,7 @@ wordle.post('/getState', async (req, res, next) => {
         // }
         const existing = await dbi.getOrCreateGlobalWord(timestamp, new_validity_timestamp, word);
         const tries = await dbi.getPlayerTries(player_id, existing!.word_id, timestamp);
+        stats.addWordleInitEvent(player_id, existing!.word_id)
         res.json({
             message: 'ok',
             guesses: await Promise.all(tries!.guesses.map(async function(g) { return validateGuess(g, existing!.word) })),
@@ -57,6 +61,7 @@ wordle.post('/validate', async (req, res, next) => {
         const t = await dbi.getPlayerTriesForWord(player_id, wordEntry!.word_id);
         var tries = t!.guesses.length;
         if (t!.guesses.includes(guess) || tries >=6) {
+            stats.addWordleGuessEvent(player_id, tries, guess == word)
             res.json({isWord: false, guess: guess, answer: [], isGuessed: guess == word});
             return;
         }
@@ -77,6 +82,7 @@ wordle.post('/validate', async (req, res, next) => {
         if (tries == 6) {
             guessResult.correctWord = word;
         }
+        stats.addWordleGuessEvent(player_id, tries, guess == word)
         res.json(guessResult);
     } catch (error) {
         console.log(error);

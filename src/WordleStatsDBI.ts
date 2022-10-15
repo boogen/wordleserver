@@ -73,7 +73,7 @@ class CrosswordInitEvent extends StatsEvent {
 }
 
 class CrosswordGuessEvent extends StatsEvent {
-    constructor(public playerId:number, public noOfGuessedWords:number, public noOfGuesses:number, public isFinished:boolean, public timestamp:number) {
+    constructor(public playerId:number, public noOfGuessedWords:number, public noOfGuesses:number, public isFinished:boolean, public isWord:boolean, public timestamp:number) {
         super();
     }
     getTableName(): string {
@@ -170,8 +170,8 @@ export class Stats extends StatsDBI {
         this.addStat(new CrosswordInitEvent(playerId, crosswordId, Date.now()/1000))
     }
 
-    async addCrosswordGuessEvent(playerId:number, noOfGuessedWords:number, noOfGuesses:number, isFinished:boolean) {
-        this.addStat(new CrosswordGuessEvent(playerId, noOfGuessedWords, noOfGuesses, isFinished, Date.now()/1000))
+    async addCrosswordGuessEvent(playerId:number, noOfGuessedWords:number, noOfGuesses:number, isFinished:boolean, isWord:boolean) {
+        this.addStat(new CrosswordGuessEvent(playerId, noOfGuessedWords, noOfGuesses, isFinished, isWord, Date.now()/1000))
     }
 
     async addSpellingBeeGuessEvent(playerId:number, pointsForGuess:number, pointsAfterGuess:number) {

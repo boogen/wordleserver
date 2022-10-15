@@ -3,10 +3,12 @@ import * as Sentry from "@sentry/node"
 import WordleDBI, { PlayerCrosswordState, PossibleCrossword } from '../../DBI';
 import BaseGuessRequest from '../../types/BaseGuessRequest';
 import AuthIdRequest from '../../types/AuthIdRequest';
+import { Stats } from '../../WordleStatsDBI';
 
 export const crossword = express.Router();
 
 const dbi = new WordleDBI();
+const stats:Stats = new Stats();
 
 function isFinished(crosswordState:PlayerCrosswordState) {
     if (crosswordState == null) {
@@ -95,6 +97,7 @@ crossword.post('/guess', async (req, res, next) => {
         var guessed_words = new Set(crosswordState!.guessed_words)
         const crossword = await dbi.getCrossword(crosswordState!.crossword_id)
         if (!isWord) {
+            stats.addCrosswordGuessEvent(playerId, crosswordState!.words.length, crosswordState!.tries.length, isFinished(crosswordState!), false)
             res.json({isWord:false, guessed_word: false, state: (await stateToReply(grid, crosswordState!.words, crossword!, isFinished(crosswordState!)))})
             return
         }
@@ -146,8 +149,9 @@ crossword.post('/guess', async (req, res, next) => {
         if (indexToFill) {
             convertedOriginalGrid[indexToFill.x][indexToFill.y] = original_grid[indexToFill.x][indexToFill.y]
         }
-
+        
         const newState = await dbi.setCrosswordState(playerId, crosswordState!.words, guessed_words_array, convertedOriginalGrid, crosswordState!.crossword_id, Array.from(tries))
+        stats.addCrosswordGuessEvent(playerId, guessed_words_array.length, tries.size, isFinished(newState!), true)
         res.json({isWord:true, guessed_word: guessed_word, state: (await stateToReply(convertedOriginalGrid, crosswordState!.words, crossword!, isFinished(newState!)))})
     }
     catch(error) {
@@ -190,6 +194,7 @@ crossword.post('/init', async (req, res, next) => {
         const crossword = await dbi.getCrossword(crossword_id)
         const newState = await dbi.setCrosswordState(playerId, word_list, guessed_words, grid, crossword_id, tries)
         const state = (await stateToReply(grid, word_list, crossword!, isFinished(newState!)))
+        stats.addCrosswordInitEvent(playerId, crossword_id);
         res.json({
             message:'ok',
             state: state

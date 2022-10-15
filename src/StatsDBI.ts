@@ -1,6 +1,6 @@
 import mariadb, { Connection, PoolConfig } from "mariadb";
 
-const poolConfig:PoolConfig = {host:"127.0.0.1", database:process.env.STATS_DB}
+const poolConfig:PoolConfig = {host:process.env.STATS_DB_HOST, database:process.env.STATS_DB_NAME, user:process.env.STATS_DB_USER, password:process.env.STATS_DB_PASSWORD}
 const _db = mariadb.createPool(poolConfig);
 
 export abstract class StatsEvent {
