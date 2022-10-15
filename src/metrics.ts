@@ -3,9 +3,9 @@ import { collectDefaultMetrics, register } from 'prom-client';
 
 collectDefaultMetrics();
 
-export const router = express.Router();
+export const metrics = express.Router();
 
-router.get('/metrics', async (req, res, next) => {
+metrics.get('/metrics', async (req, res, next) => {
   try {
     res.set('Content-Type', register.contentType);
     res.end(await register.metrics());

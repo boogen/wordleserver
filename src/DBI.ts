@@ -2,6 +2,7 @@ import monk, { FindOneResult, FindResult, ICollection, id, IMonkManager } from '
 import { ObjectId } from 'mongodb';
 import { number } from '@hapi/joi';
 import { DEFAULT_ELO, NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE } from './api/v3/duel_settings';
+import { getMaxPoints } from './api/v3/spelling_bee_common';
 
 export class PlayerProfile {
     constructor(public nick: string, public id:number, public _id?: ObjectId) {}
@@ -360,6 +361,21 @@ export default class WordleDBI {
             {$set:{player_points:current_duel.player_points + points},
             $push:{player_guesses: new SpellingBeeDuellGuess(guess, timestamp, current_duel.player_points + points)}
         })
+    }
+
+    async getAllPlayerDuelsBeeIds(player_id:number):Promise<number[]> {
+        return this.spelling_bee_duels().distinct('bee_id', {player_id:player_id})
+    }
+
+    async getBestResultPercentage(player_id:number, bees_ids:number[]):Promise<number[]> {
+        return Promise.all(bees_ids.map(bee_id => this.getSingleBestResultPercentage(player_id, bee_id)));
+    }
+
+    async getSingleBestResultPercentage(player_id:number, bee_id:number):Promise<number> {
+        const bee_model:Bee|null = await this.getBeeById(bee_id);
+        const best_duel:SpellingBeeDuel|null = await this.spelling_bee_duels().findOne({player_id:player_id, bee_id:bee_id}, {sort:{player_points:-1}, limit:1})
+
+        return best_duel!.player_points/getMaxPoints(bee_model!.words, bee_model!.other_letters);
     }
 
     async getLastSpellingBeeDuelOpponents(player_id:number):Promise<number[]> {

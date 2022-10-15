@@ -49,6 +49,20 @@ class SpellingBeeDuelPrematchReply {
 }
 
 
+function calculateNewSimpleRank(playerScore:number, result:DuelResult):number {
+    switch (result) {
+        case DuelResult.draw:
+            return playerScore + 0;
+        case DuelResult.win:
+            return playerScore + 50;
+            break;
+        case DuelResult.lose:
+            return playerScore - 30;
+        default:
+            throw new Error("Cannot calculate new elo - incorrect result");
+    }
+}
+
 
 function calculateNewEloRank(playerScore:number, opponentScore:number, result:DuelResult):number {
     const rankingDiff:number = playerScore - opponentScore;
@@ -71,10 +85,12 @@ function calculateNewEloRank(playerScore:number, opponentScore:number, result:Du
     return playerScore +  Math.ceil(ELO_COEFFICIENT * (numericalResult - expectedResult));
 }
 
-function createBotGuesses(bee_model:Bee):SpellingBeeDuellGuess[] {
+async function createBotGuesses(bee_model:Bee, player_id:number):Promise<SpellingBeeDuellGuess[]> {
+    const player_duels_bee_ids:number[] = await dbi.getAllPlayerDuelsBeeIds(player_id);
+    const best_result_percentage:number[] = await dbi.getBestResultPercentage(player_id, player_duels_bee_ids);
+    const average_percentage:number = best_result_percentage.reduce((a, b) => a+b, 0) / best_result_percentage.length;
     const return_value:SpellingBeeDuellGuess[] = []
-    console.log(bee_model)
-    var bot_points:number = BOT_THRESHOLD.get_random() * getMaxPoints(bee_model.words, bee_model.other_letters);
+    var bot_points:number = average_percentage * BOT_THRESHOLD.get_random() * getMaxPoints(bee_model.words, bee_model.other_letters);
     const bot_guesses:string[] = []
     while (bot_points > 0) {
         const guess:string = bee_model.words[Math.floor(Math.random() * bee_model.words.length)]
@@ -151,7 +167,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
         if (duel === null) {
             var spelling_bee_model:Bee|null = await dbi.getRandomBee();
             if (opponent_id < 0) {
-                const bot_guesses = createBotGuesses((await dbi.getRandomBee())!);
+                const bot_guesses = await createBotGuesses((await dbi.getRandomBee())!, player_id);
                 opponent_guesses = opponent_guesses.concat(bot_guesses);
             }
             else {
@@ -160,7 +176,11 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
                 opponent_guesses = opponent_guesses.concat(best_duel!.player_guesses).map(g => g = new SpellingBeeDuellGuess(g.word, g.timestamp - best_duel!.start_timestamp ,g.points_after_guess));
             }
             console.log(opponent_guesses);
-            duel = (await dbi.startDuel(spelling_bee_model!, player_id, opponent_id, opponent_guesses, opponent_guesses[opponent_guesses.length - 1].points_after_guess, timestamp));
+            var opponent_points = 0;
+            if (opponent_guesses.length > 0) {
+               opponent_points = opponent_guesses[opponent_guesses.length - 1].points_after_guess;
+            }
+            duel = (await dbi.startDuel(spelling_bee_model!, player_id, opponent_id, opponent_guesses, opponent_points, timestamp));
         }
         else {
             opponent_guesses = opponent_guesses.concat(duel.opponent_guesses)
@@ -230,7 +250,7 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
         }
         const currentEloScore:number = await dbi.getCurrentSpellingBeeElo(player_id);
         const opponentElo:number = await dbi.getCurrentSpellingBeeElo(duel.opponent_id);
-        const new_player_elo:number = calculateNewEloRank(currentEloScore, opponentElo, result);
+        const new_player_elo:number = calculateNewSimpleRank(currentEloScore, result);
         dbi.updateSpellingBeeEloRank(player_id, new_player_elo);
         res.json(new SpelllingBeeDuelEnd(result, duel.player_points, duel.opponent_points, new_player_elo, new_player_elo - currentEloScore))
     } catch (error) {
