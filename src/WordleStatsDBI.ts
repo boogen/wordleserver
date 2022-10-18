@@ -8,7 +8,7 @@ class RegistrationEvent extends StatsEvent {
         return "registration_event";
     }
     getValues():any[] {
-        return [this.authId, this.playerId, this.timestamp]
+        return [this.authId, this.playerId, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')]
     }
 }
 
@@ -20,7 +20,7 @@ class LoginEvent extends StatsEvent {
         return "login_event"
     }
     getValues():any[] {
-        return [this.playerId, this.timestamp];
+        return [this.playerId, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
     }
 }
 
@@ -44,7 +44,7 @@ class WordleInitEvent extends StatsEvent {
         return "wordle_init_event";
     }
     getValues():any[] {
-        return [this.playerId, this.wordle_id, this.timestamp];
+        return [this.playerId, this.wordle_id, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
     }
 }
 
@@ -56,7 +56,7 @@ class WordleGuessEvent extends StatsEvent {
         return "wordle_guess_event";
     }
     getValues():any[] {
-        return [this.playerId, this.tryNo, this.isGuessed, this.timestamp];
+        return [this.playerId, this.tryNo, this.isGuessed, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
     }
 }
 
@@ -68,7 +68,7 @@ class CrosswordInitEvent extends StatsEvent {
         return "crossword_init";
     }
     getValues():any[] {
-        return [this.playerId, this.crosswordId, this.timestamp];
+        return [this.playerId, this.crosswordId, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
     }
 }
 
@@ -80,7 +80,7 @@ class CrosswordGuessEvent extends StatsEvent {
         return "crossword_guess";
     }
     getValues():any[] {
-        return [this.playerId, this.noOfGuessedWords, this.noOfGuesses, this.isFinished, this.timestamp];
+        return [this.playerId, this.noOfGuessedWords, this.noOfGuesses, this.isFinished, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
     }
 }
 
@@ -92,7 +92,7 @@ class SpellingBeeGuessEvent extends StatsEvent {
         return "spelling_bee_guess";
     }
     getValues():any[] {
-        return [this.playerId, this.pointsForGuess, this.pointsAfterGuess, this.timestamp];
+        return [this.playerId, this.pointsForGuess, this.pointsAfterGuess, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
     }
 }
 
@@ -104,7 +104,7 @@ class SpellingBeeDuelPrematchEvent extends StatsEvent {
         return "spelling_bee_duel_prematch";
     }
     getValues():any[] {
-        return [this.playerId, this.opponentId, this.timestamp];
+        return [this.playerId, this.opponentId, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
     }
 }
 
@@ -116,7 +116,7 @@ class SpellingBeeDuelStartEvent extends StatsEvent {
         return "spelling_bee_duel_start_event";
     }
     getValues():any[] {
-        return [this.player_id, this.opponent_id, this.bee_id, this.duel_id, this.timestamp];
+        return [this.player_id, this.opponent_id, this.bee_id, this.duel_id, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
     }
 }
 
@@ -128,7 +128,7 @@ class SpellingBeeDuelGuessEvent extends StatsEvent {
         return "spelling_bee_duel_guess_event";
     }
     getValues():any[] {
-        return [this.playerId, this.duel_id, this.pointsForGuess, this.pointsAfterGuess, this.timestamp];
+        return [this.playerId, this.duel_id, this.pointsForGuess, this.pointsAfterGuess, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
     }
 }
 
@@ -140,7 +140,7 @@ class SpellingBeeDuelEndEvent extends StatsEvent {
         return "spelling_bee_duel_end_event";
     }
     getValues():any[] {
-        return [this.player_id, this.duel_id, this.result, this.previous_elo, this.new_elo, this.timestamp];
+        return [this.player_id, this.duel_id, this.result, this.previous_elo, this.new_elo, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
     }
 }
 
