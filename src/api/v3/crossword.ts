@@ -97,7 +97,7 @@ crossword.post('/guess', async (req, res, next) => {
         var guessed_words = new Set(crosswordState!.guessed_words)
         const crossword = await dbi.getCrossword(crosswordState!.crossword_id)
         if (!isWord) {
-            await stats.addCrosswordGuessEvent(playerId, crosswordState!.words.length, crosswordState!.tries.length, isFinished(crosswordState!), false)
+            await stats.addCrosswordGuessEvent(playerId, crosswordState!.guessed_words.length, crosswordState!.tries.length + crosswordState!.guessed_words.length, isFinished(crosswordState!), false)
             res.json({isWord:false, guessed_word: false, state: (await stateToReply(grid, crosswordState!.words, crossword!, isFinished(crosswordState!)))})
             return
         }
