@@ -80,7 +80,7 @@ class CrosswordGuessEvent extends StatsEvent {
         return "crossword_guess";
     }
     getValues():any[] {
-        return [this.playerId, this.noOfGuessedWords, this.noOfGuesses, this.isWord, this.isFinished, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
+        return [this.playerId, this.noOfGuessedWords, this.noOfGuesses, this.isFinished, this.isWord, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
     }
 }
 
