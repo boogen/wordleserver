@@ -1,8 +1,10 @@
-* FIRST RUN *
+# WORDLE SERVER
+
+## FIRST RUN
 First run adds model and setups databases
 `docker compose --profile=model up`
 
-* NEXT RUNS*
+## NEXT RUNS
 `docker compose up`
 
 # Express API Starter
