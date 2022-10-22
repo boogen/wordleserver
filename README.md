@@ -1,3 +1,10 @@
+* FIRST RUN *
+First run adds model and setups databases
+`docker compose --profile=model up`
+
+* NEXT RUNS*
+`docker compose up`
+
 # Express API Starter
 
 Includes API Server utilities:
@@ -19,27 +26,3 @@ Development utilities:
   * ☕️ Simple, flexible, fun JavaScript test framework for Node.js & The Browser ☕️
 * [supertest](https://www.npmjs.com/package/supertest)
   * HTTP assertions made easy via superagent.
-
-## Setup
-
-```
-npm install
-```
-
-## Lint
-
-```
-npm run lint
-```
-
-## Test
-
-```
-npm run test
-```
-
-## Development
-
-```
-npm run dev
-```
