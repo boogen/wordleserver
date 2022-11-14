@@ -61,7 +61,7 @@ player.post("/getProfile", async (req:express.Request, res:express.Response, nex
         const value = new ProfileRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
         console.log("Getting profile for player: " + value.playerId)
-        const profile = await dbi.getProfile(728);
+        const profile = await dbi.getProfile(value.playerId);
         const duel_stats = await dbi.getSpellingBeeDuelStats(player_id, 728)
         const spelling_bee_stats = await dbi.getSpellingBeeStats(728)
         if (profile === null) {
