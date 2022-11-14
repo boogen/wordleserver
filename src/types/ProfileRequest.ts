@@ -3,7 +3,7 @@ import express from 'express';
 
 const profileSchema = joi.object({
     authId: joi.string().trim().required(),
-    playerId: joi.number().required()
+    playerId: joi.number().integer().required()
 });
 
 export default class ProfileRequest {
