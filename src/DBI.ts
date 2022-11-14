@@ -177,7 +177,7 @@ export default class WordleDBI {
     //PROFILE STATS
     async getSpellingBeeStats(profile_player_id: number):Promise<Array<number>> {
         var result = await this.guessed_words_bee().find({player_id:profile_player_id});
-        const return_value:number[] = new Array(RANKS.length).fill(0);
+        var return_value:number[] = new Array(RANKS.length).fill(0);
         result.forEach(async gw => {
             const global_bee = await this.global_bee().findOne({bee_id:gw.bee_id})
             const bee:Bee|null = await this.getBeeById(global_bee!.bee_model_id)
