@@ -82,4 +82,24 @@ player.post("/getProfile", async (req:express.Request, res:express.Response, nex
         next(error);
         Sentry.captureException(error);
     }
+})
+
+player.post("/getMyProfile", async (req:express.Request, res:express.Response, next) => {
+    try {
+        const value = new AuthIdRequest(req);
+        const player_id = await dbi.resolvePlayerId(value.authId);
+        const profile = await dbi.getProfile(player_id);
+        const spelling_bee_stats = await dbi.getSpellingBeeStats(player_id)
+        if (profile === null) {
+            res.json({message: null});
+            return;
+        }
+        res.json({message: 'ok', profile: {nick: profile.nick, spelling_bee_stats:spelling_bee_stats}})
+    }
+    catch(error) {
+        console.log(error);
+        next(error);
+        Sentry.captureException(error);
+    }
 });
+;
