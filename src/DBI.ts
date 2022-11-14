@@ -102,6 +102,10 @@ export class SpellingBeeDuelMatch {
     constructor(public player_id:number, public opponent_id:number) {}
 }
 
+export class SocialToAuth {
+    constructor(public socialId:string, public authId:string) {}
+}
+
 export class SpellingBeeDuel {
     constructor(public bee_duel_id:number,
         public bee_id:number,
@@ -141,6 +145,7 @@ export default class WordleDBI {
     spelling_bee_duels():ICollection<SpellingBeeDuel> {return _db.get("spelling_bee_duels")}
     spelling_bee_elo_rank():ICollection<SpellingBeeDuelEloRankEntry> {return _db.get("elo_rank_spelling_bee_duel");}
     spelling_bee_duel_prematch():ICollection<SpellingBeeDuelMatch> { return _db.get("spelling_bee_duel_prematch");}
+    social_to_auth():ICollection<SocialToAuth> { return _db.get("social_to_auth")}
 
     constructor() {
         this.friend_codes().createIndex({friend_code: 1}, {unique:true})
@@ -163,6 +168,7 @@ export default class WordleDBI {
         this.spelling_bee_duels().createIndex({bee_duel_id: 1}, {unique:true})
         this.spelling_bee_elo_rank().createIndex({player_id:1}, {unique:true})
         this.spelling_bee_duel_prematch().createIndex({player_id:1}, {unique:true})
+        this.social_to_auth().createIndex({socialId:1}, {unique:true})
     }
 
     //SEQ
@@ -220,6 +226,9 @@ export default class WordleDBI {
     }
 
     //PLAYER
+    async checkSocialId(authId:string, socialId:string):Promise<FindOneResult<SocialToAuth>> {
+        return this.social_to_auth().findOneAndUpdate({socialId:socialId}, {$setOnInsert:{authId:authId, socialId:socialId}}, {upsert:true})
+    }
     async addPlayerToAuthMap(authId:string, playerId:number) {
         return await this.player_auth().insert({auth_id: authId, player_id: playerId});
     }

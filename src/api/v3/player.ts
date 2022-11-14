@@ -6,6 +6,7 @@ import Utils from '../../utils';
 import WordleDBI from '../../DBI';
 import {Stats} from '../../WordleStatsDBI'
 import AuthIdRequest from '../../types/AuthIdRequest';
+import SetSocialIdRequest from '../../types/SetSocialIdRequest';
 
 export const player = express.Router();
 
@@ -54,6 +55,12 @@ player.post("/getNick", async (req:express.Request, res:express.Response, next) 
     const player_id = await dbi.resolvePlayerId(value.authId);
     const profile = await dbi.getProfile(player_id)
     res.json({message:"ok", nick:profile?.nick})
+})
+
+player.post("/setSocialId",  async (req:express.Request, res:express.Response, next) => {
+    var value = new SetSocialIdRequest(req);
+    const social_to_auth = await dbi.checkSocialId(value.authId, value.socialId);
+    res.json({message:'ok', authId:social_to_auth!.authId})
 })
 
 player.post("/getProfile", async (req:express.Request, res:express.Response, next) => {
