@@ -242,6 +242,7 @@ export default class WordleDBI {
     }
 
     async getProfile(playerId:number):Promise<PlayerProfile|null> {
+        console.log(playerId);
         return this.player_profile().findOne({id: playerId});
     }
 
