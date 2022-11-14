@@ -175,12 +175,9 @@ export default class WordleDBI {
     }
 
     //PROFILE STATS
-    async getSpellingBeeStats(profile_player_id: number):Promise<Map<String, number>> {
+    async getSpellingBeeStats(profile_player_id: number):Promise<Array<number>> {
         var result = await this.guessed_words_bee().find({player_id:profile_player_id});
-        const return_value:Map<String, number> = new Map();
-        for (var rank of RANKS) {
-            return_value.set(rank, 0)
-        }
+        const return_value:number[] = new Array(RANKS.length).fill(0);
         result.forEach(async gw => {
             const bee:Bee|null = await this.getBeeById(gw.bee_id)
             var letters = bee!.other_letters;
@@ -190,8 +187,7 @@ export default class WordleDBI {
                 points += wordPoints(word, letters)
             }
             var rank = pointsToRank(points, maxPoints);
-            var currentCount:number|undefined = return_value.get(rank)
-            return_value.set(rank, currentCount! + 1)
+            return_value[rank] += 1
         }
         )
         return return_value;
