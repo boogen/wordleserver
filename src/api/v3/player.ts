@@ -5,6 +5,7 @@ import SetNickRequest from '../../types/SetNickRequest';
 import Utils from '../../utils';
 import WordleDBI from '../../DBI';
 import {Stats} from '../../WordleStatsDBI'
+import AuthIdRequest from '../../types/AuthIdRequest';
 
 export const player = express.Router();
 
@@ -47,6 +48,13 @@ player.post("/setNick", async (req, res, next) => {
         Sentry.captureException(error);
     }
 });
+
+player.post("/getNick", async (req:express.Request, res:express.Response, next) => {
+    var value = new AuthIdRequest(req)
+    const player_id = await dbi.resolvePlayerId(value.authId);
+    const profile = await dbi.getProfile(player_id)
+    res.json({message:"ok", nick:profile?.nick})
+})
 
 player.post("/getProfile", async (req:express.Request, res:express.Response, next) => {
     try {
