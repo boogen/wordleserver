@@ -192,7 +192,6 @@ export default class WordleDBI {
             return_value[rank] = return_value[rank] + 1
         }
         ))
-        console.log(return_value);
         return return_value;
     }
     async getSpellingBeeDuelStats(player_id: number, profile_player_id: number):Promise<Map<String, number>> {
