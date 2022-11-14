@@ -13,7 +13,7 @@ export default class ProfileRequest {
     constructor(req:express.Request) {
         profileSchema.validate(req.body);
         this.authId = req.body.authId;
-        this.playerId = req.body.playerId;
+        this.playerId = Number.parseInt(req.body.playerId);
     }
 }
 
