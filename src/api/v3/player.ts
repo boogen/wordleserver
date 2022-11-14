@@ -69,7 +69,7 @@ player.post("/getProfile", async (req:express.Request, res:express.Response, nex
             res.json({message: null});
             return;
         }
-        res.json({message: 'ok', profile: {nick: profile.nick, duel_stats:duel_stats, spelling_bee_stats:spelling_bee_stats}})
+        res.json({message: 'ok', profile: {nick: profile.nick, duel_stats:{}, spelling_bee_stats:{}}})
     }
     catch(error) {
         console.log(error);
