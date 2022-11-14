@@ -68,7 +68,7 @@ player.post("/getProfile", async (req:express.Request, res:express.Response, nex
             res.json({message: null});
             return;
         }
-        res.json({message: 'ok', profile: {nick: profile.nick, duel_stats:Object.fromEntries(duel_stats.entries()), spelling_bee_stats:Object.fromEntries(spelling_bee_stats.entries())}})
+        res.json({message: 'ok', profile: {nick: profile.nick, duel_stats:Object.fromEntries(duel_stats.entries()), spelling_bee_stats:spelling_bee_stats}})
     }
     catch(error) {
         console.log(error);
