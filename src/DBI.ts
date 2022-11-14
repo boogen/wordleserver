@@ -2,10 +2,14 @@ import monk, { FindOneResult, FindResult, ICollection, id, IMonkManager } from '
 import { ObjectId } from 'mongodb';
 import { number } from '@hapi/joi';
 import { DEFAULT_ELO, NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE } from './api/v3/duel_settings';
-import { getMaxPoints } from './api/v3/spelling_bee_common';
+import { getMaxPoints, pointsToRank, RANKS, wordPoints } from './api/v3/spelling_bee_common';
 
 export class PlayerProfile {
     constructor(public nick: string, public id:number, public _id?: ObjectId) {}
+}
+
+class SpellingBeeDuelAggregate {
+    constructor(public _id: number, public count:number) {}
 }
 
 export class Word {
@@ -170,8 +174,54 @@ export default class WordleDBI {
         return sequenceDocument!.sequence_value;
     }
 
-    //PLAYER
+    //PROFILE STATS
+    async getSpellingBeeStats(profile_player_id: number):Promise<Map<String, number>> {
+        var result = await this.guessed_words_bee().find({player_id:profile_player_id});
+        const return_value:Map<String, number> = new Map();
+        for (var rank of RANKS) {
+            return_value.set(rank, 0)
+        }
+        result.forEach(async gw => {
+            const bee:Bee|null = await this.getBeeById(gw.bee_id)
+            var letters = bee!.other_letters;
+            var points:number = 0;
+            var maxPoints:number = getMaxPoints(bee!.words, letters)
+            for (var word of gw.guesses) {
+                points += wordPoints(word, letters)
+            }
+            var rank = pointsToRank(points, maxPoints);
+            var currentCount:number|undefined = return_value.get(rank)
+            return_value.set(rank, currentCount! + 1)
+        }
+        )
+        return return_value;
+    }
+    async getSpellingBeeDuelStats(player_id: number, profile_player_id: number):Promise<Map<String, number>> {
+        var result = await this.spelling_bee_duels()
+        .aggregate<SpellingBeeDuelAggregate[]>([{$match:{player_id: player_id, opponent_id:profile_player_id, finished:true}},
+            {$group:{_id:{$cmp:["$player_points", "$opponent_points"]}, count:{$count:{}}}}]);
+        var return_value:Map<String, number> = new Map();
+        return_value.set("LOSS", 0);
+        return_value.set("DRAW", 0);
+        return_value.set("WIN", 0);
+        result.forEach(r => {
+            switch (r._id) {
+                case -1:
+                    return_value.set("LOSS", r.count);
+                    break;
+                case 0:
+                    return_value.set("DRAW", r.count);
+                case 1:
+                    return_value.set("WIN", r.count)
+                default:
+                    break;
+            }
+            
+        })
+        return return_value;
+    }
 
+    //PLAYER
     async addPlayerToAuthMap(authId:string, playerId:number) {
         return await this.player_auth().insert({auth_id: authId, player_id: playerId});
     }

@@ -1,6 +1,6 @@
 import express from 'express';
 import Sentry from '@sentry/node';
-import AuthIdRequest from '../../types/AuthIdRequest';
+import ProfileRequest from '../../types/ProfileRequest';
 import SetNickRequest from '../../types/SetNickRequest';
 import Utils from '../../utils';
 import WordleDBI from '../../DBI';
@@ -50,14 +50,16 @@ player.post("/setNick", async (req, res, next) => {
 
 player.post("/getProfile", async (req:express.Request, res:express.Response, next) => {
     try {
-        const value = new AuthIdRequest(req);
+        const value = new ProfileRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
-        const profile = await dbi.getProfile(player_id);
+        const profile = await dbi.getProfile(value.playerId);
+        const duel_stats = await dbi.getSpellingBeeDuelStats(player_id, value.playerId)
+        const spelling_bee_stats = await dbi.getSpellingBeeStats(value.playerId)
         if (profile === null) {
             res.json({message: null});
             return;
         }
-        res.json({message: 'ok', profile: {nick: profile.nick}})
+        res.json({message: 'ok', profile: {nick: profile.nick, duel_stats:duel_stats, spelling_bee_stats:spelling_bee_stats}})
     }
     catch(error) {
         console.log(error);

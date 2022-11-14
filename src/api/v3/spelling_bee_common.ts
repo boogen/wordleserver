@@ -1,11 +1,24 @@
 import WordleDBI, { Bee } from "../../DBI";
 
+const POINTS = [0, .02, .05, .08, .15, .25, .4, .5, .7];
+export const RANKS = ["Żółtodziób", "Debiutant", "Początkujący", "Bystrzak", "Wschodząca gwiazda", "Erudyta", "Ekspert", "Mistrz", "Geniusz"]
+
 export function getMaxPoints(words:String[], letters:string[]):number {
     var sum = 0;
     for (var word of words) {
         sum += wordPoints(word, letters)
     }
     return sum
+}
+
+export function pointsToRank(points:number, maxPoints:number):String {
+    var percentage = points/maxPoints;
+    for (var i = POINTS.length - 1; i >= 0; i--) {
+        if (percentage >= POINTS[i]) {
+            return RANKS[i];
+        }
+    }
+    return RANKS[0];
 }
 
 export function wordPoints(word:String, letters:string[]):number {
