@@ -188,6 +188,7 @@ export default class WordleDBI {
                 points += wordPoints(word, letters)
             }
             var rank = pointsToRank(points, maxPoints);
+            console.log(return_value[rank] + 1)
             return_value[rank] = return_value[rank] + 1
         }
         )
