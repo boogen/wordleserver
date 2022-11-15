@@ -336,7 +336,13 @@ export default class WordleDBI {
         var bee_words:string[] = (await this.bees().findOne({id: bee_model_id}))!.words;
         var wordOnList:boolean = bee_words.includes(word);
         if (word.includes(JOKER)) {
-            var potentialWords = ALPHABET.map(letter => word.replace(JOKER, letter));
+            var potentialWords = ALPHABET.map(letter => {
+                var readyWord = word;
+                while(readyWord.includes(JOKER)) { 
+                    readyWord = readyWord.replace(JOKER, letter)
+                }
+                return readyWord;
+                });
             for (var singleWord of potentialWords) {
                 if (bee_words.includes(singleWord)) {
                     wordOnList = true;
