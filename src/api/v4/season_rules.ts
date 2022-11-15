@@ -26,6 +26,7 @@ export class SeasonRules {
     }
 
     reviver(key:string, value:any):void {
+        console.log(key + " " + value)
         switch(key) {
             case "fixedPoints": this.addFixedPoints(value); break;
             case "multiplier": this.addMultipliers(value); break;
