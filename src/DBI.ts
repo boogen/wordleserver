@@ -323,6 +323,7 @@ export default class WordleDBI {
     //BEE
 
     async isBeeWordOnExtraList(word:string):Promise<boolean> {
+        console.log(word);
         if (word.includes(JOKER)) {
             var potentialWords = ALPHABET.map(letter => word.replace(JOKER, letter))
             console.log(potentialWords);
