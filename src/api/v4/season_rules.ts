@@ -22,17 +22,12 @@ export class SeasonRules {
         profileSchema.validate(json);
         this.noOfLetters = 7;
         this.addBlank = false;
-        JSON.parse(json, this.reviver)
-    }
-
-    reviver(key:string, value:any):void {
-        console.log(key + " " + value)
-        switch(key) {
-            case "fixedPoints": this.addFixedPoints(value); break;
-            case "multiplier": this.addMultipliers(value); break;
-            case "penalties": this.addPenalties(value); break;
-            case "noOfLetters": this.noOfLetters = Number.parseInt(value)
-            case "addBlank": this.addBlank = Boolean(value)
+        var seasonData = JSON.parse(json)
+        if (seasonData.noOfLetters != undefined) {
+            this.noOfLetters = Number.parseInt(seasonData.noOfLetters);
+        }
+        if (seasonData.addBlank != undefined) {
+            this.addBlank = Boolean(seasonData.addBlank)
         }
     }
 
