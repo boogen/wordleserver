@@ -5,11 +5,14 @@ import AuthIdRequest from '../../types/AuthIdRequest';
 import SpellingBeeGuessRequest from '../../types/SpellingBeeGuessRequest';
 import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess } from './spelling_bee_common';
 import { get_ranking, RankingReply } from './ranking_common';
+import { Stats } from '../../WordleStatsDBI';
 
 export const spelling_bee = express.Router();
 const dbi = new WordleDBI()
 const BEE_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
+
+const stats:Stats = new Stats();
 
 class GlobalSpellingBeeStateReply extends SpellingBeeStateReply {
     constructor(public messageEnum:SpellingBeeReplyEnum, public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number, public max_points:number) {
@@ -71,6 +74,8 @@ spelling_bee.post('/guess', async (req, res, next) => {
         }
         var message = await checkSpellingBeeGuess(guess, guesses, bee_model!, dbi)
         if (message != SpellingBeeReplyEnum.ok) {
+            var playerPoints = (await dbi.getBeePlayerPoints(player_id, letters!.bee_id));
+            stats.addSpellingBeeGuessEvent(player_id, guess, false, 0, playerPoints);
             res.json(new GlobalSpellingBeeStateReply(message,
                 letters!.main_letter,
                 letters!.letters,
@@ -82,11 +87,13 @@ spelling_bee.post('/guess', async (req, res, next) => {
         state = await dbi.addBeeGuess(player_id, letters!.bee_id, guess)
         var points = wordPoints(guess, letters!.letters)
         await dbi.increaseBeeRank(player_id, letters!.bee_id, points)
+        var playerPoints = (await dbi.getBeePlayerPoints(player_id, letters!.bee_id));
+        stats.addSpellingBeeGuessEvent(player_id, guess, true, points, playerPoints);
         res.json(new SuccessfullGlobalSpellingBeeStateReply(
             letters!.main_letter,
             letters!.letters,
             state!.guesses,
-            (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
+            playerPoints,
             getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters),
             points
             ))

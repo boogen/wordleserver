@@ -14,7 +14,7 @@ CREATE OR REPLACE TABLE crossword_init ( playerId int,  crosswordId int,  timest
 
 CREATE OR REPLACE TABLE crossword_guess ( playerId int,  noOfGuessedWords int,  noOfGuesses int,  isFinished boolean,  isWord boolean,  timestamp timestamp);
 
-CREATE OR REPLACE TABLE spelling_bee_guess ( playerId int,  pointsForGuess int,  pointsAfterGuess int,  timestamp timestamp);
+CREATE OR REPLACE TABLE spelling_bee_guess ( playerId int,  pointsForGuess int, word tinytext, isWord boolean, pointsAfterGuess int,  timestamp timestamp);
 
 CREATE OR REPLACE TABLE spelling_bee_duel_prematch ( playerId int,  opponentId int,  timestamp timestamp);
 

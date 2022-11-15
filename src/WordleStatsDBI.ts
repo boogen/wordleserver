@@ -85,14 +85,14 @@ class CrosswordGuessEvent extends StatsEvent {
 }
 
 class SpellingBeeGuessEvent extends StatsEvent {
-    constructor(public playerId:number, public pointsForGuess:number, public pointsAfterGuess:number, public timestamp:number) {
+    constructor(public playerId:number, public pointsForGuess:number, public word:string, public isWord:boolean, public pointsAfterGuess:number, public timestamp:number) {
         super();
     }
     getTableName(): string {
         return "spelling_bee_guess";
     }
     getValues():any[] {
-        return [this.playerId, this.pointsForGuess, this.pointsAfterGuess, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
+        return [this.playerId, this.pointsForGuess, this.word, this.isWord, this.pointsAfterGuess, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
     }
 }
 
@@ -174,8 +174,8 @@ export class Stats extends StatsDBI {
         this.addStat(new CrosswordGuessEvent(playerId, noOfGuessedWords, noOfGuesses, isFinished, isWord, Date.now()/1000))
     }
 
-    async addSpellingBeeGuessEvent(playerId:number, pointsForGuess:number, pointsAfterGuess:number) {
-        this.addStat(new SpellingBeeGuessEvent(playerId, pointsForGuess, pointsAfterGuess, Date.now()/1000))
+    async addSpellingBeeGuessEvent(playerId:number, word:string, isWord:boolean, pointsForGuess:number, pointsAfterGuess:number) {
+        this.addStat(new SpellingBeeGuessEvent(playerId, pointsForGuess, word, isWord, pointsAfterGuess, Date.now()/1000))
     }
 
     async addSpellingBeeDuelPrematchEvent(playerId:number, opponentId:number) {
