@@ -3,6 +3,8 @@ import { SeasonRules } from "./season_rules";
 
 const POINTS = [0, .02, .05, .08, .15, .25, .4, .5, .7];
 export const RANKS = ["Noob", "Rookie", "Beginner", "Smartiepants", "Rockstar", "Erudite", "Expert", "Master", "Genius"]
+export const JOKER:string = "🃏"
+export const ALPHABET:string[] = ["a","ą","b", "c", "ć", "d", "e", "ę", "f", "g", "h", "i", "j", "k", "l", "ł", "m", "n", "ń", "o", "ó", "p", "r", "s", "ś", "t", "u", "w", "y", "z", "ź", "ż"]
 
 export function getMaxPoints(words:String[], letters:string[]):number {
     var sum = 0;

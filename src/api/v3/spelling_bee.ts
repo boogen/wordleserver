@@ -34,7 +34,7 @@ spelling_bee.post('/getState', async (req, res, next) => {
         }
         var letters = await dbi.getLettersForBee(timestamp);
         if (null === letters) {
-            letters = await dbi.createLettersForBee(new_validity_timestamp);
+            letters = await dbi.createLettersForBee(new_validity_timestamp, null);
         }
         var state = await dbi.getBeeState(player_id, letters.bee_id);
         var guesses:string[] = []

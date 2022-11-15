@@ -3,6 +3,8 @@ import { ObjectId } from 'mongodb';
 import { number } from '@hapi/joi';
 import { DEFAULT_ELO, NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE } from './api/v3/duel_settings';
 import { getMaxPoints, pointsToRank, RANKS, wordPoints } from './api/v3/spelling_bee_common';
+import { ALPHABET, JOKER } from './api/v4/spelling_bee_common';
+import { SeasonRules } from './api/v4/season_rules';
 
 export class PlayerProfile {
     constructor(public nick: string, public id:number, public _id?: ObjectId) {}
@@ -321,7 +323,13 @@ export default class WordleDBI {
     //BEE
 
     async isBeeWordOnExtraList(word:string):Promise<boolean> {
-        return this.extra_bee_words().findOne({word:word}).then(value => {return value != null});
+        if (word.includes(JOKER)) {
+            var potentialWords = ALPHABET.map(letter => word.replace(JOKER, letter))
+            return this.extra_bee_words().findOne({word:{$in: potentialWords}}).then(value => {return value != null});
+        }
+        else {
+            return this.extra_bee_words().findOne({word:word}).then(value => {return value != null});
+        }
     }
 
     async wordExists(word:string, bee_model_id:number) {
@@ -340,10 +348,17 @@ export default class WordleDBI {
         return (await this.bees().aggregate([{ $sample: { size: 1 } }]))[0]
     }
 
-    async createLettersForBee(validityTimestamp:number) {
+    async createLettersForBee(validityTimestamp:number, season_rules:SeasonRules|null) {
         var bee:Bee = (await this.getRandomBee())
         const bee_id = await this.getNextSequenceValue("global_bee");
-        return this.global_bee().insert(new GlobalBee(bee_id, bee.id, validityTimestamp, bee.other_letters, bee.main_letter))
+        var other_letters = bee.other_letters;
+        while (season_rules != null && season_rules.noOfLetters < other_letters.length) {
+            other_letters.splice(Math.floor(Math.random() * other_letters.length), 1);
+        }
+        if (season_rules != null && season_rules.addBlank) {
+            other_letters[Math.floor(Math.random() * other_letters.length)] = JOKER;
+        }
+        return this.global_bee().insert(new GlobalBee(bee_id, bee.id, validityTimestamp, other_letters, bee.main_letter))
     }
 
     async getBeeState(player_id:number, bee_id:number):Promise<FindOneResult<GuessedWordsBee>> {

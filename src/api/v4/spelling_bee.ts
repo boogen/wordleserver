@@ -5,6 +5,7 @@ import AuthIdRequest from './types/AuthIdRequest';
 import SpellingBeeGuessRequest from './types/SpellingBeeGuessRequest';
 import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess } from './spelling_bee_common';
 import { get_ranking, RankingReply } from './ranking_common';
+import { SeasonRules } from './season_rules';
 
 export const spelling_bee = express.Router();
 const dbi = new WordleDBI()
@@ -34,7 +35,7 @@ spelling_bee.post('/getState', async (req, res, next) => {
         }
         var letters = await dbi.getLettersForBee(timestamp);
         if (null === letters) {
-            letters = await dbi.createLettersForBee(new_validity_timestamp);
+            letters = await dbi.createLettersForBee(new_validity_timestamp, new SeasonRules("{noOfLetters: 6, addBlank: true}"));
         }
         var state = await dbi.getBeeState(player_id, letters.bee_id);
         var guesses:string[] = []

@@ -8,17 +8,20 @@ const profileSchema = joi.object({
     fixedPoints: joi.array().items(fixedPointsSchema),
     multipliers: joi.array().items(multiplierSchema),
     penaltiesSchema: joi.array().items(penaltiesSchema),
-    noOfLetters: joi.number()
+    noOfLetters: joi.number(),
+    addBlank: joi.boolean()
 });
 
 export class SeasonRules {
-    fixedPoints:Map<number, number> = new Map();
-    multiplier:Map<number, number> = new Map();
-    penalties:Map<string, number> = new Map();
-    noOfLetters:number;
+    public fixedPoints:Map<number, number> = new Map();
+    public multiplier:Map<number, number> = new Map();
+    public penalties:Map<string, number> = new Map();
+    public noOfLetters:number;
+    public addBlank:boolean;
     constructor(json:string) {
         profileSchema.validate(json);
         this.noOfLetters = 7;
+        this.addBlank = false;
         JSON.parse(json, this.reviver)
     }
 
@@ -28,6 +31,7 @@ export class SeasonRules {
             case "multiplier": this.addMultipliers(value); break;
             case "penalties": this.addPenalties(value); break;
             case "noOfLetters": this.noOfLetters = Number.parseInt(value)
+            case "addBlank": this.addBlank = Boolean(value)
         }
     }
 
