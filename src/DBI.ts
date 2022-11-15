@@ -3,8 +3,8 @@ import { ObjectId } from 'mongodb';
 import { number } from '@hapi/joi';
 import { DEFAULT_ELO, NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE } from './api/v3/duel_settings';
 import { getMaxPoints, pointsToRank, RANKS, wordPoints } from './api/v3/spelling_bee_common';
-import { ALPHABET, JOKER } from './api/v4/spelling_bee_common';
-import { SeasonRules } from './api/v4/season_rules';
+import { ALPHABET, JOKER } from './api/v3/spelling_bee_common';
+import { SeasonRules } from './api/v3/season_rules';
 
 export class PlayerProfile {
     constructor(public nick: string, public id:number, public _id?: ObjectId) {}
@@ -323,13 +323,9 @@ export default class WordleDBI {
     //BEE
 
     async isBeeWordOnExtraList(word:string):Promise<boolean> {
-        console.log(word);
         if (word.includes(JOKER)) {
             var potentialWords = ALPHABET.map(letter => word.replace(JOKER, letter))
-            console.log(potentialWords);
-            var return_value = await this.extra_bee_words().findOne({word:{$in: potentialWords}}).then(value => {return value != null});
-            console.log(return_value)
-            return return_value;
+            return await this.extra_bee_words().findOne({word:{$in: potentialWords}}).then(value => {return value != null});
         }
         else {
             return this.extra_bee_words().findOne({word:word}).then(value => {return value != null});
@@ -337,7 +333,18 @@ export default class WordleDBI {
     }
 
     async wordExists(word:string, bee_model_id:number) {
-        return (await this.bees().findOne({id: bee_model_id}))!.words.includes(word) || this.isBeeWordOnExtraList(word);
+        var bee_words:string[] = (await this.bees().findOne({id: bee_model_id}))!.words;
+        var wordOnList:boolean = bee_words.includes(word);
+        if (word.includes(JOKER)) {
+            var potentialWords = ALPHABET.map(letter => word.replace(JOKER, letter));
+            for (var singleWord of potentialWords) {
+                if (bee_words.includes(singleWord)) {
+                    wordOnList = true;
+                    break;
+                }
+            }
+        }
+        return wordOnList || this.isBeeWordOnExtraList(word);
     }
 
     async getLettersForBee(timestamp:number):Promise<FindOneResult<GlobalBee>> {
