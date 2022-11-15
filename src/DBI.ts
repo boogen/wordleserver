@@ -352,6 +352,7 @@ export default class WordleDBI {
         var bee:Bee = (await this.getRandomBee())
         const bee_id = await this.getNextSequenceValue("global_bee");
         var other_letters = bee.other_letters;
+        console.log(season_rules)
         while (season_rules != null && season_rules.noOfLetters < other_letters.length) {
             other_letters.splice(Math.floor(Math.random() * other_letters.length), 1);
         }
