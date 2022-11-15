@@ -35,7 +35,7 @@ class SpelllingBeeDuelEnd {
         public opponent_points:number,
         public new_player_elo:number,
         public player_elo_diff:number,
-        public commonGuesses:string[],
+        public common_guesses:string[],
         public time_left?:number) {}
 }
 
