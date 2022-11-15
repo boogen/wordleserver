@@ -70,12 +70,12 @@ export async function checkSpellingBeeGuess(guess:string, current_guesses:string
         if (!guess.includes(bee!.main_letter)) {
             message = SpellingBeeReplyEnum.no_main_letter
         }
-        for (var singleLetter of guess) {
-            if (singleLetter != bee!.main_letter && !other_letters.includes(singleLetter)) {
-                message = SpellingBeeReplyEnum.invalid_letter_used
-                break
-            }
-        }
+        // for (var singleLetter of guess) {
+        //     if (singleLetter != bee!.main_letter && !other_letters.includes(singleLetter)) {
+        //         message = SpellingBeeReplyEnum.invalid_letter_used
+        //         break
+        //     }
+        // }
         return message;
 }
 
