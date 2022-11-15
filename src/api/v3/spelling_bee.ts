@@ -70,7 +70,7 @@ spelling_bee.post('/guess', async (req, res, next) => {
         else {
             guesses = state.guesses
         }
-        var message = await checkSpellingBeeGuess(guess, guesses, bee_model!, dbi)
+        var message = await checkSpellingBeeGuess(guess, guesses, bee_model!, letters!.letters, dbi)
         if (message != SpellingBeeReplyEnum.ok) {
             res.json(new GlobalSpellingBeeStateReply(message,
                 letters!.main_letter,

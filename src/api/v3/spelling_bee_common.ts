@@ -56,7 +56,7 @@ export function wordPointsSeason(word:String, letters:string[], extraRules:Seaso
     return pointsForWord;
 }
 
-export async function checkSpellingBeeGuess(guess:string, current_guesses:string[], bee:Bee, dbi:WordleDBI):Promise<SpellingBeeReplyEnum> {
+export async function checkSpellingBeeGuess(guess:string, current_guesses:string[], bee:Bee, other_letters:string[], dbi:WordleDBI):Promise<SpellingBeeReplyEnum> {
     var message = SpellingBeeReplyEnum.ok;
         if (current_guesses.includes(guess)) {
             message = SpellingBeeReplyEnum.already_guessed
@@ -68,7 +68,7 @@ export async function checkSpellingBeeGuess(guess:string, current_guesses:string
             message = SpellingBeeReplyEnum.no_main_letter
         }
         for (var singleLetter of guess) {
-            if (singleLetter != bee!.main_letter && !bee!.other_letters.includes(singleLetter)) {
+            if (singleLetter != bee!.main_letter && !other_letters.includes(singleLetter)) {
                 message = SpellingBeeReplyEnum.invalid_letter_used
                 break
             }
