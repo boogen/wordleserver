@@ -64,6 +64,15 @@ spelling_bee.post('/guess', async (req, res, next) => {
         const bee_model:Bee|null = await dbi.getBeeById(letters!.bee_model_id);
         var state = await dbi.getBeeState(player_id, letters!.bee_id)
         var guessesToCheck:string[] = []
+        if (!player_guess.includes(letters!.main_letter)) {
+            res.json(new GlobalSpellingBeeStateReply(SpellingBeeReplyEnum.no_main_letter,
+                letters!.main_letter,
+                letters!.letters,
+                state!.guesses,
+                (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
+                getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters)))
+            return;
+        }
         if (player_guess.includes(JOKER)) {
             guessesToCheck = ALPHABET.map(letter => {
                 var readyWord = player_guess;
@@ -78,27 +87,33 @@ spelling_bee.post('/guess', async (req, res, next) => {
             guessesToCheck = [player_guess]
         }
         var points = 0;
+        var message:SpellingBeeReplyEnum = SpellingBeeReplyEnum.wrong_word;
+        var guesses:string[];
+        if (state === null) {
+            guesses = []
+        }
+        else {
+            guesses = state.guesses
+        }
         for (var guess of guessesToCheck) {
-            var guesses:string[];
-            if (state === null) {
-                guesses = []
+            var new_message = await checkSpellingBeeGuess(guess, guesses, bee_model!, letters!.letters, dbi)
+            if (message != SpellingBeeReplyEnum.ok) {
+                message = new_message;
             }
             else {
-                guesses = state.guesses
+                state = await dbi.addBeeGuess(player_id, letters!.bee_id, guess)
+                points += wordPoints(guess, letters!.letters)
+                await dbi.increaseBeeRank(player_id, letters!.bee_id, points)
             }
-            var message = await checkSpellingBeeGuess(guess, guesses, bee_model!, letters!.letters, dbi)
-            if (message != SpellingBeeReplyEnum.ok) {
-                res.json(new GlobalSpellingBeeStateReply(message,
-                    letters!.main_letter,
-                    letters!.letters,
-                    guesses,
-                    (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
-                    getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters)))
-                return;
-            }
-            state = await dbi.addBeeGuess(player_id, letters!.bee_id, guess)
-            points += wordPoints(guess, letters!.letters)
-            await dbi.increaseBeeRank(player_id, letters!.bee_id, points)
+        }
+        if (message != SpellingBeeReplyEnum.ok) {
+            res.json(new GlobalSpellingBeeStateReply(message,
+                letters!.main_letter,
+                letters!.letters,
+                guesses,
+                (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
+                getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters)))
+            return;
         }
         res.json(new SuccessfullGlobalSpellingBeeStateReply(
             letters!.main_letter,
