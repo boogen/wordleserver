@@ -327,7 +327,9 @@ export default class WordleDBI {
         if (word.includes(JOKER)) {
             var potentialWords = ALPHABET.map(letter => word.replace(JOKER, letter))
             console.log(potentialWords);
-            return this.extra_bee_words().findOne({word:{$in: potentialWords}}).then(value => {return value != null});
+            var return_value = await this.extra_bee_words().findOne({word:{$in: potentialWords}}).then(value => {return value != null});
+            console.log(return_value)
+            return return_value;
         }
         else {
             return this.extra_bee_words().findOne({word:word}).then(value => {return value != null});
