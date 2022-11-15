@@ -100,12 +100,12 @@ spelling_bee.post('/guess', async (req, res, next) => {
             if (message != SpellingBeeReplyEnum.ok) {
                 message = new_message;
             }
-            else {
+            if (new_message === SpellingBeeReplyEnum.ok) {
                 state = await dbi.addBeeGuess(player_id, letters!.bee_id, guess)
                 points += wordPoints(guess, letters!.letters)
-                await dbi.increaseBeeRank(player_id, letters!.bee_id, points)
             }
         }
+        await dbi.increaseBeeRank(player_id, letters!.bee_id, points)
         if (message != SpellingBeeReplyEnum.ok) {
             res.json(new GlobalSpellingBeeStateReply(message,
                 letters!.main_letter,
