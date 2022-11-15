@@ -13,7 +13,7 @@ export default class ProfileRequest extends AuthIdRequest {
     constructor(req:express.Request) {
         super(req);
         profileSchema.validate(req.body);
-        this.player_id = Number.parseInt(req.body.playerId);
+        this.player_id = Number.parseInt(req.body.player_id);
     }
 }
 
