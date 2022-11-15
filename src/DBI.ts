@@ -205,18 +205,18 @@ export default class WordleDBI {
         .aggregate<SpellingBeeDuelAggregate[]>([{$match:{player_id: player_id, opponent_id:profile_player_id, finished:true}},
             {$group:{_id:{$cmp:["$player_points", "$opponent_points"]}, count:{$count:{}}}}]);
         var return_value:Map<String, number> = new Map();
-        return_value.set("LOSS", 0);
-        return_value.set("DRAW", 0);
-        return_value.set("WIN", 0);
+        return_value.set("loss", 0);
+        return_value.set("draw", 0);
+        return_value.set("win", 0);
         result.forEach(r => {
             switch (r._id) {
                 case -1:
-                    return_value.set("LOSS", r.count);
+                    return_value.set("loss", r.count);
                     break;
                 case 0:
-                    return_value.set("DRAW", r.count);
+                    return_value.set("draw", r.count);
                 case 1:
-                    return_value.set("WIN", r.count)
+                    return_value.set("win", r.count)
                 default:
                     break;
             }
