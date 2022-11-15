@@ -30,7 +30,13 @@ class SpellingBeeDuelStart {
 }
 
 class SpelllingBeeDuelEnd {
-    constructor(public result:DuelResult, public player_points:number, public opponent_points:number, public new_player_elo:number, public player_elo_diff:number, public time_left?:number) {}
+    constructor(public result:DuelResult,
+        public player_points:number,
+        public opponent_points:number,
+        public new_player_elo:number,
+        public player_elo_diff:number,
+        public commonGuesses:string[],
+        public time_left?:number) {}
 }
 
 class SpellingBeeDuelStateReply {
@@ -239,10 +245,10 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
         if (duel === null) {
             var ongoing_duel:SpellingBeeDuel|null = await dbi.checkForExistingDuel(player_id, timestamp, DUEL_DURATION);
             if (ongoing_duel === null) {
-                res.json(new SpelllingBeeDuelEnd(DuelResult.error, -1, -1, -1, -1))
+                res.json(new SpelllingBeeDuelEnd(DuelResult.error, -1, -1, -1, -1, []))
             }
             else {
-                res.json(new SpelllingBeeDuelEnd(DuelResult.error, -1, -1, Math.floor(ongoing_duel.start_timestamp + DUEL_DURATION - timestamp), -1, -1))
+                res.json(new SpelllingBeeDuelEnd(DuelResult.error, -1, -1, -1, -1, [], Math.floor(ongoing_duel.start_timestamp + DUEL_DURATION - timestamp)))
             }
             return
         }
@@ -257,9 +263,15 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
         const currentEloScore:number = await dbi.getCurrentSpellingBeeElo(player_id);
         const opponentElo:number = await dbi.getCurrentSpellingBeeElo(duel.opponent_id);
         const new_player_elo:number = calculateNewSimpleRank(currentEloScore, result);
+        var commonGuesses:string[] = []
+        for (var guess of duel.player_guesses) {
+            if (duel.opponent_guesses.filter(opponentGuess => opponentGuess.word === guess.word).length > 0) {
+                commonGuesses.push(guess.word);
+            }
+        }
         dbi.updateSpellingBeeEloRank(player_id, new_player_elo);
         stats.addSpellingBeeDuelEndEvent(player_id, duel!.bee_duel_id, result, currentEloScore, new_player_elo)
-        res.json(new SpelllingBeeDuelEnd(result, duel.player_points, duel.opponent_points, new_player_elo, new_player_elo - currentEloScore))
+        res.json(new SpelllingBeeDuelEnd(result, duel.player_points, duel.opponent_points, new_player_elo, new_player_elo - currentEloScore, commonGuesses))
     } catch (error) {
         console.log(error)
         next(error)

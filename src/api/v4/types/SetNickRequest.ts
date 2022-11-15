@@ -3,7 +3,7 @@ import express from 'express';
 import joi from '@hapi/joi';
 
 const setNickSchema = joi.object({
-    authId: joi.string().trim().required(),
+    auth_id: joi.string().trim().required(),
     nick: joi.string().trim().required()
 });
 

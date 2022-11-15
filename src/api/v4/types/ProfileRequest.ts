@@ -3,8 +3,8 @@ import express from 'express';
 import AuthIdRequest from './AuthIdRequest';
 
 const profileSchema = joi.object({
-    authId: joi.string().trim().required(),
-    playerId: joi.number().integer().required()
+    auth_id: joi.string().trim().required(),
+    player_id: joi.number().integer().required()
 });
 
 export default class ProfileRequest extends AuthIdRequest {

@@ -2,7 +2,7 @@ import joi from '@hapi/joi';
 import express from 'express';
 
 const socialIdRequestSchema = joi.object({
-    authId: joi.string().trim().required(),
+    auth_id: joi.string().trim().required(),
     socialId: joi.string().trim().required()
 });
 
