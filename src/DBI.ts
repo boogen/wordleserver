@@ -325,6 +325,7 @@ export default class WordleDBI {
     async isBeeWordOnExtraList(word:string):Promise<boolean> {
         if (word.includes(JOKER)) {
             var potentialWords = ALPHABET.map(letter => word.replace(JOKER, letter))
+            console.log(potentialWords);
             return this.extra_bee_words().findOne({word:{$in: potentialWords}}).then(value => {return value != null});
         }
         else {
