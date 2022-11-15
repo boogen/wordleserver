@@ -5,7 +5,7 @@ import AuthIdRequest from './types/AuthIdRequest';
 import SpellingBeeGuessRequest from './types/SpellingBeeGuessRequest';
 import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess } from './spelling_bee_common';
 import { get_ranking, RankingReply } from './ranking_common';
-import { SeasonRules } from '../v4/season_rules';
+import { SeasonRules } from './season_rules';
 
 export const spelling_bee = express.Router();
 const dbi = new WordleDBI()

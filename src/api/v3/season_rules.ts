@@ -8,26 +8,26 @@ const profileSchema = joi.object({
     fixedPoints: joi.array().items(fixedPointsSchema),
     multipliers: joi.array().items(multiplierSchema),
     penaltiesSchema: joi.array().items(penaltiesSchema),
-    noOfLetters: joi.number()
+    noOfLetters: joi.number(),
+    addBlank: joi.boolean()
 });
 
 export class SeasonRules {
-    fixedPoints:Map<number, number> = new Map();
-    multiplier:Map<number, number> = new Map();
-    penalties:Map<string, number> = new Map();
-    noOfLetters:number;
+    public fixedPoints:Map<number, number> = new Map();
+    public multiplier:Map<number, number> = new Map();
+    public penalties:Map<string, number> = new Map();
+    public noOfLetters:number;
+    public addBlank:boolean;
     constructor(json:string) {
         profileSchema.validate(json);
         this.noOfLetters = 7;
-        JSON.parse(json, this.reviver)
-    }
-
-    reviver(key:string, value:any):void {
-        switch(key) {
-            case "fixedPoints": this.addFixedPoints(value); break;
-            case "multiplier": this.addMultipliers(value); break;
-            case "penalties": this.addPenalties(value); break;
-            case "noOfLetters": this.noOfLetters = Number.parseInt(value)
+        this.addBlank = false;
+        var seasonData = JSON.parse(json)
+        if (seasonData.noOfLetters != undefined) {
+            this.noOfLetters = Number.parseInt(seasonData.noOfLetters);
+        }
+        if (seasonData.addBlank != undefined) {
+            this.addBlank = Boolean(seasonData.addBlank)
         }
     }
 
