@@ -107,7 +107,7 @@ spelling_bee.post('/guess', async (req, res, next) => {
             }
             if (new_message === SpellingBeeReplyEnum.ok) {
                 state = await dbi.addBeeGuess(player_id, letters!.bee_id, guess)
-                points += wordPointsSeason(guess, letters!.letters, season_rules)
+                points += wordPointsSeason(guess, state!.letters.map(ls => ls.letter), season_rules)
             }
         }
         await dbi.increaseBeeRank(player_id, letters!.bee_id, points)
