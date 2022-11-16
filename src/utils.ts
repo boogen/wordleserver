@@ -10,6 +10,7 @@ export default class Utils {
     
         return text;
     }
+
 }
 
 export class MinMax {

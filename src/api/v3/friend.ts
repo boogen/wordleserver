@@ -8,6 +8,15 @@ import AddFriendRequest from './types/AddFriendRequest';
 export const friend = express.Router();
 const dbi = new WordleDBI();
 
+export function generateFriendCode(length:number):string {
+    var text = "";
+    var possible = "0123456789";
+
+    for (var i = 0; i < length; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+}
 
 friend.post('/code', async (req, res, next) => {
     try {
@@ -16,7 +25,7 @@ friend.post('/code', async (req, res, next) => {
         var friend_code = null;
         var generated_friend_code = null;
         do {
-            generated_friend_code = Array.from({length: 3}, () => utils.randomString(4)).join("-");
+            generated_friend_code = generateFriendCode(7);
             console.log(generated_friend_code)
         } while ((friend_code = await dbi.addFriendCode(player_id, generated_friend_code)));
         res.json({

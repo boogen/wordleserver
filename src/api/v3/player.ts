@@ -8,6 +8,7 @@ import {Stats} from '../../WordleStatsDBI'
 import AuthIdRequest from './types/AuthIdRequest';
 import SetSocialIdRequest from './types/SetSocialIdRequest';
 import utils from '../../utils';
+import { generateFriendCode } from './friend';
 
 export const player = express.Router();
 
@@ -78,7 +79,7 @@ player.post("/getProfile", async (req:express.Request, res:express.Response, nex
         }
         var friendCode = await dbi.getFriendCode(player_id);
         while (!friendCode) {
-            var generated_friend_code = Array.from({length: 3}, () => utils.randomString(4)).join("-");
+            var generated_friend_code = generateFriendCode(7);
             friendCode = await dbi.addFriendCode(player_id, generated_friend_code);
         }
         res.json({message: 'ok', profile: {nick: profile.nick, duel_stats:Object.fromEntries(duel_stats.entries()), spelling_bee_stats:spelling_bee_stats, friend_code: friendCode}})
