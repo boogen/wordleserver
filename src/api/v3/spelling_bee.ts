@@ -70,7 +70,7 @@ spelling_bee.post('/guess', async (req, res, next) => {
         const letters = await dbi.getLettersForBee(timestamp);
         const bee_model:Bee|null = await dbi.getBeeById(letters!.bee_model_id);
         var state = await dbi.getBeeState(player_id, letters!.bee_id)
-        var letterCorrectnessMessage = checkGuessForIncorrectLetters(player_guess, bee_model!, letters!.letters);
+        var letterCorrectnessMessage = checkGuessForIncorrectLetters(player_guess, bee_model!, state!.letters);
         if (letterCorrectnessMessage != SpellingBeeReplyEnum.ok) {
             res.json(new GlobalSpellingBeeStateReply(letterCorrectnessMessage,
                 state!.letters,
@@ -79,6 +79,7 @@ spelling_bee.post('/guess', async (req, res, next) => {
                 getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters)))
             return;
         }
+
         var guessesToCheck:string[] = []
         if (player_guess.includes(JOKER)) {
             guessesToCheck = ALPHABET.map(letter => {
@@ -120,6 +121,9 @@ spelling_bee.post('/guess', async (req, res, next) => {
                 (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
                 getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters)))
             return;
+        }
+        for (var letter of player_guess) {
+            state!.letters.filter(letterState => letterState.letter === letter).forEach(letterState => letterState.usageLimit -= 1);
         }
         res.json(new SuccessfullGlobalSpellingBeeStateReply(
             state!.letters,

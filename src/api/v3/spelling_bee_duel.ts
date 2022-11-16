@@ -212,7 +212,7 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
         const timestamp = Date.now() / 1000;
         var duel:SpellingBeeDuel|null = await dbi.checkForExistingDuel(player_id, timestamp, DUEL_DURATION);
         const bee_model:Bee|null = await dbi.getBeeById(duel!.bee_id)
-        var letterCorrectnessMessage = checkGuessForIncorrectLetters(guess, bee_model!, bee_model!.other_letters);
+        var letterCorrectnessMessage = checkGuessForIncorrectLetters(guess, bee_model!, []);
         if (letterCorrectnessMessage != SpellingBeeReplyEnum.ok) {
             res.json(new SpellingBeeDuelGuessReply(letterCorrectnessMessage, new SpellingBeeDuelStateReply(duel!.main_letter, duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points,Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION), 0));
             return;

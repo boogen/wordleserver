@@ -73,13 +73,14 @@ export async function checkSpellingBeeGuess(guess:string, current_guesses:string
         return message;
 }
 
-export function checkGuessForIncorrectLetters(guess:string, bee:Bee, other_letters:string[]):SpellingBeeReplyEnum {
+export function checkGuessForIncorrectLetters(guess:string, bee:Bee, letters:LetterState[]):SpellingBeeReplyEnum {
     var message = SpellingBeeReplyEnum.ok;
-    if (!guess.includes(bee!.main_letter)) {
+    for (var requiredLetter of letters.filter(LetterState => LetterState.required))
+    if (!guess.includes(requiredLetter.letter)) {
         message = SpellingBeeReplyEnum.no_main_letter
     }
     for (var singleLetter of guess) {
-        if (singleLetter != bee!.main_letter && !other_letters.includes(singleLetter)) {
+        if (letters.filter(LetterState => singleLetter === LetterState.letter && LetterState.usageLimit > 0).length === 0) {
             message = SpellingBeeReplyEnum.invalid_letter_used
             break
         }
