@@ -11,7 +11,7 @@ export default class AddFriendRequest extends AuthIdRequest {
     friendCode: string;
     constructor(req:express.Request) {
         addFriendSchema.validate(req.body)
-        super(req.body.authId)
+        super(req)
         this.friendCode = req.body.friendCode;
     }
 }
