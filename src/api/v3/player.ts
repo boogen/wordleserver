@@ -87,7 +87,7 @@ player.post("/getProfile", async (req:express.Request, res:express.Response, nex
         const player_id = await dbi.resolvePlayerId(value.authId);
         console.log("Getting profile for player: " + value.player_id)
 
-        res.json({message: 'ok', profile: getProfile(player_id, value.player_id)})
+        res.json({message: 'ok', profile: await getProfile(player_id, value.player_id)})
     }
     catch(error) {
         console.log(error);
