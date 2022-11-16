@@ -20,7 +20,7 @@ class GlobalSpellingBeeStateReply extends SpellingBeeStateReply {
 }
 
 class SuccessfullGlobalSpellingBeeStateReply extends SuccessfullSpellingBeeStateReply {
-    constructor(public letters:LetterState[], public guessed_words:string[], public player_points:number, public max_points:number, points:number) {
+    constructor(public letters:LetterState[], public guessed_words:string[], public player_points:number, public max_points:number, points:number, public letters_to_buy_prices:number[]) {
         super(SpellingBeeReplyEnum.ok, letters, guessed_words, player_points, points);
     }
 }
@@ -86,13 +86,14 @@ spelling_bee.post('/guess', async (req, res, next) => {
         var totalPointsAdded = result.pointsAdded.reduce((a, b) => a+b)
         await dbi.increaseBeeRank(player_id, letters!.bee_id, totalPointsAdded)
         const max_points = getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters);
-        await dbi.saveLettersState(player_id, letters!.bee_id, result.newLetterState)
+        state = await dbi.saveLettersState(player_id, letters!.bee_id, result.newLetterState)
         res.json(new SuccessfullGlobalSpellingBeeStateReply(
             state!.letters,
             state!.guesses,
             (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
             max_points,
-            totalPointsAdded
+            totalPointsAdded,
+            state!.lettersToBuy.map(lb => lb.price)
             ))
     } catch (error) {
         console.log(error);
