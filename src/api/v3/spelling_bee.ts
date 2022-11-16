@@ -124,7 +124,8 @@ spelling_bee.post('/buy_letter',async (req, res, next) => {
     }
     var lettersState = state!.letters;
     var pointInfo = await dbi.increaseBeeRank(player_id, letters!.bee_id, -letterPrice.price)
-    var possibleLetters = ALPHABET.filter(letter => lettersState.filter(ls => letter !== ls.letter).length === 0)
+    var plainLetters = lettersState.map(ls => ls.letter)
+    var possibleLetters = ALPHABET.filter(letter => !plainLetters.includes(letter))
     console.log(possibleLetters)
     var boughtLetterIndex:number = Math.floor(Math.random() * possibleLetters.length)
     var boughtLetter:string = possibleLetters[boughtLetterIndex]
