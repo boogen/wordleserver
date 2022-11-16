@@ -3,9 +3,9 @@ import * as Sentry from "@sentry/node"
 import WordleDBI, { Bee, GlobalBee, GuessedWordsBee, LetterState, RankingEntry } from '../../DBI'
 import AuthIdRequest from './types/AuthIdRequest';
 import SpellingBeeGuessRequest from './types/SpellingBeeGuessRequest';
-import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess, JOKER, ALPHABET, getNewLetterState, checkGuessForIncorrectLetters } from './spelling_bee_common';
+import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess, JOKER, ALPHABET, getNewLetterState, checkGuessForIncorrectLetters, wordPointsSeason } from './spelling_bee_common';
 import { get_ranking, RankingReply } from './ranking_common';
-import { SeasonRules } from './season_rules';
+import { getSeasonRules, SeasonRules } from './season_rules';
 import * as fs from 'fs';
 
 export const spelling_bee = express.Router();
@@ -35,11 +35,7 @@ spelling_bee.post('/getState', async (req, res, next) => {
             new_validity_timestamp += BEE_VALIDITY;
         }
         var letters:GlobalBee|null = await dbi.getLettersForBee(timestamp);
-        var season_rules_json = fs.readFileSync('model/season.json','utf8');
-        var season_rules = new SeasonRules("{}")
-        if (season_rules_json) {
-            season_rules = new SeasonRules(season_rules_json);
-        }
+        var season_rules = getSeasonRules()
         if (null === letters) {
             letters = await dbi.createLettersForBee(new_validity_timestamp, season_rules);
         }
@@ -64,6 +60,7 @@ spelling_bee.post('/getState', async (req, res, next) => {
 spelling_bee.post('/guess', async (req, res, next) => {
     try {
         const request = new SpellingBeeGuessRequest(req);
+        var season_rules = getSeasonRules();
         const player_guess = request.guess;
         const player_id = await dbi.resolvePlayerId(request.authId);
         const timestamp = Date.now() / 1000;
@@ -110,16 +107,17 @@ spelling_bee.post('/guess', async (req, res, next) => {
             }
             if (new_message === SpellingBeeReplyEnum.ok) {
                 state = await dbi.addBeeGuess(player_id, letters!.bee_id, guess)
-                points += wordPoints(guess, letters!.letters)
+                points += wordPointsSeason(guess, letters!.letters, season_rules)
             }
         }
         await dbi.increaseBeeRank(player_id, letters!.bee_id, points)
+        const max_points = getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters);
         if (message != SpellingBeeReplyEnum.ok) {
             res.json(new GlobalSpellingBeeStateReply(message,
                 state!.letters,
                 guesses,
                 (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
-                getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters)))
+                max_points))
             return;
         }
         for (var letter of player_guess) {
@@ -130,7 +128,7 @@ spelling_bee.post('/guess', async (req, res, next) => {
             state!.letters,
             state!.guesses,
             (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
-            getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters),
+            max_points,
             points
             ))
     } catch (error) {

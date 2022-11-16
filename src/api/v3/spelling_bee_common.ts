@@ -59,6 +59,14 @@ export function wordPointsSeason(word:String, letters:string[], extraRules:Seaso
     if (extraRules.fixedPoints.has(word.length)) {
         pointsForWord = extraRules.fixedPoints.get(word.length)!;
     }
+    for (var letter of word) {
+        if (letters.includes(letter)) {
+            pointsForWord += extraRules.getPointsForLetter(letter)
+        }
+        else {
+            pointsForWord += extraRules.getPointsForLetter(JOKER)
+        }
+    }
     return pointsForWord;
 }
 

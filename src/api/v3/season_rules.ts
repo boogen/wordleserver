@@ -1,4 +1,5 @@
 import joi, { required } from '@hapi/joi';
+import * as fs from 'fs';
 
 const fixedPointsSchema = joi.object({length: joi.number().required(), points: joi.number().required()})
 const multiplierSchema = joi.object({length: joi.number().required(), value: joi.number().required()})
@@ -15,6 +16,13 @@ const profileSchema = joi.object({
     pointsForLetters: joi.array().items(pointsForLetterSchema),
     letterUsage: joi.array().items(letterUsageSchema)
 });
+
+export function getSeasonRules():SeasonRules {
+    if (fs.existsSync('model/season.json')) {
+        return new SeasonRules(fs.readFileSync('model/season.json','utf8'))
+    }
+    return new SeasonRules('{}');
+}
 
 export class SeasonRules {
     public fixedPoints:Map<number, number> = new Map();
@@ -82,7 +90,7 @@ export class SeasonRules {
 
     getPointsForLetter(letter:string):number {
         if (!this.pointsForLetters.has(letter)) {
-            return -1;
+            return 0;
         }
         return this.pointsForLetters.get(letter)!;
     }
