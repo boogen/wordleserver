@@ -68,9 +68,10 @@ friend.post('/list', async (req, res, next) => {
         const value =new AuthIdRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
         var friendList = await dbi.friendList(player_id);
+
         res.json({
             status: "ok",
-            friendList: friendList.map(friendId => getProfile(player_id, friendId))
+            friendList: await Promise.all(friendList.map(async (friendId) => { return { player_id: friendId, nick: (await dbi.getProfile(friendId))!.nick }; }))
         })
     }
     catch(error) {
