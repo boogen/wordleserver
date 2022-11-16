@@ -75,7 +75,7 @@ export class GlobalBee {
 }
 
 export class LetterState {
-    constructor(public letter:string, public usageLimit:number, public pointForLetter:number, public required:boolean) {}
+    constructor(public letter:string, public usageLimit:number, public pointsForLetter:number, public required:boolean) {}
 }
 
 export class GuessedWordsBee {
