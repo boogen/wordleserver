@@ -5,6 +5,7 @@ import { DEFAULT_ELO, NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE } from './api/v3/duel_
 import { getMaxPoints, getNewLetterState, pointsToRank, RANKS, wordPoints } from './api/v3/spelling_bee_common';
 import { ALPHABET, JOKER } from './api/v3/spelling_bee_common';
 import { LetterToBuy, SeasonRules } from './api/v3/season_rules';
+import { player } from './api/v3/player';
 
 export class PlayerProfile {
     constructor(public nick: string, public id:number, public _id?: ObjectId) {}
@@ -534,6 +535,13 @@ export default class WordleDBI {
     }
 
     //BEE RANKING
+    async getPlayerSpellingBeeScore(player_id:number, bee_id:number):Promise<FindOneResult<RankingEntry>> {
+        const rank =  this.db().get("bee#" + bee_id + "_ranking");
+        rank.createIndex({player_id: 1})
+        rank.createIndex({score: 1});
+        return rank.findOne({player_id:player_id})
+    }
+
     async increaseBeeRank(player_id:number, bee_id:number, points:number):Promise<RankingEntry> {
         const rank =  this.db().get("bee#" + bee_id + "_ranking");
         rank.createIndex({player_id: 1})

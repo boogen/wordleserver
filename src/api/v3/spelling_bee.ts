@@ -108,14 +108,22 @@ spelling_bee.post('/buy_letter',async (req, res, next) => {
     const letters = await dbi.getLettersForBee(timestamp);
     const bee_model:Bee|null = await dbi.getBeeById(letters!.bee_model_id);
     var state = await dbi.getBeeState(player_id, letters!.bee_id)
-    var lettersToBuy = state!.lettersToBuy;
+    var lettersToBuy = state!.lettersToBuy; 
     if (lettersToBuy.length == 0) {
-        res.json({"message":"error"})
+        res.json({"message":"no letters to buy"})
         return;
     }
+    var currentPlayerPoints:number|undefined = (await dbi.getPlayerSpellingBeeScore(player_id, letters!.bee_id))?.score
+    if (!currentPlayerPoints) {
+        currentPlayerPoints = 0;
+    }
     var letterPrice = lettersToBuy.splice(0, 1)[0];
+    if (letterPrice.price > currentPlayerPoints) {
+        res.json({"message": "not_enough_points"})
+        return;
+    }
     var lettersState = state!.letters;
-    var pointInfo = await dbi.increaseBeeRank(player_id, letters!.bee_id, letterPrice.price)
+    var pointInfo = await dbi.increaseBeeRank(player_id, letters!.bee_id, -letterPrice.price)
     var possibleLetters = ALPHABET.filter(letter => lettersState.filter(ls => letter !== ls.letter).length === 0)
     lettersState.push(new LetterState(possibleLetters[Math.floor(Math.random() * possibleLetters.length)], letterPrice.useLimit, 0 , false));
     var newState = await dbi.addNewLetterToSpellingBeeState(player_id, letters!.bee_id, lettersState, lettersToBuy);
