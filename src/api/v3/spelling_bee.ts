@@ -3,7 +3,7 @@ import * as Sentry from "@sentry/node"
 import WordleDBI, { Bee, GlobalBee, GuessedWordsBee, LetterState, RankingEntry } from '../../DBI'
 import AuthIdRequest from './types/AuthIdRequest';
 import SpellingBeeGuessRequest from './types/SpellingBeeGuessRequest';
-import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess, JOKER, ALPHABET, getNewLetterState, checkGuessForIncorrectLetters, wordPointsSeason, GuessToCheck } from './spelling_bee_common';
+import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess, JOKER, ALPHABET, getNewLetterState, checkGuessForIncorrectLetters, wordPointsSeason, processPlayerGuess} from './spelling_bee_common';
 import { get_ranking, RankingReply } from './ranking_common';
 import { getSeasonRules, SeasonRules } from './season_rules';
 import * as fs from 'fs';
@@ -67,9 +67,10 @@ spelling_bee.post('/guess', async (req, res, next) => {
         const letters = await dbi.getLettersForBee(timestamp);
         const bee_model:Bee|null = await dbi.getBeeById(letters!.bee_model_id);
         var state = await dbi.getBeeState(player_id, letters!.bee_id)
-        var letterCorrectnessMessage = checkGuessForIncorrectLetters(player_guess, bee_model!, state!.letters);
-        if (letterCorrectnessMessage != SpellingBeeReplyEnum.ok) {
-            res.json(new GlobalSpellingBeeStateReply(letterCorrectnessMessage,
+        var result = await processPlayerGuess(player_guess, state!.guesses, bee_model!, state!.letters, season_rules, dbi);
+
+        if (result.message != SpellingBeeReplyEnum.ok) {
+            res.json(new GlobalSpellingBeeStateReply(result.message,
                 state!.letters,
                 state!.guesses,
                 (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
@@ -77,61 +78,19 @@ spelling_bee.post('/guess', async (req, res, next) => {
             return;
         }
 
-        var guessesToCheck:string[] = []
-        if (player_guess.includes(JOKER)) {
-            guessesToCheck = ALPHABET.map(letter => {
-                var readyWord = player_guess;
-                var jokersUsed:number[] = [];
-                while(readyWord.includes(JOKER)) {
-                    jokersUsed.push(readyWord.indexOf(JOKER));
-                    readyWord = readyWord.replace(JOKER, letter)
-                }
-                return readyWord;
-                }
-            )
+        for (var guess of result.guessesAdded) {
+            state = await dbi.addBeeGuess(player_id, letters!.bee_id, guess)
         }
-        else {
-            guessesToCheck = [player_guess]
-        }
-        var points = 0;
-        var message:SpellingBeeReplyEnum = SpellingBeeReplyEnum.wrong_word;
-        var guesses:string[];
-        if (state === null) {
-            guesses = []
-        }
-        else {
-            guesses = state.guesses
-        }
-        for (var guess of guessesToCheck) {
-            var new_message = await checkSpellingBeeGuess(guess, guesses, bee_model!, letters!.letters, dbi)
-            if (message != SpellingBeeReplyEnum.ok) {
-                message = new_message;
-            }
-            if (new_message === SpellingBeeReplyEnum.ok) {
-                state = await dbi.addBeeGuess(player_id, letters!.bee_id, guess)
-                points += wordPointsSeason(player_guess, state!.letters.map(ls => ls.letter), season_rules)
-            }
-        }
-        await dbi.increaseBeeRank(player_id, letters!.bee_id, points)
+        var totalPointsAdded = result.pointsAdded.reduce((a, b) => a+b)
+        await dbi.increaseBeeRank(player_id, letters!.bee_id, totalPointsAdded)
         const max_points = getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters);
-        if (message != SpellingBeeReplyEnum.ok) {
-            res.json(new GlobalSpellingBeeStateReply(message,
-                state!.letters,
-                guesses,
-                (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
-                max_points))
-            return;
-        }
-        for (var letter of player_guess) {
-            state!.letters.filter(letterState => letterState.letter === letter).forEach(letterState => letterState.usageLimit -= 1);
-        }
-        await dbi.saveLettersState(player_id, letters!.bee_id, state!.letters)
+        await dbi.saveLettersState(player_id, letters!.bee_id, result.newLetterState)
         res.json(new SuccessfullGlobalSpellingBeeStateReply(
             state!.letters,
             state!.guesses,
             (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
             max_points,
-            points
+            totalPointsAdded
             ))
     } catch (error) {
         console.log(error);

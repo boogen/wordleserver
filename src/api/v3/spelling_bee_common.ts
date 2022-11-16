@@ -7,8 +7,8 @@ export const RANKS = ["Noob", "Rookie", "Beginner", "Smartiepants", "Rockstar", 
 export const JOKER:string = "*"
 export const ALPHABET:string[] = ["a","ą","b", "c", "ć", "d", "e", "ę", "f", "g", "h", "i", "j", "k", "l", "ł", "m", "n", "ń", "o", "ó", "p", "r", "s", "ś", "t", "u", "w", "y", "z", "ź", "ż"]
 
-export class GuessToCheck {
-    constructor(public word:string, public jokersUsedPositions:number[]) {}
+export class SpellingBeeChanges {
+    constructor(public message:SpellingBeeReplyEnum, public guessesAdded:string[], public pointsAdded:number[], public newLetterState:LetterState[]) {}
 }
 
 export function getMaxPoints(words:String[], letters:string[]):number {
@@ -42,6 +42,48 @@ export function pointsToRank(points:number, maxPoints:number):number {
         }
     }
     return 0;
+}
+
+export async function processPlayerGuess(playerGuess:string, guesses:string[], beeModel:Bee, letterState:LetterState[], seasonRules:SeasonRules, dbi:WordleDBI):Promise<SpellingBeeChanges> {
+    var letterCorrectnessMessage = checkGuessForIncorrectLetters(playerGuess, beeModel, letterState);
+    if (letterCorrectnessMessage != SpellingBeeReplyEnum.ok) {
+        return new SpellingBeeChanges(letterCorrectnessMessage, [], [], []);
+    }
+
+    var guessesToCheck:string[] = []
+    if (playerGuess.includes(JOKER)) {
+        guessesToCheck = ALPHABET.map(letter => {
+            var readyWord = playerGuess;
+            var jokersUsed:number[] = [];
+            while(readyWord.includes(JOKER)) {
+                jokersUsed.push(readyWord.indexOf(JOKER));
+                readyWord = readyWord.replace(JOKER, letter)
+            }
+            return readyWord;
+            }
+        )
+    }
+    else {
+        guessesToCheck = [playerGuess]
+    }
+    var points = [];
+    var message:SpellingBeeReplyEnum = SpellingBeeReplyEnum.wrong_word;
+    var guessesAdded:string[] = [];
+    for (var guess of guessesToCheck) {
+        var new_message = await checkSpellingBeeGuess(guess, guesses, beeModel, letterState.map(ls => ls.letter), dbi)
+        if (message != SpellingBeeReplyEnum.ok) {
+            message = new_message;
+        }
+        if (new_message === SpellingBeeReplyEnum.ok) {
+            points.push(wordPointsSeason(playerGuess, letterState.map(ls => ls.letter), seasonRules))
+            guessesAdded.push(guess)
+        }
+    }
+    var newLetterState = letterState.map(ls => new LetterState(ls.letter, ls.usageLimit, ls.pointsForLetter, ls.required))
+    for (var letter of playerGuess) {
+        newLetterState.filter(letterState => letterState.letter === letter).forEach(letterState => letterState.usageLimit -= 1);
+    }
+    return new SpellingBeeChanges(message, guessesAdded, points, newLetterState);
 }
 
 export function wordPoints(word:String, letters:string[]):number {

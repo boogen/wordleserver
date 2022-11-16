@@ -1,13 +1,14 @@
 import express, { NextFunction } from 'express';
 import Sentry from '@sentry/node';
 import AuthIdRequest from './types/AuthIdRequest'
-import { checkGuessForIncorrectLetters, checkSpellingBeeGuess, getMaxPoints, SpellingBeeReplyEnum, wordPoints } from './spelling_bee_common';
-import WordleDBI, { Bee, SpellingBeeDuel, SpellingBeeDuellGuess } from '../../DBI';
+import { checkGuessForIncorrectLetters, checkSpellingBeeGuess, getMaxPoints, processPlayerGuess, SpellingBeeReplyEnum, wordPoints } from './spelling_bee_common';
+import WordleDBI, { Bee, LetterState, SpellingBeeDuel, SpellingBeeDuellGuess } from '../../DBI';
 import BaseGuessRequest from './types/BaseGuessRequest';
 import { get_bot_id, get_nick } from './player_common';
 import { ELO_COEFFICIENT, DUEL_DURATION, BOT_THRESHOLD, MATCH_ELO_DIFF, CHANCE_FOR_BOT } from './duel_settings';
 import { get_ranking } from './ranking_common';
 import { Stats } from '../../WordleStatsDBI';
+import { getSeasonRules } from './season_rules';
 
 export const spelling_bee_duel = express.Router();
 const dbi = new WordleDBI()
@@ -34,7 +35,7 @@ class SpelllingBeeDuelEnd {
 }
 
 class SpellingBeeDuelStateReply {
-    constructor(public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number, public time_left:number, public round_time:number) {
+    constructor(public letters:LetterState[], public guessed_words:string[], public player_points:number, public time_left:number, public round_time:number) {
     }
 }
 
@@ -184,7 +185,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
             if (opponent_guesses.length > 0) {
                opponent_points = opponent_guesses[opponent_guesses.length - 1].points_after_guess;
             }
-            duel = (await dbi.startDuel(spelling_bee_model!, player_id, opponent_id, opponent_guesses, opponent_points, timestamp));
+            duel = (await dbi.startDuel(spelling_bee_model!, player_id, opponent_id, opponent_guesses, opponent_points, timestamp, getSeasonRules()));
         }
         else {
             opponent_guesses = opponent_guesses.concat(duel.opponent_guesses)
@@ -194,7 +195,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
         res
         .status(200)
         .json(new SpellingBeeDuelStart((await get_nick(opponent_id, dbi)).nick, opponent_guesses.map(g => new SpellingBeeDuellGuessMessage("", g.timestamp, g.points_after_guess)),
-            new SpellingBeeDuelStateReply(duel!.main_letter, duel!.letters, duel!.player_guesses.map(guess => guess.word), duel!.player_points, Math.floor(duel.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION))
+            new SpellingBeeDuelStateReply(duel!.letters, duel!.player_guesses.map(guess => guess.word), duel!.player_points, Math.floor(duel.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION))
         )
     }
     catch (error) {
@@ -212,20 +213,17 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
         const timestamp = Date.now() / 1000;
         var duel:SpellingBeeDuel|null = await dbi.checkForExistingDuel(player_id, timestamp, DUEL_DURATION);
         const bee_model:Bee|null = await dbi.getBeeById(duel!.bee_id)
-        var letterCorrectnessMessage = checkGuessForIncorrectLetters(guess, bee_model!, []);
-        if (letterCorrectnessMessage != SpellingBeeReplyEnum.ok) {
-            res.json(new SpellingBeeDuelGuessReply(letterCorrectnessMessage, new SpellingBeeDuelStateReply(duel!.main_letter, duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points,Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION), 0));
+        const result = await processPlayerGuess(guess, duel!.player_guesses.map(g => g.word), bee_model!, duel!.letters, getSeasonRules("duel_season.json"), dbi);
+        if (result.message != SpellingBeeReplyEnum.ok) {
+            res.json(new SpellingBeeDuelGuessReply(result.message, new SpellingBeeDuelStateReply(duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points,Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION), 0));
             return;
         }
-        var message = await checkSpellingBeeGuess(guess, duel!.player_guesses.map(g => g.word), bee_model!, bee_model!.other_letters, dbi)
-        if (message !== SpellingBeeReplyEnum.ok) {
-            res.json(new SpellingBeeDuelGuessReply(message, new SpellingBeeDuelStateReply(duel!.main_letter, duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points,Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION), 0));
-            return;
+        for (var i = 0; i < result.guessesAdded.length; i++) {
+            duel = await dbi.addPlayerGuessInSpellingBeeDuel(duel!.bee_duel_id, player_id, result.guessesAdded[i], result.pointsAdded[i], duel!, timestamp);
         }
-        var points:number = wordPoints(guess, bee_model!.other_letters)
-        duel = await dbi.addPlayerGuessInSpellingBeeDuel(duel!.bee_duel_id, player_id, guess, points, duel!, timestamp);
-        stats.addSpellingBeeDuelGuessEvent(player_id, duel!.bee_duel_id, points, duel!.player_points);
-        res.json(new SpellingBeeDuelGuessReply(message, new SpellingBeeDuelStateReply(duel!.main_letter, duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points, Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION), points));
+        var totalPoints = result.pointsAdded.reduce((a, b) => a + b);
+        stats.addSpellingBeeDuelGuessEvent(player_id, duel!.bee_duel_id, totalPoints, duel!.player_points);
+        res.json(new SpellingBeeDuelGuessReply(result.message, new SpellingBeeDuelStateReply(duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points, Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION), totalPoints));
     }
     catch(error) {
         console.log(error)

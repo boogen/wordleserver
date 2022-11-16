@@ -2,7 +2,7 @@ import monk, { FindOneResult, FindResult, ICollection, id, IMonkManager } from '
 import { ObjectId } from 'mongodb';
 import { number } from '@hapi/joi';
 import { DEFAULT_ELO, NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE } from './api/v3/duel_settings';
-import { getMaxPoints, pointsToRank, RANKS, wordPoints } from './api/v3/spelling_bee_common';
+import { getMaxPoints, getNewLetterState, pointsToRank, RANKS, wordPoints } from './api/v3/spelling_bee_common';
 import { ALPHABET, JOKER } from './api/v3/spelling_bee_common';
 import { SeasonRules } from './api/v3/season_rules';
 
@@ -121,8 +121,7 @@ export class SpellingBeeDuel {
         public opponent_guesses:SpellingBeeDuellGuess[],
         public player_points:number,
         public opponent_points:number,
-        public letters:string[],
-        public main_letter:string,
+        public letters:LetterState[],
         public start_timestamp:number,
         public finished:boolean,
         public _id?:ObjectId) {}
@@ -426,15 +425,14 @@ export default class WordleDBI {
         return this.spelling_bee_duels().findOne({bee_id:bee_model_id, player_id:player_id, start_timestamp:{$lt:timestamp - duelDuration}}, {sort:{player_points:-1}, limit:1})
     }
 
-    async startDuel(bee_model:Bee, player_id: number, opponent_id:number, opponent_guesses:SpellingBeeDuellGuess[], opponent_points:number, timestamp: number):Promise<SpellingBeeDuel> {
+    async startDuel(bee_model:Bee, player_id: number, opponent_id:number, opponent_guesses:SpellingBeeDuellGuess[], opponent_points:number, timestamp: number, seasonRules:SeasonRules):Promise<SpellingBeeDuel> {
         var return_value = new SpellingBeeDuel((await this.getNextSequenceValue("spelling_bee_duel_id")),
             bee_model.id,
             player_id,
             opponent_id,
             [], opponent_guesses,
             0, opponent_points,
-            bee_model.other_letters,
-            bee_model.main_letter,
+            getNewLetterState(bee_model.main_letter, bee_model.other_letters, seasonRules),
             timestamp,
             false
             );
@@ -468,6 +466,7 @@ export default class WordleDBI {
     async markOldDuelsAsFinished(player_id:number) {
         this.spelling_bee_duels().update({player_id:player_id, finished:false}, {$set:{finished:true}})
     }
+
 
     async addPlayerGuessInSpellingBeeDuel(duel_id:number, player_id:number, guess:string, points:number, current_duel:SpellingBeeDuel, timestamp:number):Promise<SpellingBeeDuel|null> {
         return this.spelling_bee_duels().findOneAndUpdate({bee_duel_id:duel_id},

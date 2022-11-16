@@ -1,5 +1,6 @@
 import joi, { required } from '@hapi/joi';
 import * as fs from 'fs';
+import { file } from 'googleapis/build/src/apis/file';
 
 const fixedPointsSchema = joi.object({length: joi.number().required(), points: joi.number().required()})
 const multiplierSchema = joi.object({length: joi.number().required(), value: joi.number().required()})
@@ -17,9 +18,9 @@ const profileSchema = joi.object({
     letterUsage: joi.array().items(letterUsageSchema)
 });
 
-export function getSeasonRules():SeasonRules {
-    if (fs.existsSync('model/season.json')) {
-        return new SeasonRules(fs.readFileSync('model/season.json','utf8'))
+export function getSeasonRules(filename:string = "season.json"):SeasonRules {
+    if (fs.existsSync('model/' + filename)) {
+        return new SeasonRules(fs.readFileSync('model/' + filename,'utf8'))
     }
     return new SeasonRules('{}');
 }
