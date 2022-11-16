@@ -401,6 +401,10 @@ export default class WordleDBI {
         return this.guessed_words_bee().findOneAndUpdate({player_id: player_id, bee_id: bee_id}, {$push: {guesses: guess}}, {upsert:true})
     }
 
+    async saveLettersState(player_id:number, bee_id:number, lettersState:LetterState[]):Promise<FindOneResult<GuessedWordsBee>> {
+        return this.guessed_words_bee().findOneAndUpdate({player_id: player_id, bee_id: bee_id}, {$set: {letters: lettersState}}, {upsert:true})
+    }
+
     //BEE DUEL
 
 

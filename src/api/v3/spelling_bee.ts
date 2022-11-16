@@ -125,6 +125,7 @@ spelling_bee.post('/guess', async (req, res, next) => {
         for (var letter of player_guess) {
             state!.letters.filter(letterState => letterState.letter === letter).forEach(letterState => letterState.usageLimit -= 1);
         }
+        await dbi.saveLettersState(player_id, letters!.bee_id, state!.letters)
         res.json(new SuccessfullGlobalSpellingBeeStateReply(
             state!.letters,
             state!.guesses,
