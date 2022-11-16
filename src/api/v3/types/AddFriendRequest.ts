@@ -4,14 +4,14 @@ import express from 'express';
 
 const addFriendSchema = joi.object({
     authId: joi.string().trim().required(),
-    friendCode: joi.string().trim().required()
+    friend_code: joi.string().trim().required()
 });
 
 export default class AddFriendRequest extends AuthIdRequest {
-    friendCode: string;
+    friend_code: string;
     constructor(req:express.Request) {
         addFriendSchema.validate(req.body)
         super(req)
-        this.friendCode = req.body.friendCode;
+        this.friend_code = req.body.friend_code;
     }
 }
