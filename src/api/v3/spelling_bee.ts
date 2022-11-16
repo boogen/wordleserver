@@ -77,7 +77,7 @@ spelling_bee.post('/guess', async (req, res, next) => {
             return;
         }
 
-        var guessesToCheck:GuessToCheck[] = []
+        var guessesToCheck:string[] = []
         if (player_guess.includes(JOKER)) {
             guessesToCheck = ALPHABET.map(letter => {
                 var readyWord = player_guess;
@@ -86,12 +86,12 @@ spelling_bee.post('/guess', async (req, res, next) => {
                     jokersUsed.push(readyWord.indexOf(JOKER));
                     readyWord = readyWord.replace(JOKER, letter)
                 }
-                return new GuessToCheck(readyWord, jokersUsed);
+                return readyWord;
                 }
             )
         }
         else {
-            guessesToCheck = [new GuessToCheck(player_guess, [])]
+            guessesToCheck = [player_guess]
         }
         var points = 0;
         var message:SpellingBeeReplyEnum = SpellingBeeReplyEnum.wrong_word;
@@ -103,13 +103,13 @@ spelling_bee.post('/guess', async (req, res, next) => {
             guesses = state.guesses
         }
         for (var guess of guessesToCheck) {
-            var new_message = await checkSpellingBeeGuess(guess.word, guesses, bee_model!, letters!.letters, dbi)
+            var new_message = await checkSpellingBeeGuess(guess, guesses, bee_model!, letters!.letters, dbi)
             if (message != SpellingBeeReplyEnum.ok) {
                 message = new_message;
             }
             if (new_message === SpellingBeeReplyEnum.ok) {
-                state = await dbi.addBeeGuess(player_id, letters!.bee_id, guess.word)
-                points += wordPointsSeason(guess, state!.letters.map(ls => ls.letter), season_rules)
+                state = await dbi.addBeeGuess(player_id, letters!.bee_id, guess)
+                points += wordPointsSeason(player_guess, state!.letters.map(ls => ls.letter), season_rules)
             }
         }
         await dbi.increaseBeeRank(player_id, letters!.bee_id, points)

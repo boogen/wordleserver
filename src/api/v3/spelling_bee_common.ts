@@ -26,7 +26,7 @@ export function getNewLetterState(mainLetter:string, letters:string[], rules:Sea
     return returnValue;
 }
 
-export function getMaxPointsSeason(words:GuessToCheck[], letters:string[], extraRules:SeasonRules):number {
+export function getMaxPointsSeason(words:string[], letters:string[], extraRules:SeasonRules):number {
     var sum = 0;
     for (var word of words) {
         sum += wordPointsSeason(word, letters, extraRules)
@@ -57,21 +57,15 @@ export function wordPoints(word:String, letters:string[]):number {
     return points + 7;
 }
 
-export function wordPointsSeason(word:GuessToCheck, letters:string[], extraRules:SeasonRules):number {
-    var pointsForWord = wordPoints(word.word, letters);
-    if (extraRules.fixedPoints.has(word.word.length)) {
-        pointsForWord = extraRules.fixedPoints.get(word.word.length)!;
+export function wordPointsSeason(word:string, letters:string[], extraRules:SeasonRules):number {
+    var pointsForWord = wordPoints(word, letters);
+    if (extraRules.fixedPoints.has(word.length)) {
+        pointsForWord = extraRules.fixedPoints.get(word.length)!;
     }
-    for (var letterIndex=0; letterIndex < word.word.length; letterIndex++) {
-        if (word.jokersUsedPositions.includes(letterIndex)) {
-            continue
-        }
-        var letter = word.word[letterIndex]
+    for (var letter of word) {
         if (letters.includes(letter)) {
             pointsForWord += extraRules.getPointsForLetter(letter)
         }
-
-        pointsForWord -= extraRules.getPointsForLetter(JOKER) * word.jokersUsedPositions.length
     }
     return pointsForWord;
 }
