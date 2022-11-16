@@ -4,6 +4,7 @@ import Sentry from '@sentry/node';
 import WordleDBI from '../../DBI';
 import AuthIdRequest from './types/AuthIdRequest';
 import AddFriendRequest from './types/AddFriendRequest';
+import { getProfile } from './player';
 
 export const friend = express.Router();
 const dbi = new WordleDBI();
@@ -69,7 +70,7 @@ friend.post('/list', async (req, res, next) => {
         var friendList = await dbi.friendList(player_id);
         res.json({
             status: "ok",
-            friendList: friendList
+            friendList: friendList.map(friendId => getProfile(player_id, friendId))
         })
     }
     catch(error) {

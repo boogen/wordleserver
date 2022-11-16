@@ -19,6 +19,22 @@ function makeid():string {
     return Utils.randomString(36);
 }
 
+export async function getProfile(akserId:number, playerId:number) {
+    const profile = await dbi.getProfile(playerId);
+    const duel_stats = await dbi.getSpellingBeeDuelStats(akserId, playerId)
+    const spelling_bee_stats = await dbi.getSpellingBeeStats(playerId)
+    if (profile === null) {
+        return null;
+    }
+    var friendCode = await dbi.getFriendCode(playerId);
+    while (!friendCode) {
+        var generated_friend_code = generateFriendCode(7);
+        friendCode = await dbi.addFriendCode(playerId, generated_friend_code);
+    }
+    var isFriend = (await dbi.friendList(akserId)).includes(playerId)
+    return {nick: profile.nick, duel_stats:Object.fromEntries(duel_stats.entries()), spelling_bee_stats:spelling_bee_stats, friend_code: friendCode.friend_code, is_friend:isFriend};
+}
+
 player.post("/register", async (req, res, next) => {
     try {
         var authId = makeid();
@@ -70,20 +86,8 @@ player.post("/getProfile", async (req:express.Request, res:express.Response, nex
         const value = new ProfileRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
         console.log("Getting profile for player: " + value.player_id)
-        const profile = await dbi.getProfile(value.player_id);
-        const duel_stats = await dbi.getSpellingBeeDuelStats(player_id, value.player_id)
-        const spelling_bee_stats = await dbi.getSpellingBeeStats(value.player_id)
-        if (profile === null) {
-            res.json({message: null});
-            return;
-        }
-        var friendCode = await dbi.getFriendCode(value.player_id);
-        while (!friendCode) {
-            var generated_friend_code = generateFriendCode(7);
-            friendCode = await dbi.addFriendCode(value.player_id, generated_friend_code);
-        }
-        var isFriend = (await dbi.friendList(player_id)).includes(value.player_id)
-        res.json({message: 'ok', profile: {nick: profile.nick, duel_stats:Object.fromEntries(duel_stats.entries()), spelling_bee_stats:spelling_bee_stats, friend_code: friendCode.friend_code, is_friend:isFriend}})
+
+        res.json({message: 'ok', profile: getProfile(player_id, value.player_id)})
     }
     catch(error) {
         console.log(error);
