@@ -4,7 +4,7 @@ import { number } from '@hapi/joi';
 import { DEFAULT_ELO, NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE } from './api/v3/duel_settings';
 import { getMaxPoints, getNewLetterState, pointsToRank, RANKS, wordPoints } from './api/v3/spelling_bee_common';
 import { ALPHABET, JOKER } from './api/v3/spelling_bee_common';
-import { SeasonRules } from './api/v3/season_rules';
+import { LetterToBuy, SeasonRules } from './api/v3/season_rules';
 
 export class PlayerProfile {
     constructor(public nick: string, public id:number, public _id?: ObjectId) {}
@@ -79,7 +79,7 @@ export class LetterState {
 }
 
 export class GuessedWordsBee {
-    constructor(public bee_id:number, public guesses:string[], public letters:LetterState[], public player_id?:number, playerId?:number, public id?: ObjectId) {
+    constructor(public bee_id:number, public guesses:string[], public letters:LetterState[], public lettersToBuy:LetterToBuy[], public player_id?:number, playerId?:number, public id?: ObjectId) {
         if (playerId !== undefined) {
             this.player_id = playerId;
         }
@@ -392,8 +392,8 @@ export default class WordleDBI {
         return this.global_bee().insert(new GlobalBee(bee_id, bee.id, validityTimestamp, other_letters, bee.main_letter))
     }
 
-    async createBeeState(player_id:number, bee_id:number, letters:LetterState[]):Promise<GuessedWordsBee> {
-        return this.guessed_words_bee().insert({player_id:player_id, bee_id:bee_id, guesses:[], letters:letters})
+    async createBeeState(player_id:number, bee_id:number, letters:LetterState[], lettersToBuy:LetterToBuy[]):Promise<GuessedWordsBee> {
+        return this.guessed_words_bee().insert({player_id:player_id, bee_id:bee_id, guesses:[], letters:letters, lettersToBuy:lettersToBuy})
     }
 
     async getBeeState(player_id:number, bee_id:number):Promise<FindOneResult<GuessedWordsBee>> {

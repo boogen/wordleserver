@@ -7,6 +7,7 @@ const multiplierSchema = joi.object({length: joi.number().required(), value: joi
 
 const pointsForLetterSchema = joi.object({letter:joi.string().trim().required(), points: joi.number().required()})
 const letterUsageSchema = joi.object({letter:joi.string().trim().required(), limit: joi.number().required()})
+const letterToBuySchema = joi.object({price: joi.number().required(), useLimit: joi.number().required()})
 
 
 const profileSchema = joi.object({
@@ -15,7 +16,8 @@ const profileSchema = joi.object({
     noOfLetters: joi.number(),
     addBlank: joi.boolean(),
     pointsForLetters: joi.array().items(pointsForLetterSchema),
-    letterUsage: joi.array().items(letterUsageSchema)
+    letterUsage: joi.array().items(letterUsageSchema),
+    lettersToBuy: joi.array().items(letterToBuySchema)
 });
 
 export function getSeasonRules(filename:string = "season.json"):SeasonRules {
@@ -25,16 +27,22 @@ export function getSeasonRules(filename:string = "season.json"):SeasonRules {
     return new SeasonRules('{}');
 }
 
+export class LetterToBuy {
+    constructor(public price:number, public useLimit:number) {}
+}
+
 export class SeasonRules {
     public fixedPoints:Map<number, number> = new Map();
     public multiplier:Map<number, number> = new Map();
     public pointsForLetters:Map<string, number> = new Map();
     public letterUsage:Map<String, number> = new Map();
+    public lettersToBuy:LetterToBuy[];
 
     public noOfLetters:number;
     public addBlank:boolean;
     constructor(json:string) {
         profileSchema.validate(json);
+        
         this.noOfLetters = 7;
         this.addBlank = false;
         var seasonData = JSON.parse(json)
@@ -56,6 +64,7 @@ export class SeasonRules {
         if (seasonData.letterUsage) {
             this.addLetterUsage(seasonData.letterUsage);
         }
+        this.lettersToBuy = seasonData.lettersToBuy?.map((letter: LetterToBuy) => new LetterToBuy(letter.price, letter.useLimit))
     }
 
     addFixedPoints(fixedPoints:any[]) {

@@ -14,7 +14,7 @@ const BEE_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
 
 class GlobalSpellingBeeStateReply extends SpellingBeeStateReply {
-    constructor(public messageEnum:SpellingBeeReplyEnum, public letters:LetterState[], public guessed_words:string[], public player_points:number, public max_points:number) {
+    constructor(public messageEnum:SpellingBeeReplyEnum, public letters:LetterState[], public guessed_words:string[], public player_points:number, public max_points:number, public letters_to_buy_prices:number[]) {
         super(messageEnum.toString(), letters, guessed_words, player_points);
     }
 }
@@ -42,14 +42,14 @@ spelling_bee.post('/getState', async (req, res, next) => {
         var state:GuessedWordsBee|null = await dbi.getBeeState(player_id, letters.bee_id);
         var guesses:string[] = []
         if (state === null) {
-            state = await dbi.createBeeState(player_id, letters.bee_id, getNewLetterState(letters.main_letter, letters.letters, season_rules))
+            state = await dbi.createBeeState(player_id, letters.bee_id, getNewLetterState(letters.main_letter, letters.letters, season_rules), season_rules.lettersToBuy)
             guesses = []
         }
         else {
             guesses = state.guesses
         }
 	    const playerPoints = await dbi.getBeePlayerPoints(player_id, letters.bee_id)
-        res.json(new GlobalSpellingBeeStateReply(SpellingBeeReplyEnum.ok, state.letters, guesses, playerPoints, getMaxPoints((await dbi.getBeeWords(letters.bee_model_id)), letters.letters)));
+        res.json(new GlobalSpellingBeeStateReply(SpellingBeeReplyEnum.ok, state.letters, guesses, playerPoints, getMaxPoints((await dbi.getBeeWords(letters.bee_model_id)), letters.letters), state.lettersToBuy.map(lb => lb.price)));
     } catch (error) {
         console.log(error);
         next(error);
@@ -74,7 +74,9 @@ spelling_bee.post('/guess', async (req, res, next) => {
                 state!.letters,
                 state!.guesses,
                 (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
-                getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters)))
+                getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters),
+                state!.lettersToBuy.map(lb => lb.price))
+                )  
             return;
         }
 
@@ -99,6 +101,15 @@ spelling_bee.post('/guess', async (req, res, next) => {
     }
 });
 
+spelling_bee.post('/buy_letter',async (req, res, next) => {
+    const value = new AuthIdRequest(req)
+    const player_id = await dbi.resolvePlayerId(value.authId)
+    const timestamp = Date.now() / 1000;
+    const letters = await dbi.getLettersForBee(timestamp);
+    const bee_model:Bee|null = await dbi.getBeeById(letters!.bee_model_id);
+    var state = await dbi.getBeeState(player_id, letters!.bee_id)
+    var lettersState = state!.letters;
+})
 
 
 spelling_bee.post('/ranking', async (req, res, next) => {
