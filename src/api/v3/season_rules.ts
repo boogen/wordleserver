@@ -1,6 +1,6 @@
 import joi, { required } from '@hapi/joi';
 import * as fs from 'fs';
-import { file } from 'googleapis/build/src/apis/file';
+//import { file } from 'googleapis/build/src/apis/file';
 
 const fixedPointsSchema = joi.object({length: joi.number().required(), points: joi.number().required()})
 const multiplierSchema = joi.object({length: joi.number().required(), value: joi.number().required()})
