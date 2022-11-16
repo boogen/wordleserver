@@ -80,7 +80,7 @@ export function checkGuessForIncorrectLetters(guess:string, bee:Bee, letters:Let
         message = SpellingBeeReplyEnum.no_main_letter
     }
     for (var singleLetter of guess) {
-        if (letters.filter(LetterState => singleLetter === LetterState.letter && LetterState.usageLimit > 0).length === 0) {
+        if (letters.filter(letterState => singleLetter === letterState.letter && letterState.usageLimit != 0).length == 0) {
             message = SpellingBeeReplyEnum.invalid_letter_used
             break
         }
