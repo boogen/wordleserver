@@ -77,10 +77,10 @@ player.post("/getProfile", async (req:express.Request, res:express.Response, nex
             res.json({message: null});
             return;
         }
-        var friendCode = await dbi.getFriendCode(player_id);
+        var friendCode = await dbi.getFriendCode(value.player_id);
         while (!friendCode) {
             var generated_friend_code = generateFriendCode(7);
-            friendCode = await dbi.addFriendCode(player_id, generated_friend_code);
+            friendCode = await dbi.addFriendCode(value.player_id, generated_friend_code);
         }
         res.json({message: 'ok', profile: {nick: profile.nick, duel_stats:Object.fromEntries(duel_stats.entries()), spelling_bee_stats:spelling_bee_stats, friend_code: friendCode.friend_code}})
     }

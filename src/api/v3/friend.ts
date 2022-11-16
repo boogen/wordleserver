@@ -44,6 +44,7 @@ friend.post('/add', async (req, res, next) => {
     try {
         const value = new AddFriendRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
+        console.log('Friend code:' + value.friendCode)
         if (await dbi.addFriend(player_id, value.friendCode)) {
             res.json({
                 status: "ok"
