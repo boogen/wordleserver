@@ -3,7 +3,7 @@ import * as Sentry from "@sentry/node"
 import WordleDBI, { Bee, GlobalBee, GuessedWordsBee, LetterState, RankingEntry } from '../../DBI'
 import AuthIdRequest from './types/AuthIdRequest';
 import SpellingBeeGuessRequest from './types/SpellingBeeGuessRequest';
-import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess, JOKER, ALPHABET, getNewLetterState, checkGuessForIncorrectLetters, wordPointsSeason } from './spelling_bee_common';
+import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess, JOKER, ALPHABET, getNewLetterState, checkGuessForIncorrectLetters, wordPointsSeason, GuessToCheck } from './spelling_bee_common';
 import { get_ranking, RankingReply } from './ranking_common';
 import { getSeasonRules, SeasonRules } from './season_rules';
 import * as fs from 'fs';
@@ -77,19 +77,21 @@ spelling_bee.post('/guess', async (req, res, next) => {
             return;
         }
 
-        var guessesToCheck:string[] = []
+        var guessesToCheck:GuessToCheck[] = []
         if (player_guess.includes(JOKER)) {
             guessesToCheck = ALPHABET.map(letter => {
                 var readyWord = player_guess;
-                while(readyWord.includes(JOKER)) { 
+                var jokersUsed:number[] = [];
+                while(readyWord.includes(JOKER)) {
+                    jokersUsed.push(readyWord.indexOf(JOKER));
                     readyWord = readyWord.replace(JOKER, letter)
                 }
-                return readyWord;
+                return new GuessToCheck(readyWord, jokersUsed);
                 }
             )
         }
         else {
-            guessesToCheck = [player_guess]
+            guessesToCheck = [new GuessToCheck(player_guess, [])]
         }
         var points = 0;
         var message:SpellingBeeReplyEnum = SpellingBeeReplyEnum.wrong_word;
@@ -101,12 +103,12 @@ spelling_bee.post('/guess', async (req, res, next) => {
             guesses = state.guesses
         }
         for (var guess of guessesToCheck) {
-            var new_message = await checkSpellingBeeGuess(guess, guesses, bee_model!, letters!.letters, dbi)
+            var new_message = await checkSpellingBeeGuess(guess.word, guesses, bee_model!, letters!.letters, dbi)
             if (message != SpellingBeeReplyEnum.ok) {
                 message = new_message;
             }
             if (new_message === SpellingBeeReplyEnum.ok) {
-                state = await dbi.addBeeGuess(player_id, letters!.bee_id, guess)
+                state = await dbi.addBeeGuess(player_id, letters!.bee_id, guess.word)
                 points += wordPointsSeason(guess, state!.letters.map(ls => ls.letter), season_rules)
             }
         }

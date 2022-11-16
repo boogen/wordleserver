@@ -7,6 +7,9 @@ export const RANKS = ["Noob", "Rookie", "Beginner", "Smartiepants", "Rockstar", 
 export const JOKER:string = "*"
 export const ALPHABET:string[] = ["a","ą","b", "c", "ć", "d", "e", "ę", "f", "g", "h", "i", "j", "k", "l", "ł", "m", "n", "ń", "o", "ó", "p", "r", "s", "ś", "t", "u", "w", "y", "z", "ź", "ż"]
 
+export class GuessToCheck {
+    constructor(public word:string, public jokersUsedPositions:number[]) {}
+}
 
 export function getMaxPoints(words:String[], letters:string[]):number {
     var sum = 0;
@@ -23,7 +26,7 @@ export function getNewLetterState(mainLetter:string, letters:string[], rules:Sea
     return returnValue;
 }
 
-export function getMaxPointsSeason(words:String[], letters:string[], extraRules:SeasonRules):number {
+export function getMaxPointsSeason(words:GuessToCheck[], letters:string[], extraRules:SeasonRules):number {
     var sum = 0;
     for (var word of words) {
         sum += wordPointsSeason(word, letters, extraRules)
@@ -54,41 +57,56 @@ export function wordPoints(word:String, letters:string[]):number {
     return points + 7;
 }
 
-export function wordPointsSeason(word:String, letters:string[], extraRules:SeasonRules):number {
-    var pointsForWord = wordPoints(word, letters);
-    if (extraRules.fixedPoints.has(word.length)) {
-        pointsForWord = extraRules.fixedPoints.get(word.length)!;
+export function wordPointsSeason(word:GuessToCheck, letters:string[], extraRules:SeasonRules):number {
+    var pointsForWord = wordPoints(word.word, letters);
+    if (extraRules.fixedPoints.has(word.word.length)) {
+        pointsForWord = extraRules.fixedPoints.get(word.word.length)!;
     }
-    for (var letter of word) {
+    for (var letterIndex=0; letterIndex < word.word.length; letterIndex++) {
+        if (word.jokersUsedPositions.includes(letterIndex)) {
+            continue
+        }
+        var letter = word.word[letterIndex]
         if (letters.includes(letter)) {
             pointsForWord += extraRules.getPointsForLetter(letter)
         }
-        else {
-            pointsForWord += extraRules.getPointsForLetter(JOKER)
-        }
+
+        pointsForWord -= extraRules.getPointsForLetter(JOKER) * word.jokersUsedPositions.length
     }
     return pointsForWord;
 }
 
 export async function checkSpellingBeeGuess(guess:string, current_guesses:string[], bee:Bee, other_letters:string[], dbi:WordleDBI):Promise<SpellingBeeReplyEnum> {
     var message = SpellingBeeReplyEnum.ok;
-        if (current_guesses.includes(guess)) {
-            message = SpellingBeeReplyEnum.already_guessed
-        }
-        if (!(await dbi.wordExists(guess, bee!.id))) {
-            message = SpellingBeeReplyEnum.wrong_word
-        }
-        return message;
+    
+    if (current_guesses.includes(guess)) {
+        message = SpellingBeeReplyEnum.already_guessed
+    }
+    if (!(await dbi.wordExists(guess, bee!.id))) {
+        message = SpellingBeeReplyEnum.wrong_word
+    }
+    return message;
 }
 
 export function checkGuessForIncorrectLetters(guess:string, bee:Bee, letters:LetterState[]):SpellingBeeReplyEnum {
     var message = SpellingBeeReplyEnum.ok;
+    var letterOccurences:Map<string, number> = new Map();
+    for (var singleLetter of guess) {
+        var i = 0;
+        if (letterOccurences.has(singleLetter)) {
+            i = letterOccurences.get(singleLetter)!;
+        }
+        letterOccurences.set(singleLetter, i + 1)
+    }
     for (var requiredLetter of letters.filter(LetterState => LetterState.required))
     if (!guess.includes(requiredLetter.letter)) {
         message = SpellingBeeReplyEnum.no_main_letter
     }
     for (var singleLetter of guess) {
-        if (letters.filter(letterState => singleLetter === letterState.letter && letterState.usageLimit != 0).length == 0) {
+        if (letters
+            .filter(letterState => singleLetter === letterState.letter &&
+                 (letterState.usageLimit > letterOccurences.get(singleLetter)! || letterState.usageLimit < 0))
+                 .length == 0) {
             message = SpellingBeeReplyEnum.invalid_letter_used
             break
         }
