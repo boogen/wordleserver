@@ -141,7 +141,7 @@ export function checkGuessForIncorrectLetters(guess:string, bee:Bee, letters:Let
     for (var singleLetter of guess) {
         if (letters
             .filter(letterState => singleLetter === letterState.letter &&
-                 (letterState.usageLimit > letterOccurences.get(singleLetter)! || letterState.usageLimit < 0))
+                 (letterState.usageLimit >= letterOccurences.get(singleLetter)! || letterState.usageLimit < 0))
                  .length == 0) {
             message = SpellingBeeReplyEnum.invalid_letter_used
             break
