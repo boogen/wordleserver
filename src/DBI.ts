@@ -272,7 +272,7 @@ export default class WordleDBI {
             }
         }
         addFriendToList(player_id, friend_id, this.db())
-        addFriendToList(friend_id, player_id, this.db())
+        //addFriendToList(friend_id, player_id, this.db())
         return true;
     }
 
