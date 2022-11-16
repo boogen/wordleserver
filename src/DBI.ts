@@ -392,6 +392,10 @@ export default class WordleDBI {
         return this.global_bee().insert(new GlobalBee(bee_id, bee.id, validityTimestamp, other_letters, bee.main_letter))
     }
 
+    async addNewLetterToSpellingBeeState(player_id:number, bee_id:number, letters:LetterState[], lettersToBuy:LetterToBuy[]):Promise<FindOneResult<GuessedWordsBee>> {
+        return this.guessed_words_bee().findOneAndUpdate({player_id:player_id, bee_id:bee_id}, {$set:{letters:letters, lettersToBuy:lettersToBuy}})
+    }
+
     async createBeeState(player_id:number, bee_id:number, letters:LetterState[], lettersToBuy:LetterToBuy[]):Promise<GuessedWordsBee> {
         return this.guessed_words_bee().insert({player_id:player_id, bee_id:bee_id, guesses:[], letters:letters, lettersToBuy:lettersToBuy})
     }
@@ -530,7 +534,7 @@ export default class WordleDBI {
     }
 
     //BEE RANKING
-    async increaseBeeRank(player_id:number, bee_id:number, points:number) {
+    async increaseBeeRank(player_id:number, bee_id:number, points:number):Promise<RankingEntry> {
         const rank =  this.db().get("bee#" + bee_id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
