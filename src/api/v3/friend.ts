@@ -71,7 +71,7 @@ friend.post('/list', async (req, res, next) => {
 
         res.json({
             status: "ok",
-            friendList: await Promise.all(friendList.map(async (friendId) => { return { player_id: friendId, nick: (await dbi.getProfile(friendId))!.nick }; }))
+            friend_list: await Promise.all(friendList.map(async (friendId) => { return { player_id: friendId, nick: (await dbi.getProfile(friendId))!.nick }; }))
         })
     }
     catch(error) {
