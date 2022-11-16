@@ -18,7 +18,7 @@ friend.post('/code', async (req, res, next) => {
         do {
             generated_friend_code = Array.from({length: 3}, () => utils.randomString(4)).join("-");
             console.log(generated_friend_code)
-        } while ((friend_code = await dbi.addFriendCode(player_id, generated_friend_code)) == null);
+        } while ((friend_code = await dbi.addFriendCode(player_id, generated_friend_code)));
         res.json({
             status: "ok",
             friendCode: friend_code

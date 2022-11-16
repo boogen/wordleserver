@@ -282,13 +282,17 @@ export default class WordleDBI {
         return (await friends.find()).map(f => f.id)
     }
 
-    async addFriendCode(player_id:number, friend_code:string):Promise<string> {
+    async getFriendCode(playerId:number):Promise<FindOneResult<FriendCode>> {
+        return this.friend_codes().findOne({player_id:playerId});
+    }
+
+    async addFriendCode(player_id:number, friend_code:string):Promise<FindOneResult<FriendCode>> {
         try {
-            return (await this.friend_codes().findOneAndUpdate({player_id: player_id}, {$setOnInsert:{player_id: player_id, friend_code: friend_code}}, {upsert:true}))!.friend_code;
+            return this.friend_codes().findOneAndUpdate({player_id: player_id}, {$setOnInsert:{player_id: player_id, friend_code: friend_code}}, {upsert:true});
         }
         catch(error) {
             console.log(error)
-            return "";
+            return null;
         }
     }
 
