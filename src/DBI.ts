@@ -74,8 +74,12 @@ export class GlobalBee {
     }
 }
 
+export class LetterState {
+    constructor(public letter:string, public usageLimit:number, public pointForLetter:number, public required:boolean) {}
+}
+
 export class GuessedWordsBee {
-    constructor(public bee_id:number, public guesses:string[], public player_id?:number, playerId?:number, public id?: ObjectId) {
+    constructor(public bee_id:number, public guesses:string[], public letters:LetterState[], public player_id?:number, playerId?:number, public id?: ObjectId) {
         if (playerId !== undefined) {
             this.player_id = playerId;
         }
@@ -383,6 +387,10 @@ export default class WordleDBI {
             other_letters[Math.floor(Math.random() * other_letters.length)] = JOKER;
         }
         return this.global_bee().insert(new GlobalBee(bee_id, bee.id, validityTimestamp, other_letters, bee.main_letter))
+    }
+
+    async createBeeState(player_id:number, bee_id:number, letters:LetterState[]):Promise<GuessedWordsBee> {
+        return this.guessed_words_bee().insert({player_id:player_id, bee_id:bee_id, guesses:[], letters:letters})
     }
 
     async getBeeState(player_id:number, bee_id:number):Promise<FindOneResult<GuessedWordsBee>> {

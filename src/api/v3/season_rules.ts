@@ -1,21 +1,27 @@
-import joi from '@hapi/joi';
+import joi, { required } from '@hapi/joi';
 
-const fixedPointsSchema = joi.object({length: joi.number(), points: joi.number()})
-const multiplierSchema = joi.object({length: joi.number(), value: joi.number()})
-const penaltiesSchema = joi.object({length: joi.number(), points: joi.number()})
+const fixedPointsSchema = joi.object({length: joi.number().required(), points: joi.number().required()})
+const multiplierSchema = joi.object({length: joi.number().required(), value: joi.number().required()})
+
+const pointsForLetterSchema = joi.object({letter:joi.string().trim().required(), points: joi.number().required()})
+const letterUsageSchema = joi.object({letter:joi.string().trim().required(), limit: joi.number().required()})
+
 
 const profileSchema = joi.object({
     fixedPoints: joi.array().items(fixedPointsSchema),
     multipliers: joi.array().items(multiplierSchema),
-    penaltiesSchema: joi.array().items(penaltiesSchema),
     noOfLetters: joi.number(),
-    addBlank: joi.boolean()
+    addBlank: joi.boolean(),
+    pointsForLetters: joi.array().items(pointsForLetterSchema),
+    letterUsage: joi.array().items(letterUsageSchema)
 });
 
 export class SeasonRules {
     public fixedPoints:Map<number, number> = new Map();
     public multiplier:Map<number, number> = new Map();
-    public penalties:Map<string, number> = new Map();
+    public pointsForLetters:Map<string, number> = new Map();
+    public letterUsage:Map<String, number> = new Map();
+
     public noOfLetters:number;
     public addBlank:boolean;
     constructor(json:string) {
@@ -28,6 +34,18 @@ export class SeasonRules {
         }
         if (seasonData.addBlank != undefined) {
             this.addBlank = Boolean(seasonData.addBlank)
+        }
+        if (seasonData.fixedPoints) {
+            this.addFixedPoints(seasonData.fixedPoints);
+        }
+        if (seasonData.multipliers) {
+            this.addMultipliers(seasonData.multipliers);
+        }
+        if (seasonData.pointsForLetters) {
+            this.addPointsForLetters(seasonData.pointsForLetters);
+        }
+        if (seasonData.letterUsage) {
+            this.addLetterUsage(seasonData.letterUsage);
         }
     }
 
@@ -43,9 +61,29 @@ export class SeasonRules {
         }
     }
 
-    addPenalties(penalties:any[]) {
-        for (var penalty of penalties) {
-            this.penalties.set(penalty.length, penalty.value);
+    addPointsForLetters(pointsForLetters:any[]) {
+        for (var pfl of pointsForLetters) {
+            this.pointsForLetters.set(pfl.letter, pfl.points);
         }
+    }
+
+    addLetterUsage(letterUsage:any[]) {
+        for (var lu of letterUsage) {
+            this.letterUsage.set(lu.letter, lu.limit);
+        }
+    }
+
+    getUsageLimit(letter:string):number {
+        if (!this.letterUsage.has(letter)) {
+            return -1;
+        }
+        return this.letterUsage.get(letter)!;
+    }
+
+    getPointsForLetter(letter:string):number {
+        if (!this.pointsForLetters.has(letter)) {
+            return -1;
+        }
+        return this.pointsForLetters.get(letter)!;
     }
 }

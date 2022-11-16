@@ -12,7 +12,7 @@ Sentry.init({dsn: process.env.sentry_dsn});
 
 import {notFound, errorHandler} from './middlewares';
 import { apiV3 } from './api/v3';
-import  {apiV4} from './api/v4';
+
 import WordleDBI from './DBI';
 
 export const app = express();
@@ -49,7 +49,6 @@ app.use((req, res, next) => {
 })
 
 app.use('/api/v3', apiV3)
-app.use('/api/v4', apiV4)
 app.use('/', metrics)
 
 app.use(notFound);

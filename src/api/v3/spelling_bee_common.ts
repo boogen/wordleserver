@@ -1,4 +1,4 @@
-import WordleDBI, { Bee } from "../../DBI";
+import WordleDBI, { Bee, LetterState } from "../../DBI";
 import { SeasonRules } from "./season_rules";
 
 const POINTS = [0, .02, .05, .08, .15, .25, .4, .5, .7];
@@ -14,6 +14,13 @@ export function getMaxPoints(words:String[], letters:string[]):number {
         sum += wordPoints(word, letters)
     }
     return sum
+}
+
+export function getNewLetterState(mainLetter:string, letters:string[], rules:SeasonRules):LetterState[] {
+    var returnValue:LetterState[] = []
+    returnValue.push(new LetterState(mainLetter, rules.getUsageLimit(mainLetter), rules.getPointsForLetter(mainLetter), true));
+    letters.forEach(letter => returnValue.push(new LetterState(letter, rules.getUsageLimit(letter), rules.getPointsForLetter(letter), false)));
+    return returnValue;
 }
 
 export function getMaxPointsSeason(words:String[], letters:string[], extraRules:SeasonRules):number {
@@ -52,11 +59,6 @@ export function wordPointsSeason(word:String, letters:string[], extraRules:Seaso
     if (extraRules.fixedPoints.has(word.length)) {
         pointsForWord = extraRules.fixedPoints.get(word.length)!;
     }
-    for (var letter of word) {
-        if (extraRules.penalties.has(letter)) {
-            pointsForWord -= extraRules.penalties.get(letter)!;
-        }
-    }
     return pointsForWord;
 }
 
@@ -68,16 +70,21 @@ export async function checkSpellingBeeGuess(guess:string, current_guesses:string
         if (!(await dbi.wordExists(guess, bee!.id))) {
             message = SpellingBeeReplyEnum.wrong_word
         }
-        if (!guess.includes(bee!.main_letter)) {
-            message = SpellingBeeReplyEnum.no_main_letter
-        }
-        // for (var singleLetter of guess) {
-        //     if (singleLetter != bee!.main_letter && !other_letters.includes(singleLetter)) {
-        //         message = SpellingBeeReplyEnum.invalid_letter_used
-        //         break
-        //     }
-        // }
         return message;
+}
+
+export function checkGuessForIncorrectLetters(guess:string, bee:Bee, other_letters:string[]):SpellingBeeReplyEnum {
+    var message = SpellingBeeReplyEnum.ok;
+    if (!guess.includes(bee!.main_letter)) {
+        message = SpellingBeeReplyEnum.no_main_letter
+    }
+    for (var singleLetter of guess) {
+        if (singleLetter != bee!.main_letter && !other_letters.includes(singleLetter)) {
+            message = SpellingBeeReplyEnum.invalid_letter_used
+            break
+        }
+    }
+    return message;
 }
 
 export class SpellingBeeGuessReply {
@@ -93,9 +100,9 @@ export enum SpellingBeeReplyEnum {
 }
 
 export class SpellingBeeStateReply {
-    constructor(public message:string, public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number) {}
+    constructor(public message:string, public letters:LetterState[], public guessed_words:string[], public player_points:number) {}
 }
 
 export class SuccessfullSpellingBeeStateReply {
-    constructor(public message:SpellingBeeReplyEnum, public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number, public points:number) {}
+    constructor(public message:SpellingBeeReplyEnum, public letters:LetterState[], public guessed_words:string[], public player_points:number, public points:number) {}
 }

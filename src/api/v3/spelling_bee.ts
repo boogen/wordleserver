@@ -1,11 +1,12 @@
 import express from 'express';
 import * as Sentry from "@sentry/node"
-import WordleDBI, { Bee, RankingEntry } from '../../DBI'
+import WordleDBI, { Bee, GlobalBee, GuessedWordsBee, LetterState, RankingEntry } from '../../DBI'
 import AuthIdRequest from './types/AuthIdRequest';
 import SpellingBeeGuessRequest from './types/SpellingBeeGuessRequest';
-import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess, JOKER, ALPHABET } from './spelling_bee_common';
+import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess, JOKER, ALPHABET, getNewLetterState, checkGuessForIncorrectLetters } from './spelling_bee_common';
 import { get_ranking, RankingReply } from './ranking_common';
 import { SeasonRules } from './season_rules';
+import * as fs from 'fs';
 
 export const spelling_bee = express.Router();
 const dbi = new WordleDBI()
@@ -13,14 +14,14 @@ const BEE_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
 
 class GlobalSpellingBeeStateReply extends SpellingBeeStateReply {
-    constructor(public messageEnum:SpellingBeeReplyEnum, public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number, public max_points:number) {
-        super(messageEnum.toString(), main_letter, other_letters, guessed_words, player_points);
+    constructor(public messageEnum:SpellingBeeReplyEnum, public letters:LetterState[], public guessed_words:string[], public player_points:number, public max_points:number) {
+        super(messageEnum.toString(), letters, guessed_words, player_points);
     }
 }
 
 class SuccessfullGlobalSpellingBeeStateReply extends SuccessfullSpellingBeeStateReply {
-    constructor(public main_letter:string, public other_letters:string[], public guessed_words:string[], public player_points:number, public max_points:number, points:number) {
-        super(SpellingBeeReplyEnum.ok, main_letter, other_letters, guessed_words, player_points, points);
+    constructor(public letters:LetterState[], public guessed_words:string[], public player_points:number, public max_points:number, points:number) {
+        super(SpellingBeeReplyEnum.ok, letters, guessed_words, player_points, points);
     }
 }
 
@@ -33,20 +34,26 @@ spelling_bee.post('/getState', async (req, res, next) => {
         while (new_validity_timestamp < timestamp) {
             new_validity_timestamp += BEE_VALIDITY;
         }
-        var letters = await dbi.getLettersForBee(timestamp);
-        if (null === letters) {
-            letters = await dbi.createLettersForBee(new_validity_timestamp, new SeasonRules('{"noOfLetters": 6, "addBlank": true}'));
+        var letters:GlobalBee|null = await dbi.getLettersForBee(timestamp);
+        var season_rules_json = fs.readFileSync('model/season.json','utf8');
+        var season_rules = new SeasonRules("{}")
+        if (season_rules_json) {
+            season_rules = new SeasonRules(season_rules_json);
         }
-        var state = await dbi.getBeeState(player_id, letters.bee_id);
+        if (null === letters) {
+            letters = await dbi.createLettersForBee(new_validity_timestamp, season_rules);
+        }
+        var state:GuessedWordsBee|null = await dbi.getBeeState(player_id, letters.bee_id);
         var guesses:string[] = []
         if (state === null) {
+            state = await dbi.createBeeState(player_id, letters.bee_id, getNewLetterState(letters.main_letter, letters.letters, season_rules))
             guesses = []
         }
         else {
             guesses = state.guesses
         }
 	    const playerPoints = await dbi.getBeePlayerPoints(player_id, letters.bee_id)
-        res.json(new GlobalSpellingBeeStateReply(SpellingBeeReplyEnum.ok, letters.main_letter, letters.letters, guesses, playerPoints, getMaxPoints((await dbi.getBeeWords(letters.bee_model_id)), letters.letters)));
+        res.json(new GlobalSpellingBeeStateReply(SpellingBeeReplyEnum.ok, state.letters, guesses, playerPoints, getMaxPoints((await dbi.getBeeWords(letters.bee_model_id)), letters.letters)));
     } catch (error) {
         console.log(error);
         next(error);
@@ -63,16 +70,16 @@ spelling_bee.post('/guess', async (req, res, next) => {
         const letters = await dbi.getLettersForBee(timestamp);
         const bee_model:Bee|null = await dbi.getBeeById(letters!.bee_model_id);
         var state = await dbi.getBeeState(player_id, letters!.bee_id)
-        var guessesToCheck:string[] = []
-        if (!player_guess.includes(letters!.main_letter)) {
-            res.json(new GlobalSpellingBeeStateReply(SpellingBeeReplyEnum.no_main_letter,
-                letters!.main_letter,
-                letters!.letters,
+        var letterCorrectnessMessage = checkGuessForIncorrectLetters(player_guess, bee_model!, letters!.letters);
+        if (letterCorrectnessMessage != SpellingBeeReplyEnum.ok) {
+            res.json(new GlobalSpellingBeeStateReply(letterCorrectnessMessage,
+                state!.letters,
                 state!.guesses,
                 (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
                 getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters)))
             return;
         }
+        var guessesToCheck:string[] = []
         if (player_guess.includes(JOKER)) {
             guessesToCheck = ALPHABET.map(letter => {
                 var readyWord = player_guess;
@@ -108,16 +115,14 @@ spelling_bee.post('/guess', async (req, res, next) => {
         await dbi.increaseBeeRank(player_id, letters!.bee_id, points)
         if (message != SpellingBeeReplyEnum.ok) {
             res.json(new GlobalSpellingBeeStateReply(message,
-                letters!.main_letter,
-                letters!.letters,
+                state!.letters,
                 guesses,
                 (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
                 getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters)))
             return;
         }
         res.json(new SuccessfullGlobalSpellingBeeStateReply(
-            letters!.main_letter,
-            letters!.letters,
+            state!.letters,
             state!.guesses,
             (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
             getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters),
