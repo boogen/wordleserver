@@ -116,7 +116,8 @@ spelling_bee.post('/buy_letter',async (req, res, next) => {
     var letterPrice = lettersToBuy.splice(0, 1)[0];
     var lettersState = state!.letters;
     var pointInfo = await dbi.increaseBeeRank(player_id, letters!.bee_id, letterPrice.price)
-    lettersState.push(new LetterState("a", letterPrice.useLimit, 0 , false));
+    var possibleLetters = ALPHABET.filter(letter => lettersState.filter(ls => letter !== ls.letter).length === 0)
+    lettersState.push(new LetterState(possibleLetters[Math.floor(Math.random() * possibleLetters.length)], letterPrice.useLimit, 0 , false));
     var newState = await dbi.addNewLetterToSpellingBeeState(player_id, letters!.bee_id, lettersState, lettersToBuy);
     res.json(new GlobalSpellingBeeStateReply(SpellingBeeReplyEnum.ok, newState!.letters, newState!.guesses, pointInfo!.score, getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters), newState!.lettersToBuy.map(lb => lb.price)));
 })
