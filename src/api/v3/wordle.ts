@@ -113,7 +113,7 @@ wordle.post('/ranking', async (req, res, next) => {
     }
 })
 
-wordle.post('/friendRanking', async (req, res, next) => {
+wordle.post('/friend_ranking', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId)
