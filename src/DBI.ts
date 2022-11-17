@@ -193,6 +193,9 @@ export default class WordleDBI {
         var return_value:number[] = new Array(RANKS.length).fill(0);
         await Promise.all(result.map(async gw => {
             const global_bee = await this.global_bee().findOne({bee_id:gw.bee_id})
+            if (!global_bee) {
+                return;
+            }
             const bee:Bee|null = await this.getBeeById(global_bee!.bee_model_id)
             var letters = bee!.other_letters;
             var points:number = 0;
