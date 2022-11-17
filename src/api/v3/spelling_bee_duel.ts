@@ -9,6 +9,7 @@ import { ELO_COEFFICIENT, DUEL_DURATION, BOT_THRESHOLD, MATCH_ELO_DIFF, CHANCE_F
 import { get_ranking } from './ranking_common';
 import { Stats } from '../../WordleStatsDBI';
 import { getSeasonRules, LetterToBuy } from './season_rules';
+import { notifyAboutRankingChange } from './ranking';
 
 export const spelling_bee_duel = express.Router();
 const dbi = new WordleDBI()
@@ -260,6 +261,8 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
         const currentEloScore:number = await dbi.getCurrentSpellingBeeElo(player_id);
         const opponentElo:number = await dbi.getCurrentSpellingBeeElo(duel.opponent_id);
         const new_player_elo:number = calculateNewSimpleRank(currentEloScore, result);
+        const oldRank = await dbi.getSpellingBeeEloRank()
+        notifyAboutRankingChange(player_id, oldRank, currentEloScore, new_player_elo, "Wspólna litera - pojedynki")
         dbi.updateSpellingBeeEloRank(player_id, new_player_elo);
         stats.addSpellingBeeDuelEndEvent(player_id, duel!.bee_duel_id, result, currentEloScore, new_player_elo)
         res.json(new SpelllingBeeDuelEnd(result, duel.player_points, duel.opponent_points, new_player_elo, new_player_elo - currentEloScore))

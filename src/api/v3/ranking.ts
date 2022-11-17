@@ -1,12 +1,39 @@
 import express, { NextFunction } from "express";
-import WordleDBI from "../../DBI";
+import WordleDBI, { RankingEntry } from "../../DBI";
 import { get_ranking, RankingReply } from "./ranking_common";
 import AuthIdRequest from "./types/AuthIdRequest";
 
 import Sentry from '@sentry/node';
+import { CreateNotificationBody } from "onesignal-node/lib/types";
+import { oneSignalClient } from "../../one_signal";
+import { get_nick } from "./player_common";
 const dbi = new WordleDBI();
 
 export const ranking = express.Router();
+
+
+function createNotification(playerIds:number[], playerNick:string, heading:string):CreateNotificationBody {
+    return {
+        contents: {
+          'en': playerNick + ' wyprzedził Cię w rankingu',
+        },
+        headings: {
+            'en': heading
+        },
+        include_external_user_ids:playerIds.map(id => id.toString())
+      };
+    }
+
+export async function notifyAboutRankingChange(player_id:number, oldRank:RankingEntry[], oldPlayerScore:number, newPlayerScore:number, heading:string) {
+    var friendsToSendTo = (await Promise.all(oldRank.filter(e => e.score > oldPlayerScore && e.score < newPlayerScore)
+    .filter(async e => await dbi.checkIfFriends(e.player_id, player_id))))
+    .map(e => e.player_id)
+
+    oneSignalClient.createNotification(
+        createNotification(friendsToSendTo, (await get_nick(player_id, dbi)).nick, heading))
+        .then(response => console.log(response.statusCode))
+        .catch(e => console.log(e.body));
+}
 
 ranking.post('/spelling_bee_duel/global', async (req:express.Request, res:express.Response, next:NextFunction) => {
     try {
