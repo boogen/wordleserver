@@ -26,6 +26,15 @@ export function getNewLetterState(mainLetter:string, letters:string[], rules:Sea
     var plainLetters = returnValue.map(ls => ls.letter)
     var possibleLetters = ALPHABET.filter(letter => !plainLetters.includes(letter))
     console.log(possibleLetters)
+
+    var boughtLetterIndex:number = Math.floor(Math.random() * possibleLetters.length)
+    var boughtLetter:string = possibleLetters[boughtLetterIndex]
+    returnValue.push(new LetterState(boughtLetter, -1, 0, false))
+
+    var boughtLetterIndex:number = Math.floor(Math.random() * possibleLetters.length)
+    var boughtLetter:string = possibleLetters[boughtLetterIndex]
+    returnValue.push(new LetterState(boughtLetter, -1, 0, false))
+
     var boughtLetterIndex:number = Math.floor(Math.random() * possibleLetters.length)
     var boughtLetter:string = possibleLetters[boughtLetterIndex]
     returnValue.push(new LetterState(boughtLetter, -1, 0, true))
