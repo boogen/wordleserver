@@ -3,7 +3,7 @@ import * as Sentry from "@sentry/node"
 import WordleDBI, { Bee, GlobalBee, GuessedWordsBee, LetterState, RankingEntry } from '../../DBI'
 import AuthIdRequest from './types/AuthIdRequest';
 import SpellingBeeGuessRequest from './types/SpellingBeeGuessRequest';
-import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess, JOKER, ALPHABET, getNewLetterState, checkGuessForIncorrectLetters, wordPointsSeason, processPlayerGuess} from './spelling_bee_common';
+import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess, JOKER, ALPHABET, getNewLetterState, checkGuessForIncorrectLetters, wordPointsSeason, processPlayerGuess, initExtraLetters} from './spelling_bee_common';
 import { get_ranking, RankingReply } from './ranking_common';
 import { getSeasonRules, SeasonRules } from './season_rules';
 import * as fs from 'fs';
@@ -43,6 +43,7 @@ spelling_bee.post('/getState', async (req, res, next) => {
         var season_rules = getSeasonRules()
         if (null === letters) {
             letters = await dbi.createLettersForBee(new_validity_timestamp, season_rules);
+            initExtraLetters(letters!.main_letter, letters!.letters, season_rules);
         }
         var state:GuessedWordsBee|null = await dbi.getBeeState(player_id, letters.bee_id);
         var guesses:string[] = []
