@@ -8,7 +8,7 @@ const dbi = new WordleDBI();
 
 export const ranking = express.Router();
 
-ranking.post('/spelling_bee_duel_global', async (req:express.Request, res:express.Response, next:NextFunction) => {
+ranking.post('/spelling_bee_duel/global', async (req:express.Request, res:express.Response, next:NextFunction) => {
     try {
         const request = new AuthIdRequest(req);
         const player_id = await dbi.resolvePlayerId(request.authId);
@@ -22,7 +22,7 @@ ranking.post('/spelling_bee_duel_global', async (req:express.Request, res:expres
 
 })
 
-ranking.post('/spelling_bee_duel_friends', async (req:express.Request, res:express.Response, next:NextFunction) => {
+ranking.post('/spelling_bee_duel/friends', async (req:express.Request, res:express.Response, next:NextFunction) => {
     try {
         const request = new AuthIdRequest(req);
         const player_id = await dbi.resolvePlayerId(request.authId);
@@ -38,7 +38,7 @@ ranking.post('/spelling_bee_duel_friends', async (req:express.Request, res:expre
 
 })
 
-ranking.post('/spelling_bee_global', async (req, res, next) => {
+ranking.post('/spelling_bee/global', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
@@ -59,7 +59,7 @@ ranking.post('/spelling_bee_global', async (req, res, next) => {
     }
 })
 
-ranking.post('/spelling_bee_friends', async (req, res, next) => {
+ranking.post('/spelling_bee/friends', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
@@ -83,7 +83,7 @@ ranking.post('/spelling_bee_friends', async (req, res, next) => {
     }
 })
 
-ranking.post('/wordle_daily_challenge_global', async (req, res, next) => {
+ranking.post('/wordle_daily_challenge/global', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
@@ -103,7 +103,7 @@ ranking.post('/wordle_daily_challenge_global', async (req, res, next) => {
     }
 })
 
-ranking.post('/wordle_daily_challenge_friends', async (req, res, next) => {
+ranking.post('/wordle_daily_challenge/friends', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId)
