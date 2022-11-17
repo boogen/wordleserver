@@ -91,52 +91,8 @@ wordle.post('/validate', async (req, res, next) => {
     }
 })
 
-wordle.post('/ranking', async (req, res, next) => {
-    try {
-        const value = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.authId);
-        const timestamp = Date.now() / 1000;
-        const wordEntry = await dbi.getGlobalWord(timestamp);
-        if (wordEntry === null) {
-            res.json({message: 'ok', ranking:[]})
-            return
-        }
-        const ranking = await dbi.getWordleRanking(wordEntry.word_id)
-        res.json({message:'ok',
-        myInfo:await getMyPositionInRank(player_id, ranking, dbi),
-        ranking: await Promise.all(ranking.map( async function(re) { return {player:(((await dbi.getProfile(re.player_id))) || {nick: null}).nick, score: re.score, position: re.position};}))});
-    }
-    catch (error) {
-        console.log(error);
-        next(error);
-        Sentry.captureException(error);
-    }
-})
 
-wordle.post('/friend_ranking', async (req, res, next) => {
-    try {
-        const value = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.authId)
 
-        const timestamp = Date.now() / 1000;
-        const wordEntry = await dbi.getGlobalWord(timestamp);
-        if (wordEntry === null) {
-            res.json({message: 'ok', ranking:[]})
-            return
-        }
-        var friends = await dbi.friendList(player_id);
-        friends.push(player_id)
-        const ranking = await dbi.getWordleRankingWithFilter(wordEntry.word_id, friends)
-        res.json({message:'ok',
-        myInfo: await getMyPositionInRank(player_id, ranking, dbi),
-        ranking: await Promise.all(ranking.map( async function(re) { return {player:(((await dbi.getProfile(re.player_id))) || {nick: null}).nick, score: re.score};}))});
-    }
-    catch (error) {
-        console.log(error);
-        next(error);
-        Sentry.captureException(error);
-    }
-})
 
 async function getMyPositionInRank(player_id:number, rank:RankingEntry[], dbi:WordleDBI) {
     for (const index in rank) {

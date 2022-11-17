@@ -1,10 +1,11 @@
-import express from 'express';
+import express, { NextFunction } from 'express';
 import utils from '../../utils';
 import Sentry from '@sentry/node';
 import WordleDBI from '../../DBI';
 import AuthIdRequest from './types/AuthIdRequest';
 import AddFriendRequest from './types/AddFriendRequest';
 import { getProfile } from './player';
+import { get_ranking, RankingReply } from './ranking_common';
 
 export const friend = express.Router();
 const dbi = new WordleDBI();
@@ -62,6 +63,7 @@ friend.post('/add', async (req, res, next) => {
         Sentry.captureException(error);
     }
 })
+
 
 friend.post('/list', async (req, res, next) => {
     try {

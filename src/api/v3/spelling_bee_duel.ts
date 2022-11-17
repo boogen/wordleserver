@@ -302,33 +302,4 @@ spelling_bee_duel.post('/buy_letter',async (req, res, next) => {
     res.json(new SpellingBeeDuelStateReply(duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points, Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION, duel!.lettersToBuy));
 })
 
-spelling_bee_duel.post('/get_friend_elo_rank', async (req:express.Request, res:express.Response, next:NextFunction) => {
-    try {
-        const request = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(request.authId);
-        var friends = await dbi.friendList(player_id);
-        friends.push(player_id)
-        var rank = await dbi.getSpellingBeeEloRankWithFilter(friends);
-        res.json((await get_ranking(player_id, rank, dbi)));
-    } catch (error) {
-        console.log(error)
-        next(error)
-        Sentry.captureException(error);
-    }
-
-})
-
-spelling_bee_duel.post('/get_elo_rank', async (req:express.Request, res:express.Response, next:NextFunction) => {
-    try {
-        const request = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(request.authId);
-        var rank = await dbi.getSpellingBeeEloRank();
-        res.json((await get_ranking(player_id, rank, dbi)));
-    } catch (error) {
-        console.log(error)
-        next(error)
-        Sentry.captureException(error);
-    }
-
-})
 
