@@ -278,6 +278,11 @@ export default class WordleDBI {
         return true;
     }
 
+    async checkIfFriends(player_id:number, potential_friend_id:number) {
+        const friends =  this.db().get("friends.plr#" + player_id);
+        return (await friends.find({id:potential_friend_id})).length > 0;
+    }
+
     async friendList(player_id:number):Promise<number[]> {
         const friends =  this.db().get("friends.plr#" + player_id);
         return (await friends.find()).map(f => f.id)

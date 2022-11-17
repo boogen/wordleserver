@@ -16,15 +16,15 @@ const dbi = new WordleDBI()
 const BEE_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
 
-function createNotification(playerId:number, playerNick:string):CreateNotificationBody {
+function createNotification(playerIds:number[], playerNick:string):CreateNotificationBody {
 return {
     contents: {
-      'en': playerNick + ' wyprzedził cię w rankingu',
+      'en': playerNick + ' wyprzedził Cię w rankingu',
     },
     headings: {
         'en': 'Ups!'
     },
-    include_external_user_ids:[playerId.toString()]
+    include_external_user_ids:playerIds.map(id => id.toString())
   };
 }
 
@@ -100,22 +100,17 @@ spelling_bee.post('/guess', async (req, res, next) => {
         }
         var totalPointsAdded = result.pointsAdded.reduce((a, b) => a+b)
         var friends = await dbi.friendList(player_id);
-        console.log("Player id:" + player_id)
-        console.log("Friends: " + friends)
-        var oldFriendsRank = await dbi.getBeeRankingWithFilter(letters!.bee_id, friends)
+        var oldRank = await dbi.getBeeRanking(letters!.bee_id)
         var nick = (await get_nick(player_id, dbi)!).nick
 
         var newRankingEntry = await dbi.increaseBeeRank(player_id, letters!.bee_id, totalPointsAdded)
-        console.log("Old friends rank " + oldFriendsRank)
-        console.log(newRankingEntry)
-        oldFriendsRank.filter(e => e.score > (newRankingEntry.score - totalPointsAdded) && e.score < newRankingEntry.score)
-        .forEach(e => {
-            console.log("sending notification to " + e.player_id);
-            oneSignalClient.createNotification(createNotification(e.player_id, nick))
+
+        oneSignalClient.createNotification(
+            createNotification((await Promise.all(oldRank.filter(e => e.score > (newRankingEntry.score - totalPointsAdded) && e.score < newRankingEntry.score)
+                .filter(async e => await dbi.checkIfFriends(e.player_id, player_id))))
+                .map(e => e.player_id), nick))
             .then(response => console.log(response.statusCode))
-            .catch(e => console.log(e.body));;
-        }
-            )
+            .catch(e => console.log(e.body));
         const max_points = getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters);
         state = await dbi.saveLettersState(player_id, letters!.bee_id, result.newLetterState)
         res.json(new SuccessfullGlobalSpellingBeeStateReply(
