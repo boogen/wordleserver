@@ -22,7 +22,7 @@ return {
       'en': playerNick + ' wyprzedził Cię w rankingu',
     },
     headings: {
-        'en': 'Ups!'
+        'en': 'Wspólna litera'
     },
     include_external_user_ids:playerIds.map(id => id.toString())
   };
@@ -99,16 +99,17 @@ spelling_bee.post('/guess', async (req, res, next) => {
             state = await dbi.addBeeGuess(player_id, letters!.bee_id, guess)
         }
         var totalPointsAdded = result.pointsAdded.reduce((a, b) => a+b)
-        var friends = await dbi.friendList(player_id);
         var oldRank = await dbi.getBeeRanking(letters!.bee_id)
         var nick = (await get_nick(player_id, dbi)!).nick
 
         var newRankingEntry = await dbi.increaseBeeRank(player_id, letters!.bee_id, totalPointsAdded)
 
+        var friendsToSendTo = (await Promise.all(oldRank.filter(e => e.score > (newRankingEntry.score - totalPointsAdded) && e.score < newRankingEntry.score)
+        .filter(async e => await dbi.checkIfFriends(e.player_id, player_id))))
+        .map(e => e.player_id)
+
         oneSignalClient.createNotification(
-            createNotification((await Promise.all(oldRank.filter(e => e.score > (newRankingEntry.score - totalPointsAdded) && e.score < newRankingEntry.score)
-                .filter(async e => await dbi.checkIfFriends(e.player_id, player_id))))
-                .map(e => e.player_id), nick))
+            createNotification(friendsToSendTo, nick))
             .then(response => console.log(response.statusCode))
             .catch(e => console.log(e.body));
         const max_points = getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters);
