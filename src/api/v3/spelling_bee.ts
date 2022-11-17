@@ -104,7 +104,9 @@ spelling_bee.post('/guess', async (req, res, next) => {
         var nick = (await get_nick(player_id, dbi)!).nick
 
         var newRankingEntry = await dbi.increaseBeeRank(player_id, letters!.bee_id, totalPointsAdded)
-        oldFriendsRank.filter(e => e.score > newRankingEntry.score - totalPointsAdded && e.score < newRankingEntry.score)
+        console.log(oldFriendsRank)
+        console.log(newRankingEntry)
+        oldFriendsRank.filter(e => e.score > (newRankingEntry.score - totalPointsAdded) && e.score < newRankingEntry.score)
         .forEach(e => {
             console.log("sending notification to " + e.player_id);
             oneSignalClient.createNotification(createNotification(e.player_id, nick))
