@@ -20,7 +20,7 @@ export function getMaxPoints(words:String[], letters:string[]):number {
     return sum
 }
 
-var extraLetters = []
+var extraLetters:LetterState[] = []
 
 export function initExtraLetters(mainLetter:string, other_letters:string[], season_rules:SeasonRules) {
     extraLetters = []
@@ -42,8 +42,8 @@ export function getNewLetterState(mainLetter:string, letters:string[], rules:Sea
     var returnValue:LetterState[] = []
     returnValue.push(new LetterState(mainLetter, rules.getUsageLimit(mainLetter), rules.getPointsForLetter(mainLetter), true));
     letters.forEach(letter => returnValue.push(new LetterState(letter, rules.getUsageLimit(letter), rules.getPointsForLetter(letter), false)));
-
-    return returnValue;
+    
+    return returnValue.concat(extraLetters);
 }
 
 export function getMaxPointsSeason(words:string[], letters:string[], extraRules:SeasonRules):number {
