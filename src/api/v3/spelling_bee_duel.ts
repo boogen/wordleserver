@@ -1,14 +1,14 @@
 import express, { NextFunction } from 'express';
 import Sentry from '@sentry/node';
 import AuthIdRequest from './types/AuthIdRequest'
-import { checkGuessForIncorrectLetters, checkSpellingBeeGuess, getMaxPoints, processPlayerGuess, SpellingBeeReplyEnum, wordPoints } from './spelling_bee_common';
+import { ALPHABET, checkGuessForIncorrectLetters, checkSpellingBeeGuess, getMaxPoints, processPlayerGuess, SpellingBeeReplyEnum, wordPoints } from './spelling_bee_common';
 import WordleDBI, { Bee, LetterState, SpellingBeeDuel, SpellingBeeDuellGuess } from '../../DBI';
 import BaseGuessRequest from './types/BaseGuessRequest';
 import { get_bot_id, get_nick } from './player_common';
 import { ELO_COEFFICIENT, DUEL_DURATION, BOT_THRESHOLD, MATCH_ELO_DIFF, CHANCE_FOR_BOT } from './duel_settings';
 import { get_ranking } from './ranking_common';
 import { Stats } from '../../WordleStatsDBI';
-import { getSeasonRules } from './season_rules';
+import { getSeasonRules, LetterToBuy } from './season_rules';
 
 export const spelling_bee_duel = express.Router();
 const dbi = new WordleDBI()
@@ -35,7 +35,7 @@ class SpelllingBeeDuelEnd {
 }
 
 class SpellingBeeDuelStateReply {
-    constructor(public letters:LetterState[], public guessed_words:string[], public player_points:number, public time_left:number, public round_time:number) {
+    constructor(public letters:LetterState[], public guessed_words:string[], public player_points:number, public time_left:number, public round_time:number, public letters_to_buy:LetterToBuy[]) {
     }
 }
 
@@ -195,7 +195,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
         res
         .status(200)
         .json(new SpellingBeeDuelStart((await get_nick(opponent_id, dbi)).nick, opponent_guesses.map(g => new SpellingBeeDuellGuessMessage("", g.timestamp, g.points_after_guess)),
-            new SpellingBeeDuelStateReply(duel!.letters, duel!.player_guesses.map(guess => guess.word), duel!.player_points, Math.floor(duel.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION))
+            new SpellingBeeDuelStateReply(duel!.letters, duel!.player_guesses.map(guess => guess.word), duel!.player_points, Math.floor(duel.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION, duel!.lettersToBuy))
         )
     }
     catch (error) {
@@ -215,7 +215,7 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
         const bee_model:Bee|null = await dbi.getBeeById(duel!.bee_id)
         const result = await processPlayerGuess(guess, duel!.player_guesses.map(g => g.word), bee_model!, duel!.letters, getSeasonRules("duel_season.json"), dbi);
         if (result.message != SpellingBeeReplyEnum.ok) {
-            res.json(new SpellingBeeDuelGuessReply(result.message, new SpellingBeeDuelStateReply(duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points,Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION), 0));
+            res.json(new SpellingBeeDuelGuessReply(result.message, new SpellingBeeDuelStateReply(duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points,Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION, duel!.lettersToBuy), 0));
             return;
         }
         for (var i = 0; i < result.guessesAdded.length; i++) {
@@ -223,7 +223,7 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
         }
         var totalPoints = result.pointsAdded.reduce((a, b) => a + b);
         stats.addSpellingBeeDuelGuessEvent(player_id, duel!.bee_duel_id, totalPoints, duel!.player_points);
-        res.json(new SpellingBeeDuelGuessReply(result.message, new SpellingBeeDuelStateReply(duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points, Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION), totalPoints));
+        res.json(new SpellingBeeDuelGuessReply(result.message, new SpellingBeeDuelStateReply(duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points, Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION, duel!.lettersToBuy), totalPoints));
     }
     catch(error) {
         console.log(error)
@@ -268,6 +268,38 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
         next(error)
         Sentry.captureException(error);
     }
+})
+
+spelling_bee_duel.post('/buy_letter',async (req, res, next) => {
+    const value = new AuthIdRequest(req)
+    const player_id = await dbi.resolvePlayerId(value.authId)
+    const timestamp = Date.now() / 1000;
+    var duel:SpellingBeeDuel|null = await dbi.checkForExistingDuel(player_id, timestamp, DUEL_DURATION);
+    const bee_model:Bee|null = await dbi.getBeeById(duel!.bee_id)
+    var lettersToBuy = duel!.lettersToBuy; 
+    if (lettersToBuy.length == 0) {
+        res.json({"message":"no letters to buy"})
+        return;
+    }
+    var currentPlayerPoints:number|undefined = duel?.player_points
+    if (!currentPlayerPoints) {
+        currentPlayerPoints = 0;
+    }
+    var letterPrice = lettersToBuy.splice(0, 1)[0];
+    if (letterPrice.price > currentPlayerPoints) {
+        res.json({"message": "not_enough_points"})
+        return;
+    }
+    var lettersState = duel!.letters;
+    var plainLetters = lettersState.map(ls => ls.letter)
+    var possibleLetters = ALPHABET.filter(letter => !plainLetters.includes(letter))
+    console.log(possibleLetters)
+    var boughtLetterIndex:number = Math.floor(Math.random() * possibleLetters.length)
+    var boughtLetter:string = possibleLetters[boughtLetterIndex]
+    console.log(boughtLetter + " " + boughtLetterIndex)
+    lettersState.push(new LetterState(boughtLetter, letterPrice.useLimit, 0 , false));
+    var newDuel = await dbi.addNewLetterToSpellingBeeDuel(duel!.bee_duel_id, lettersState, lettersToBuy, -letterPrice.price);
+    res.json(new SpellingBeeDuelStateReply(duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points, Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION, duel!.lettersToBuy));
 })
 
 spelling_bee_duel.post('/get_friend_elo_rank', async (req:express.Request, res:express.Response, next:NextFunction) => {

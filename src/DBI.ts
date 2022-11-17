@@ -125,6 +125,7 @@ export class SpellingBeeDuel {
         public letters:LetterState[],
         public start_timestamp:number,
         public finished:boolean,
+        public lettersToBuy:LetterToBuy[],
         public _id?:ObjectId) {}
 }
 
@@ -430,6 +431,7 @@ export default class WordleDBI {
         return this.spelling_bee_duels().findOne({bee_id:bee_model_id, player_id:player_id, start_timestamp:{$lt:timestamp - duelDuration}}, {sort:{player_points:-1}, limit:1})
     }
 
+
     async startDuel(bee_model:Bee, player_id: number, opponent_id:number, opponent_guesses:SpellingBeeDuellGuess[], opponent_points:number, timestamp: number, seasonRules:SeasonRules):Promise<SpellingBeeDuel> {
         var return_value = new SpellingBeeDuel((await this.getNextSequenceValue("spelling_bee_duel_id")),
             bee_model.id,
@@ -439,7 +441,8 @@ export default class WordleDBI {
             0, opponent_points,
             getNewLetterState(bee_model.main_letter, bee_model.other_letters, seasonRules),
             timestamp,
-            false
+            false,
+            seasonRules.lettersToBuy
             );
             this.spelling_bee_duels().insert(return_value);
         
@@ -478,6 +481,13 @@ export default class WordleDBI {
             {$set:{player_points:current_duel.player_points + points},
             $push:{player_guesses: new SpellingBeeDuellGuess(guess, timestamp, current_duel.player_points + points)}
         })
+    }
+
+    async addNewLetterToSpellingBeeDuel(duel_id:number, newLetterState:LetterState[], newLettersToBuy:LetterToBuy[],  letterPrice:number) {
+        return this.spelling_bee_duels().findOneAndUpdate({bee_duel_id:duel_id},
+            {$inc:{player_points:letterPrice},
+            $set:{letters:newLetterState, lettersToBuy:newLettersToBuy}}
+        )
     }
 
     async getAllPlayerDuelsBeeIds(player_id:number):Promise<number[]> {
