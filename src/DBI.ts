@@ -558,7 +558,11 @@ export default class WordleDBI {
             return 0
         }
         return pointsFromRank.score
-        }
+    }
+
+    async getBeeRankingWithFilter(bee_id:number, friends:number[]):Promise<RankingEntry[]> {
+        return await this.getRankingWithFilter("bee", bee_id, friends);
+    }
 
     async getBeeRanking(bee_id:number):Promise<RankingEntry[]> {
         return await this.getRanking("bee", bee_id);
@@ -645,7 +649,7 @@ export default class WordleDBI {
         return returnValue
     }
 
-    async getRankingWithFilter(word_id:number, friends:number[]) {
+    async getWordleRankingWithFilter(word_id:number, friends:number[]) {
         const rank =  this.db().get("word#" + word_id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
@@ -654,6 +658,27 @@ export default class WordleDBI {
 
     //RANK COMMON
 
+    async getRankingWithFilter(rank_type:string, bee_id:number, filter:number[]):Promise<RankingEntry[]> {
+        const rank:ICollection<RawRankingEntry> =  this.db().get(rank_type + "#" + bee_id + "_ranking");
+        console.log(rank_type + "#" + bee_id + "_ranking")
+        rank.createIndex({player_id: 1})
+        rank.createIndex({score: 1});
+
+        const rawRank = await rank.find({player_id: {$in:filter}}, {sort: {score:-1}, limit:100})
+
+        var returnValue:RankingEntry[] = []
+        var position = 0
+        var score = 0
+        for (var entry of rawRank) {
+            if (score != entry.score) {
+                score = entry.score
+                position += 1
+            }
+            returnValue.push(new RankingEntry(entry.player_id, entry.score, position, entry.id))
+        }
+        return returnValue;
+
+    }
 
     async getRanking(rank_type:string, bee_id:number):Promise<RankingEntry[]> {
         const rank:ICollection<RawRankingEntry> =  this.db().get(rank_type + "#" + bee_id + "_ranking");

@@ -126,7 +126,7 @@ wordle.post('/friendRanking', async (req, res, next) => {
         }
         var friends = await dbi.friendList(player_id);
         friends.push(player_id)
-        const ranking = await dbi.getRankingWithFilter(wordEntry.word_id, friends)
+        const ranking = await dbi.getWordleRankingWithFilter(wordEntry.word_id, friends)
         res.json({message:'ok',
         myInfo: await getMyPositionInRank(player_id, ranking, dbi),
         ranking: await Promise.all(ranking.map( async function(re) { return {player:(((await dbi.getProfile(re.player_id))) || {nick: null}).nick, score: re.score};}))});
