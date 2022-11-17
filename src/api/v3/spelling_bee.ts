@@ -106,7 +106,10 @@ spelling_bee.post('/guess', async (req, res, next) => {
         var newRankingEntry = await dbi.increaseBeeRank(player_id, letters!.bee_id, totalPointsAdded)
         oldFriendsRank.filter(e => e.score > newRankingEntry.score - totalPointsAdded && e.score < newRankingEntry.score)
         .forEach(e => {
-            oneSignalClient.createNotification(createNotification(e.player_id, nick));
+            console.log("sending notification to " + e.player_id);
+            oneSignalClient.createNotification(createNotification(e.player_id, nick))
+            .then(response => console.log(response.statusCode))
+            .catch(e => console.log(e.body));;
         }
             )
         const max_points = getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters);
