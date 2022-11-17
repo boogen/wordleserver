@@ -100,11 +100,13 @@ spelling_bee.post('/guess', async (req, res, next) => {
         }
         var totalPointsAdded = result.pointsAdded.reduce((a, b) => a+b)
         var friends = await dbi.friendList(player_id);
+        console.log("Player id:" + player_id)
+        console.log("Friends: " + friends)
         var oldFriendsRank = await dbi.getBeeRankingWithFilter(letters!.bee_id, friends)
         var nick = (await get_nick(player_id, dbi)!).nick
 
         var newRankingEntry = await dbi.increaseBeeRank(player_id, letters!.bee_id, totalPointsAdded)
-        console.log(oldFriendsRank)
+        console.log("Old friends rank " + oldFriendsRank)
         console.log(newRankingEntry)
         oldFriendsRank.filter(e => e.score > (newRankingEntry.score - totalPointsAdded) && e.score < newRankingEntry.score)
         .forEach(e => {
