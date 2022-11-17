@@ -7,11 +7,26 @@ import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, 
 import { get_ranking, RankingReply } from './ranking_common';
 import { getSeasonRules, SeasonRules } from './season_rules';
 import * as fs from 'fs';
+import { CreateNotificationBody } from 'onesignal-node/lib/types';
+import { get_nick } from './player_common';
+import { oneSignalClient } from '../../one_signal';
 
 export const spelling_bee = express.Router();
 const dbi = new WordleDBI()
 const BEE_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
+
+function createNotification(playerId:number, playerNick:string):CreateNotificationBody {
+return {
+    contents: {
+      'en': playerNick + ' wyprzedził cię w rankingu',
+    },
+    headings: {
+        'en': 'Ups!'
+    },
+    include_external_user_ids:[playerId.toString()]
+  };
+}
 
 class GlobalSpellingBeeStateReply extends SpellingBeeStateReply {
     constructor(public messageEnum:SpellingBeeReplyEnum, public letters:LetterState[], public guessed_words:string[], public player_points:number, public max_points:number, public letters_to_buy_prices:number[]) {
@@ -84,7 +99,16 @@ spelling_bee.post('/guess', async (req, res, next) => {
             state = await dbi.addBeeGuess(player_id, letters!.bee_id, guess)
         }
         var totalPointsAdded = result.pointsAdded.reduce((a, b) => a+b)
-        await dbi.increaseBeeRank(player_id, letters!.bee_id, totalPointsAdded)
+        var friends = await dbi.friendList(player_id);
+        var oldFriendsRank = await dbi.getBeeRankingWithFilter(letters!.bee_id, friends)
+        var nick = (await get_nick(player_id, dbi)!).nick
+
+        var newRankingEntry = await dbi.increaseBeeRank(player_id, letters!.bee_id, totalPointsAdded)
+        oldFriendsRank.filter(e => e.score > newRankingEntry.score - totalPointsAdded && e.score < newRankingEntry.score)
+        .forEach(e => {
+            oneSignalClient.createNotification(createNotification(e.player_id, nick));
+        }
+            )
         const max_points = getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters);
         state = await dbi.saveLettersState(player_id, letters!.bee_id, result.newLetterState)
         res.json(new SuccessfullGlobalSpellingBeeStateReply(

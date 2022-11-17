@@ -53,6 +53,12 @@ player.post("/register", async (req, res, next) => {
     }
 });
 
+player.post('/login',async (req, res, next) => {
+    const value = new AuthIdRequest(req);
+    const player_id:number = (await dbi.resolvePlayerId(value.authId));
+    res.json({'message':'ok', 'player_id':player_id})
+})
+
 player.post("/setNick", async (req, res, next) => {
     try {
         const value = new SetNickRequest(req);
