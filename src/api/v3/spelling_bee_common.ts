@@ -23,6 +23,12 @@ export function getNewLetterState(mainLetter:string, letters:string[], rules:Sea
     var returnValue:LetterState[] = []
     returnValue.push(new LetterState(mainLetter, rules.getUsageLimit(mainLetter), rules.getPointsForLetter(mainLetter), true));
     letters.forEach(letter => returnValue.push(new LetterState(letter, rules.getUsageLimit(letter), rules.getPointsForLetter(letter), false)));
+    var plainLetters = returnValue.map(ls => ls.letter)
+    var possibleLetters = ALPHABET.filter(letter => !plainLetters.includes(letter))
+    console.log(possibleLetters)
+    var boughtLetterIndex:number = Math.floor(Math.random() * possibleLetters.length)
+    var boughtLetter:string = possibleLetters[boughtLetterIndex]
+    returnValue.push(new LetterState(boughtLetter, -1, 0, true))
     return returnValue;
 }
 
