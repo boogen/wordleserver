@@ -13,6 +13,7 @@ const letterToBuySchema = joi.object({price: joi.number().required(), useLimit: 
 const profileSchema = joi.object({
     fixedPoints: joi.array().items(fixedPointsSchema),
     multipliers: joi.array().items(multiplierSchema),
+    panagramsOnly: joi.boolean().default(false),
     noOfLetters: joi.number(),
     addBlank: joi.boolean(),
     pointsForLetters: joi.array().items(pointsForLetterSchema),
@@ -36,6 +37,7 @@ export class SeasonRules {
     public multiplier:Map<number, number> = new Map();
     public pointsForLetters:Map<string, number> = new Map();
     public letterUsage:Map<String, number> = new Map();
+    public panagramsOnly:boolean = false;
     public lettersToBuy:LetterToBuy[];
 
     public noOfLetters:number;
@@ -63,6 +65,9 @@ export class SeasonRules {
         }
         if (seasonData.letterUsage) {
             this.addLetterUsage(seasonData.letterUsage);
+        }
+        if (seasonData.panagramsOnly) {
+            this.panagramsOnly = seasonData.panagramsOnly;
         }
         this.lettersToBuy = seasonData.lettersToBuy?.map((letter: LetterToBuy) => new LetterToBuy(letter.price, letter.useLimit))
     }

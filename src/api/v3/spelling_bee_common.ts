@@ -14,7 +14,7 @@ export class SpellingBeeChanges {
 export function getMaxPoints(words:String[], letters:string[]):number {
     var sum = 0;
     for (var word of words) {
-        sum += wordPoints(word, letters)
+        sum += wordPoints(word, letters).points
     }
     return sum
 }
@@ -86,21 +86,32 @@ export async function processPlayerGuess(playerGuess:string, guesses:string[], b
     return new SpellingBeeChanges(message, guessesAdded, points, newLetterState);
 }
 
-export function wordPoints(word:String, letters:string[]):number {
+class WordPoints {
+    constructor(public points:number, public isPanagram:boolean) {}
+}
+
+export function wordPoints(word:String, letters:string[]):WordPoints {
     if (word.length == 4) {
-        return 1
+        return new WordPoints(1, false)
     }
     var points = word.length;
     for (var letter of letters) {
+        if (letter === JOKER) {
+            continue
+        }
         if (!word.includes(letter)) {
-            return points;
+            return new WordPoints(points, false);
         }
     }
-    return points + 7;
+    return new WordPoints(points + 7, true);
 }
 
 export function wordPointsSeason(word:string, letters:string[], extraRules:SeasonRules):number {
-    var pointsForWord = wordPoints(word, letters);
+    var points = wordPoints(word, letters);
+    if (!points.isPanagram && extraRules.panagramsOnly) {
+        return 0;
+    }
+    var pointsForWord = points.points;
     if (extraRules.fixedPoints.has(word.length)) {
         pointsForWord = extraRules.fixedPoints.get(word.length)!;
     }

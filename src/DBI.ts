@@ -201,7 +201,7 @@ export default class WordleDBI {
             var points:number = 0;
             var maxPoints:number = getMaxPoints(bee!.words, letters)
             for (var word of gw.guesses) {
-                points += wordPoints(word, letters)
+                points += wordPoints(word, letters).points
             }
             var rank = pointsToRank(points, maxPoints);
             console.log(return_value[rank] + 1)

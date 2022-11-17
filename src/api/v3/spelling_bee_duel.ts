@@ -101,14 +101,14 @@ async function createBotGuesses(bee_model:Bee, player_id:number):Promise<Spellin
         const guess:string = bee_model.words[Math.floor(Math.random() * bee_model.words.length)]
         if (!bot_guesses.includes(guess)) {
             bot_guesses.push(guess)
-            bot_points -= wordPoints(guess, bee_model.other_letters)
+            bot_points -= wordPoints(guess, bee_model.other_letters).points
         }
     }
     const guess_interval:number = (DUEL_DURATION - 20) / bot_guesses.length;
     var time:number = 10;
     var points:number = 0;
     for (var guess of bot_guesses) {
-        var points_for_guess:number = wordPoints(guess, bee_model.other_letters);
+        var points_for_guess:number = wordPoints(guess, bee_model.other_letters).points;
         points += points_for_guess
         return_value.push(new SpellingBeeDuellGuess("", Math.floor(time), points));
         time += guess_interval;
