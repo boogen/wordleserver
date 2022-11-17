@@ -270,6 +270,22 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
     }
 })
 
+spelling_bee_duel.post('/get_friend_elo_rank', async (req:express.Request, res:express.Response, next:NextFunction) => {
+    try {
+        const request = new AuthIdRequest(req);
+        const player_id = await dbi.resolvePlayerId(request.authId);
+        var friends = await dbi.friendList(player_id);
+        friends.push(player_id)
+        var rank = await dbi.getSpellingBeeEloRankWithFilter(friends);
+        res.json((await get_ranking(player_id, rank, dbi)));
+    } catch (error) {
+        console.log(error)
+        next(error)
+        Sentry.captureException(error);
+    }
+
+})
+
 spelling_bee_duel.post('/get_elo_rank', async (req:express.Request, res:express.Response, next:NextFunction) => {
     try {
         const request = new AuthIdRequest(req);
