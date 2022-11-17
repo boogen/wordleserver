@@ -262,7 +262,7 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
         const opponentElo:number = await dbi.getCurrentSpellingBeeElo(duel.opponent_id);
         const new_player_elo:number = calculateNewSimpleRank(currentEloScore, result);
         const oldRank = await dbi.getSpellingBeeEloRank()
-        notifyAboutRankingChange(player_id, oldRank, currentEloScore, new_player_elo, "Wspólna litera - pojedynki")
+        notifyAboutRankingChange(player_id, oldRank, currentEloScore, new_player_elo, "Pojedynek")
         dbi.updateSpellingBeeEloRank(player_id, new_player_elo);
         stats.addSpellingBeeDuelEndEvent(player_id, duel!.bee_duel_id, result, currentEloScore, new_player_elo)
         res.json(new SpelllingBeeDuelEnd(result, duel.player_points, duel.opponent_points, new_player_elo, new_player_elo - currentEloScore))
