@@ -136,7 +136,7 @@ spelling_bee.post('/buy_letter',async (req, res, next) => {
     res.json(new GlobalSpellingBeeStateReply(SpellingBeeReplyEnum.ok, newState!.letters, newState!.guesses, pointInfo!.score, getMaxPoints((await dbi.getBeeWords(letters!.bee_model_id)), letters!.letters), newState!.lettersToBuy.map(lb => lb.price)));
 })
 
-spelling_bee.post('/friendRanking', async (req, res, next) => {
+spelling_bee.post('/friend_ranking', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
         const player_id = await dbi.resolvePlayerId(value.authId);
