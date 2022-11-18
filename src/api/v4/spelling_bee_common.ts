@@ -1,5 +1,5 @@
 import { func } from "@hapi/joi";
-import WordleDBI, { OldBee, LetterState } from "../../DBI";
+import WordleDBI, { Bee, LetterState } from "../../DBI";
 import { SeasonRules } from "./season_rules";
 
 const POINTS = [0, .02, .05, .08, .15, .25, .4, .5, .7];
@@ -64,7 +64,7 @@ export function pointsToRank(points:number, maxPoints:number):number {
     return 0;
 }
 
-export async function processPlayerGuess(playerGuess:string, guesses:string[], beeModel:OldBee, letterState:LetterState[], seasonRules:SeasonRules, dbi:WordleDBI):Promise<SpellingBeeChanges> {
+export async function processPlayerGuess(playerGuess:string, guesses:string[], beeModel:Bee, letterState:LetterState[], seasonRules:SeasonRules, dbi:WordleDBI):Promise<SpellingBeeChanges> {
     var letterCorrectnessMessage = checkGuessForIncorrectLetters(playerGuess, beeModel, letterState);
     if (letterCorrectnessMessage != SpellingBeeReplyEnum.ok) {
         return new SpellingBeeChanges(letterCorrectnessMessage, [], [], []);
@@ -143,7 +143,7 @@ export function wordPointsSeason(word:string, letters:string[], extraRules:Seaso
     return pointsForWord;
 }
 
-export async function checkSpellingBeeGuess(guess:string, current_guesses:string[], bee:OldBee, other_letters:string[], dbi:WordleDBI):Promise<SpellingBeeReplyEnum> {
+export async function checkSpellingBeeGuess(guess:string, current_guesses:string[], bee:Bee, other_letters:string[], dbi:WordleDBI):Promise<SpellingBeeReplyEnum> {
     var message = SpellingBeeReplyEnum.ok;
     
     if (current_guesses.includes(guess)) {
@@ -155,7 +155,7 @@ export async function checkSpellingBeeGuess(guess:string, current_guesses:string
     return message;
 }
 
-export function checkGuessForIncorrectLetters(guess:string, bee:OldBee, letters:LetterState[]):SpellingBeeReplyEnum {
+export function checkGuessForIncorrectLetters(guess:string, bee:Bee, letters:LetterState[]):SpellingBeeReplyEnum {
     var message = SpellingBeeReplyEnum.ok;
     var letterOccurences:Map<string, number> = new Map();
     for (var singleLetter of guess) {
