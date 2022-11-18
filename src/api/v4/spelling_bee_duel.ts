@@ -127,7 +127,7 @@ async function getSpellingBeeDuelPrematchPlayerInfo(id:number):Promise<SpellingB
 spelling_bee_duel.post('/prematch', async (req:express.Request, res:express.Response, next:Function) => {
     try {
         const request = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(request.authId);
+        const player_id = await dbi.resolvePlayerId(request.auth_id);
         const timestamp:number = Date.now() / 1000;
         const existing_duell = await dbi.checkForUnfinishedDuel(player_id, timestamp, DUEL_DURATION);
         if (existing_duell !== null) {
@@ -161,7 +161,7 @@ spelling_bee_duel.post('/prematch', async (req:express.Request, res:express.Resp
 spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Response, next:Function) => {
     try {
         const request = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(request.authId);
+        const player_id = await dbi.resolvePlayerId(request.auth_id);
         const timestamp:number = Date.now() / 1000;
         var duel:SpellingBeeDuel|null = await dbi.checkForUnfinishedDuel(player_id, timestamp, DUEL_DURATION);
         if (duel === null) {
@@ -210,7 +210,7 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
     try {
         const request = new BaseGuessRequest(req);
         const guess = request.guess;
-        const player_id = await dbi.resolvePlayerId(request.authId);
+        const player_id = await dbi.resolvePlayerId(request.auth_id);
         const timestamp = Date.now() / 1000;
         var duel:SpellingBeeDuel|null = await dbi.checkForExistingDuel(player_id, timestamp, DUEL_DURATION);
         const bee_model:Bee|null = await dbi.getBeeById(duel!.bee_id)
@@ -237,7 +237,7 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
 spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, next:NextFunction) => {
     try {
         const request = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(request.authId);
+        const player_id = await dbi.resolvePlayerId(request.auth_id);
         const timestamp = Date.now() / 1000;
         var duel:SpellingBeeDuel|null = await dbi.checkForUnfinishedDuel(player_id, timestamp, DUEL_DURATION);
         if (duel === null) {
@@ -275,7 +275,7 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
 
 spelling_bee_duel.post('/buy_letter',async (req, res, next) => {
     const value = new AuthIdRequest(req)
-    const player_id = await dbi.resolvePlayerId(value.authId)
+    const player_id = await dbi.resolvePlayerId(value.auth_id)
     const timestamp = Date.now() / 1000;
     var duel:SpellingBeeDuel|null = await dbi.checkForExistingDuel(player_id, timestamp, DUEL_DURATION);
     const bee_model:Bee|null = await dbi.getBeeById(duel!.bee_id)

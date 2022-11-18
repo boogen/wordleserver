@@ -38,7 +38,7 @@ export async function notifyAboutRankingChange(player_id:number, oldRank:Ranking
 ranking.post('/spelling_bee_duel/global', async (req:express.Request, res:express.Response, next:NextFunction) => {
     try {
         const request = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(request.authId);
+        const player_id = await dbi.resolvePlayerId(request.auth_id);
         var rank = await dbi.getSpellingBeeEloRank();
         res.json((await get_ranking(player_id, rank, dbi)));
     } catch (error) {
@@ -52,7 +52,7 @@ ranking.post('/spelling_bee_duel/global', async (req:express.Request, res:expres
 ranking.post('/spelling_bee_duel/friends', async (req:express.Request, res:express.Response, next:NextFunction) => {
     try {
         const request = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(request.authId);
+        const player_id = await dbi.resolvePlayerId(request.auth_id);
         var friends = await dbi.friendList(player_id);
         friends.push(player_id)
         var rank = await dbi.getSpellingBeeEloRankWithFilter(friends);
@@ -68,7 +68,7 @@ ranking.post('/spelling_bee_duel/friends', async (req:express.Request, res:expre
 ranking.post('/spelling_bee/global', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.authId);
+        const player_id = await dbi.resolvePlayerId(value.auth_id);
         const timestamp = Date.now() / 1000;
         const bee = await dbi.getLettersForBee(timestamp);
         console.log("Bee id:" + bee);
@@ -89,7 +89,7 @@ ranking.post('/spelling_bee/global', async (req, res, next) => {
 ranking.post('/spelling_bee/friends', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.authId);
+        const player_id = await dbi.resolvePlayerId(value.auth_id);
         const timestamp = Date.now() / 1000;
         const bee = await dbi.getLettersForBee(timestamp);
         console.log("Bee id:" + bee);
@@ -113,7 +113,7 @@ ranking.post('/spelling_bee/friends', async (req, res, next) => {
 ranking.post('/wordle_daily_challenge/global', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.authId);
+        const player_id = await dbi.resolvePlayerId(value.auth_id);
         const timestamp = Date.now() / 1000;
         const wordEntry = await dbi.getGlobalWord(timestamp);
         if (wordEntry === null) {
@@ -133,7 +133,7 @@ ranking.post('/wordle_daily_challenge/global', async (req, res, next) => {
 ranking.post('/wordle_daily_challenge/friends', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.authId)
+        const player_id = await dbi.resolvePlayerId(value.auth_id)
 
         const timestamp = Date.now() / 1000;
         const wordEntry = await dbi.getGlobalWord(timestamp);

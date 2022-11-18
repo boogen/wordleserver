@@ -55,15 +55,15 @@ player.post("/register", async (req, res, next) => {
 
 player.post('/login',async (req, res, next) => {
     const value = new AuthIdRequest(req);
-    const player_id:number = (await dbi.resolvePlayerId(value.authId));
+    const player_id:number = (await dbi.resolvePlayerId(value.auth_id));
     res.json({'message':'ok', 'player_id':player_id})
 })
 
 player.post("/setNick", async (req, res, next) => {
     try {
         const value = new SetNickRequest(req);
-        console.log(value.authId)
-        const player_id:number = (await dbi.resolvePlayerId(value.authId));
+        console.log(value.auth_id)
+        const player_id:number = (await dbi.resolvePlayerId(value.auth_id));
         await dbi.setNick(player_id, value.nick, (nick:string) => res.json({message:'ok', profile: {nick: nick}}));
         await stats.addSetNickEvent(player_id, value.nick);
     }
@@ -76,7 +76,7 @@ player.post("/setNick", async (req, res, next) => {
 
 player.post("/getNick", async (req:express.Request, res:express.Response, next) => {
     var value = new AuthIdRequest(req)
-    const player_id = await dbi.resolvePlayerId(value.authId);
+    const player_id = await dbi.resolvePlayerId(value.auth_id);
     const profile = await dbi.getProfile(player_id)
     res.json({message:"ok", nick:profile?.nick})
 })
@@ -90,7 +90,7 @@ player.post("/setSocialId",  async (req:express.Request, res:express.Response, n
 player.post("/getProfile", async (req:express.Request, res:express.Response, next) => {
     try {
         const value = new ProfileRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.authId);
+        const player_id = await dbi.resolvePlayerId(value.auth_id);
         console.log("Getting profile for player: " + value.player_id)
 
         res.json({message: 'ok', profile: await getProfile(player_id, value.player_id)})
@@ -105,7 +105,7 @@ player.post("/getProfile", async (req:express.Request, res:express.Response, nex
 player.post("/getMyProfile", async (req:express.Request, res:express.Response, next) => {
     try {
         const value = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.authId);
+        const player_id = await dbi.resolvePlayerId(value.auth_id);
         const profile = await dbi.getProfile(player_id);
         const spelling_bee_stats = await dbi.getSpellingBeeStats(player_id)
         if (profile === null) {

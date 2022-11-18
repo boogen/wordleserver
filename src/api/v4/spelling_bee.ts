@@ -33,7 +33,7 @@ class SuccessfullGlobalSpellingBeeStateReply extends SuccessfullSpellingBeeState
 spelling_bee.post('/getState', async (req, res, next) => {
     try {
         const request = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(request.authId);
+        const player_id = await dbi.resolvePlayerId(request.auth_id);
         var new_validity_timestamp = GLOBAL_TIME_START;
         const timestamp = Date.now() / 1000;
         while (new_validity_timestamp < timestamp) {
@@ -68,7 +68,7 @@ spelling_bee.post('/guess', async (req, res, next) => {
         const request = new SpellingBeeGuessRequest(req);
         var season_rules = getSeasonRules();
         const player_guess = request.guess;
-        const player_id = await dbi.resolvePlayerId(request.authId);
+        const player_id = await dbi.resolvePlayerId(request.auth_id);
         const timestamp = Date.now() / 1000;
         const letters = await dbi.getLettersForBee(timestamp);
         const bee_model:Bee|null = await dbi.getBeeById(letters!.bee_model_id);
@@ -114,7 +114,7 @@ spelling_bee.post('/guess', async (req, res, next) => {
 
 spelling_bee.post('/buy_letter',async (req, res, next) => {
     const value = new AuthIdRequest(req)
-    const player_id = await dbi.resolvePlayerId(value.authId)
+    const player_id = await dbi.resolvePlayerId(value.auth_id)
     const timestamp = Date.now() / 1000;
     const letters = await dbi.getLettersForBee(timestamp);
     const bee_model:Bee|null = await dbi.getBeeById(letters!.bee_model_id);

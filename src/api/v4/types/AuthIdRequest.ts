@@ -2,15 +2,15 @@ import joi from '@hapi/joi';
 import express from 'express';
 
 const authIdSchema = joi.object({
-    authId: joi.string().trim().required()
+    auth_id: joi.string().trim().required()
 });
 
 export default class AuthIdRequest {
-    authId:string;
+    auth_id:string;
 
     constructor(req:express.Request) {
         authIdSchema.validate(req.body);
-        this.authId = req.body.authId;
+        this.auth_id = req.body.auth_id;
     }
 }
 

@@ -42,6 +42,8 @@ export class SeasonRules {
 
     public noOfLetters:number;
     public addBlank:boolean;
+    public noOfRequiredLetters:number;
+    public duelTag:string|undefined;
     constructor(json:string) {
         profileSchema.validate(json);
         
@@ -68,6 +70,18 @@ export class SeasonRules {
         }
         if (seasonData.panagramsOnly) {
             this.panagramsOnly = seasonData.panagramsOnly;
+        }
+        if (seasonData.noOfRequiredLetters) {
+            this.noOfRequiredLetters = seasonData.noOfRequiredLetters;
+        }
+        else {
+            this.noOfRequiredLetters = 1;
+        }
+        if (seasonData.duelTag) {
+            this.duelTag = seasonData.duelTag;
+        }
+        else {
+            this.duelTag = undefined;
         }
         this.lettersToBuy = seasonData.lettersToBuy?.map((letter: LetterToBuy) => new LetterToBuy(letter.price, letter.useLimit))
     }

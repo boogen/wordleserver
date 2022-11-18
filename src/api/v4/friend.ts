@@ -23,7 +23,7 @@ export function generateFriendCode(length:number):string {
 friend.post('/code', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.authId);
+        const player_id = await dbi.resolvePlayerId(value.auth_id);
         var friend_code = null;
         var generated_friend_code = null;
         do {
@@ -45,7 +45,7 @@ friend.post('/code', async (req, res, next) => {
 friend.post('/add', async (req, res, next) => {
     try {
         const value = new AddFriendRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.authId);
+        const player_id = await dbi.resolvePlayerId(value.auth_id);
         if (await dbi.addFriend(player_id, value.friend_code)) {
             res.json({
                 status: "ok"
@@ -68,7 +68,7 @@ friend.post('/add', async (req, res, next) => {
 friend.post('/list', async (req, res, next) => {
     try {
         const value =new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.authId);
+        const player_id = await dbi.resolvePlayerId(value.auth_id);
         var friendList = await dbi.friendList(player_id);
 
         res.json({

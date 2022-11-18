@@ -89,7 +89,7 @@ crossword.post('/mock', async (req, res, next) => {
 crossword.post('/guess', async (req, res, next) => {
     try {
         const value = new BaseGuessRequest(req);
-        const playerId = await dbi.resolvePlayerId(value.authId);
+        const playerId = await dbi.resolvePlayerId(value.auth_id);
         const players_word = value.guess.toLowerCase();
         const isWord = await dbi.isWordValid(players_word);
         var crosswordState = await dbi.getCrosswordState(playerId);
@@ -165,7 +165,7 @@ crossword.post('/guess', async (req, res, next) => {
 crossword.post('/init', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
-        const playerId = await dbi.resolvePlayerId(value.authId);
+        const playerId = await dbi.resolvePlayerId(value.auth_id);
         var crosswordState = await dbi.getCrosswordState(playerId);
         var grid = []
         var word_list = []

@@ -1,11 +1,11 @@
 import monk, { FindOneResult, FindResult, ICollection, id, IMonkManager } from 'monk';
 import { ObjectId } from 'mongodb';
 import { number } from '@hapi/joi';
-import { DEFAULT_ELO, NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE } from './api/v3/duel_settings';
-import { getMaxPoints, getNewLetterState, pointsToRank, RANKS, wordPoints } from './api/v3/spelling_bee_common';
-import { ALPHABET, JOKER } from './api/v3/spelling_bee_common';
-import { LetterToBuy, SeasonRules } from './api/v3/season_rules';
-import { player } from './api/v3/player';
+import { DEFAULT_ELO, NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE } from './api/v4/duel_settings';
+import { getMaxPoints, getNewLetterState, pointsToRank, RANKS, wordPoints } from './api/v4/spelling_bee_common';
+import { ALPHABET, JOKER } from './api/v4/spelling_bee_common';
+import { LetterToBuy, SeasonRules } from './api/v4/season_rules';
+import { player } from './api/v4/player';
 
 export class PlayerProfile {
     constructor(public nick: string, public id:number, public _id?: ObjectId) {}

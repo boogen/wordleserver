@@ -16,7 +16,7 @@ const stats:Stats = new Stats();
 wordle.post('/getState', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.authId);
+        const player_id = await dbi.resolvePlayerId(value.auth_id);
         var val = await dbi.getWord();
         var word = val[0].word;
         console.log("word %s player id %s", word, player_id);
@@ -50,7 +50,7 @@ wordle.post('/getState', async (req, res, next) => {
 wordle.post('/validate', async (req, res, next) => {
     try {
         const value = new BaseGuessRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.authId)
+        const player_id = await dbi.resolvePlayerId(value.auth_id)
         const timestamp = Date.now() / 1000;
         const wordEntry = await dbi.getGlobalWord(timestamp);
 
