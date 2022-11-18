@@ -33,9 +33,13 @@ def upload_possible_words(words_file, dbname):
 
 
 def upload_bees(bees_file, dbname):
-    bees_db = dbname["bees"]
-    bees_db.drop()
-    bees_db.create_index('id', unique = True)
+    single_bees_db = dbname["bees_v2_1"]
+    single_bees_db.drop()
+    single_bees_db.create_index('id', unique = True)
+
+    double_bees_db = dbname["bees_v2_2"]
+    double_bees_db.drop()
+    double_bees_db.create_index('id', unique = True)
 
     f = open(bees_file, "r")
     lines = f.readlines()
@@ -44,17 +48,13 @@ def upload_bees(bees_file, dbname):
     for line in lines:
         print("Uploading bees: " + str(id) + "/" + str(len(lines)), end="\r")
         line = line.strip()
-        words = line.split(" ")
-        unique_letters = list(set(''.join(words)))
-        main_letter = None
-        for letter in unique_letters:
-            if all(map(lambda w: letter in w, words)):
-                main_letter = letter
-                unique_letters.remove(main_letter)
-                break
-        if main_letter is None:
-            raise "Couldn't find main letter"
-        bees_db.insert_one({'id': id, 'words':words, 'main_letter': main_letter, 'other_letters': unique_letters})
+        parts = line.split(",")
+        required_letters = list(parts[0])
+        insert = {'id':id, 'max_points':int(parts[2]), 'required_letters':required_letters, 'other_letters':list(parts[1])}
+        if len(required_letters) == 2:
+            double_bees_db.insert_one(insert)
+        else:
+            single_bees_db.insert_one(insert)
         id += 1
     print()
 

@@ -18,7 +18,7 @@ import { notifyAboutRankingChange } from './ranking';
 import { resolvePlayerId } from './DBI/player/player';
 import { addBeeGuess, addNewLetterToSpellingBeeState, createBeeState, createLettersForBee, getBeeState, getLettersForBee, saveLettersState } from './DBI/spelling_bee/spelling_bee';
 import { GuessedWordsBee } from './DBI/spelling_bee/GuessedWordsBee';
-import { getBeeById, getBeeWords } from './DBI/spelling_bee/model';
+import { getBeeById } from './DBI/spelling_bee/model';
 
 export const spelling_bee = express.Router();
 const dbi = new WordleDBI()
@@ -63,7 +63,8 @@ spelling_bee.post('/getState', async (req, res, next) => {
             guesses = state.guesses
         }
 	    const playerPoints = await dbi.getBeePlayerPoints(player_id, letters.bee_id)
-        res.json(new GlobalSpellingBeeStateReply(SpellingBeeReplyEnum.ok, state.letters, guesses, playerPoints, getMaxPoints((await getBeeWords(letters.bee_model_id, dbi)), letters.letters), state.lettersToBuy.map(lb => lb.price)));
+        var bee_model = await getBeeById(letters.bee_model_id, dbi)
+        res.json(new GlobalSpellingBeeStateReply(SpellingBeeReplyEnum.ok, state.letters, guesses, playerPoints, bee_model!.max_no_of_points, state.lettersToBuy.map(lb => lb.price)));
     } catch (error) {
         console.log(error);
         next(error);
@@ -88,7 +89,7 @@ spelling_bee.post('/guess', async (req, res, next) => {
                 state!.letters,
                 state!.guesses,
                 (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
-                getMaxPoints((await getBeeWords(letters!.bee_model_id, dbi)), letters!.letters),
+                bee_model!.max_no_of_points,
                 state!.lettersToBuy.map(lb => lb.price))
                 )  
             return;
@@ -103,7 +104,7 @@ spelling_bee.post('/guess', async (req, res, next) => {
         var newRankingEntry = await dbi.increaseBeeRank(player_id, letters!.bee_id, totalPointsAdded)
 
         notifyAboutRankingChange(player_id, oldRank, newRankingEntry.score - totalPointsAdded, newRankingEntry.score, "Wspólna litera")
-        const max_points = getMaxPoints((await getBeeWords(letters!.bee_model_id, dbi)), letters!.letters);
+        const max_points = bee_model!.max_no_of_points;
         state = await saveLettersState(player_id, letters!.bee_id, result.newLetterState, dbi)
         res.json(new SuccessfullGlobalSpellingBeeStateReply(
             state!.letters,
@@ -151,6 +152,6 @@ spelling_bee.post('/buy_letter',async (req, res, next) => {
     console.log(boughtLetter + " " + boughtLetterIndex)
     lettersState.push(new LetterState(boughtLetter, letterPrice.useLimit, 0 , false));
     var newState = await addNewLetterToSpellingBeeState(player_id, letters!.bee_id, lettersState, lettersToBuy, dbi);
-    res.json(new GlobalSpellingBeeStateReply(SpellingBeeReplyEnum.ok, newState!.letters, newState!.guesses, pointInfo!.score, getMaxPoints((await getBeeWords(letters!.bee_model_id, dbi)), letters!.letters), newState!.lettersToBuy.map(lb => lb.price)));
+    res.json(new GlobalSpellingBeeStateReply(SpellingBeeReplyEnum.ok, newState!.letters, newState!.guesses, pointInfo!.score, bee_model!.max_no_of_points, newState!.lettersToBuy.map(lb => lb.price)));
 })
 

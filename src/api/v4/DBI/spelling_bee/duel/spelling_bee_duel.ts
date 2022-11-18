@@ -1,6 +1,6 @@
 import { FindOneResult } from "monk";
 import { NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE } from "../../../duel_settings";
-import { LetterToBuy, SeasonRules } from "../../../season_rules";
+import { getSeasonRules, LetterToBuy, SeasonRules } from "../../../season_rules";
 import { getMaxPoints, getNewLetterState } from "../../../spelling_bee_common";
 import WordleDBI from "../../DBI";
 import { Bee } from "../Bee";
@@ -38,7 +38,7 @@ export async function getSpellingBeeDuelStats(player_id: number, profile_player_
 
 export async function getRandomDuelBee(opponent_id:number, dbi:WordleDBI):Promise<Bee|null> {
     if (opponent_id < 0) {
-        return getRandomBee(dbi);
+        return getRandomBee(dbi, getSeasonRules());
     }
     var possibleNotRandom = (await dbi.spelling_bee_duels().find({player_id:opponent_id},)).map(d => d.bee_id);
     possibleNotRandom = Array.from(new Set(possibleNotRandom));
@@ -121,7 +121,7 @@ export async function getSingleBestResultPercentage(player_id:number, bee_id:num
     const bee_model:Bee|null = await getBeeById(bee_id, dbi);
     const best_duel:SpellingBeeDuel|null = await dbi.spelling_bee_duels().findOne({player_id:player_id, bee_id:bee_id}, {sort:{player_points:-1}, limit:1})
 
-    return best_duel!.player_points/getMaxPoints(bee_model!.words, bee_model!.other_letters);
+    return best_duel!.player_points/bee_model!.max_no_of_points;
 }
 
 export async function getLastSpellingBeeDuelOpponents(player_id:number, dbi:WordleDBI):Promise<number[]> {

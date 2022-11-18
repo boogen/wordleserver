@@ -15,7 +15,7 @@ export async function getLettersForBee(timestamp:number, dbi:WordleDBI):Promise<
 
 
 export async function createLettersForBee(validityTimestamp:number, season_rules:SeasonRules|null, dbi:WordleDBI) {
-    var bee:Bee = (await getRandomBee(dbi))
+    var bee:Bee = (await getRandomBee(dbi, season_rules))
     const bee_id = await dbi.getNextSequenceValue("global_bee");
     var other_letters = bee.other_letters;
     console.log(season_rules)
@@ -59,7 +59,7 @@ export async function getSpellingBeeStats(profile_player_id: number, dbi:WordleD
         const bee:Bee|null = await getBeeById(global_bee!.bee_model_id, dbi)
         var letters = bee!.other_letters;
         var points:number = 0;
-        var maxPoints:number = getMaxPoints(bee!.words, letters)
+        var maxPoints:number = bee!.max_no_of_points
         for (var word of gw.guesses) {
             points += wordPoints(word, letters).points
         }

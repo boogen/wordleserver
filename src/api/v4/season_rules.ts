@@ -21,6 +21,10 @@ const profileSchema = joi.object({
     lettersToBuy: joi.array().items(letterToBuySchema)
 });
 
+export function getDuelSeasonRules():SeasonRules {
+    return getSeasonRules("duel_season.json");
+}
+
 export function getSeasonRules(filename:string = "season.json"):SeasonRules {
     if (fs.existsSync('model/' + filename)) {
         return new SeasonRules(fs.readFileSync('model/' + filename,'utf8'))

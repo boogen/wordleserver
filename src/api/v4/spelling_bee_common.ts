@@ -154,7 +154,7 @@ export async function checkSpellingBeeGuess(guess:string, current_guesses:string
     if (current_guesses.includes(guess)) {
         message = SpellingBeeReplyEnum.already_guessed
     }
-    if (!(await wordExists(guess, bee!.id, dbi))) {
+    if (!(await wordExists(guess, dbi))) {
         message = SpellingBeeReplyEnum.wrong_word
     }
     return message;

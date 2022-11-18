@@ -1,13 +1,8 @@
-import monk, { FindOneResult, FindResult, ICollection, id, IMonkManager} from 'monk';
-import { number } from '@hapi/joi';
-import { DEFAULT_ELO, NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE } from '../duel_settings';
-import { getMaxPoints, getNewLetterState, pointsToRank, RANKS, wordPoints } from '../spelling_bee_common';
-import { ALPHABET, JOKER } from '../spelling_bee_common';
-import { LetterToBuy, SeasonRules } from '../season_rules';
+import monk, { ICollection, IMonkManager} from 'monk';
+import { DEFAULT_ELO} from '../duel_settings';
 import { SpellingBeeDuelMatch } from "./spelling_bee/duel/SpellingBeeDuelMatch";
 import { Bee } from "./spelling_bee/Bee";
 import { RankingEntry } from "./ranks/RankingEntry";
-import { LetterState } from "./spelling_bee/LetterState";
 import { GlobalBee } from "./spelling_bee/GlobalBee";
 import { PlayerCrosswordState } from "./crosswords/PlayerCrosswordState";
 import { GlobalWord } from "./wordle/GlobalWord";
@@ -21,12 +16,9 @@ import { PlayerProfile } from './player/PlayerProfile';
 import { PossibleCrossword } from './crosswords/PossibleCrossword';
 import { GuessedWordsBee } from './spelling_bee/GuessedWordsBee';
 import { SpellingBeeDuelEloRankEntry } from './spelling_bee/duel/SpellingBeeDuelEloRankEntry';
-import { SpellingBeeDuellGuess } from './spelling_bee/duel/SpellingBeeDuellGuess';
 import { SocialToAuth } from './player/SocialToAuth';
 import { SpellingBeeDuel } from './spelling_bee/duel/SpellingBeeDuel';
-import { SpellingBeeDuelAggregate } from './spelling_bee/duel/SpellingBeeDuelAggregate';
 import { RawRankingEntry } from './ranks/RawRankingEntry';
-import { Query } from 'mongo-filter-query';
 import { getRank, getRankWithFilter, getScoreFromRank, updateRank } from './ranks/ranks';
 
 const _db:IMonkManager = monk(process.env.MONGO_URI!);
@@ -47,7 +39,7 @@ export default class WordleDBI {
     player_crossword_state():ICollection<PlayerCrosswordState> {return _db.get("player_crossword_state")}
     global_bee():ICollection<GlobalBee> { return _db.get("global_bee_v2")}
     guessed_words_bee():ICollection<GuessedWordsBee> { return _db.get("guessed_words_bee_v2")}
-    bees():ICollection<Bee> {return _db.get("bees_v2")}
+    bees(noOfRequiredLetters:number):ICollection<Bee> {return _db.get("bees_v2_" + noOfRequiredLetters)}
     extra_bee_words():ICollection<Word> {return _db.get("bees_fallback")}
     spelling_bee_duels():ICollection<SpellingBeeDuel> {return _db.get("spelling_bee_duels_v2")}
     spelling_bee_elo_rank():ICollection<SpellingBeeDuelEloRankEntry> {return _db.get("elo_rank_spelling_bee_duel");}
@@ -74,7 +66,9 @@ export default class WordleDBI {
         this.global_bee().createIndex({validity: 1}, {unique: true});
         this.global_bee().createIndex({bee_id: 1}, {unique: true})
         this.guessed_words_bee().createIndex({player_id:1, bee_id:1}, {unique: true})
-        this.bees().createIndex({id:1}, {unique: true});
+        for (var i = 1; i < 4; i++) {
+            this.bees(i).createIndex({id:1}, {unique: true});
+        }
         this.extra_bee_words().createIndex({word: 1}, {unique: true})
         this.spelling_bee_duels().createIndex({player_id: 1})
         this.spelling_bee_duels().createIndex({bee_id: 1})
