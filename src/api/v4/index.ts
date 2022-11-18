@@ -8,20 +8,20 @@ import {spelling_bee_duel} from './spelling_bee_duel'
 import { crossword } from './crossword';
 import {ranking} from './ranking'
 
-export const apiV3 = express.Router();
+export const apiV4 = express.Router();
 
-apiV3.get('/', (req, res) => {
+apiV4.get('/', (req, res) => {
   res.json({
     message: 'API - 👋🌎🌍🌏'
   });
 });
 
-apiV3.use('/wordle', wordle);
-apiV3.use('/player', player);
-apiV3.use('/friend', friend);
-apiV3.use('/classic', challenge);
-apiV3.use('/crossword', crossword);
-apiV3.use('/spelling_bee', spelling_bee);
-apiV3.use('/spelling_bee_duel', spelling_bee_duel)
-apiV3.use('/ranking', ranking)
+apiV4.use('/wordle', wordle);
+apiV4.use('/player', player);
+apiV4.use('/friend', friend);
+apiV4.use('/classic', challenge);
+apiV4.use('/crossword', crossword);
+apiV4.use('/spelling_bee', spelling_bee);
+apiV4.use('/spelling_bee_duel', spelling_bee_duel)
+apiV4.use('/ranking', ranking)
 
