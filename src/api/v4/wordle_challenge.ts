@@ -1,8 +1,11 @@
 import express from 'express';
 import * as Sentry from "@sentry/node"
-import WordleDBI from '../../DBI';
+import WordleDBI from './DBI/DBI';
 import AuthIdRequest from './types/AuthIdRequest';
 import BaseGuessRequest from './types/BaseGuessRequest';
+import { resolvePlayerId } from './DBI/player/player';
+import { getWord, isWordValid } from './DBI/wordle/model';
+import { addChallengeGuess, addNewPlayerWord, getPlayerChallengeTries, getPlayerLastWord } from './DBI/wordle/wordle';
 
 const dbi = new WordleDBI();
 
@@ -11,17 +14,17 @@ export const challenge = express.Router();
 challenge.post('/getState', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.auth_id);
-        var val = await dbi.getWord();
+        const player_id = await resolvePlayerId(value.auth_id, dbi);
+        var val = await getWord(dbi);
         var word = val[0].word;
         console.log("word %s player id %s", word, player_id);
 
-        var existing = await dbi.getPlayerLastWord(player_id);
+        var existing = await getPlayerLastWord(player_id, dbi);
 
         if (existing == null) {
-            existing = await dbi.addNewPlayerWord(player_id, word, 0);
+            existing = await addNewPlayerWord(player_id, word, 0, dbi);
         }
-        const tries = await dbi.getPlayerChallengeTries(player_id, existing.word_id);
+        const tries = await getPlayerChallengeTries(player_id, existing.word_id, dbi);
         res.json({
             message: 'ok',
             guesses: await Promise.all(tries!.guesses.map(async function(g) { return validateGuess(g, existing!.word) })),
@@ -38,16 +41,16 @@ challenge.post('/getState', async (req, res, next) => {
 challenge.post('/validate', async (req, res, next) => {
     try {
         const value = new BaseGuessRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.auth_id)
+        const player_id = await resolvePlayerId(value.auth_id, dbi)
         console.log(value);
         const timestamp = Date.now() / 1000;
-        const wordEntry = await dbi.getPlayerLastWord(player_id);
+        const wordEntry = await getPlayerLastWord(player_id, dbi);
 
         const guess = value.guess;
         console.log("Player id: %s", player_id);
         const word = wordEntry!.word;
         
-        const t = await dbi.getPlayerChallengeTries(player_id, wordEntry!.word_id);
+        const t = await getPlayerChallengeTries(player_id, wordEntry!.word_id, dbi);
         var tries = t!.guesses.length;
         if (t!.guesses.includes(guess) || tries >=6) {
             res.json({isWord: false, guess: guess, answer: [], isGuessed: guess == word});
@@ -58,7 +61,7 @@ challenge.post('/validate', async (req, res, next) => {
         const guessResult = await validateGuess(guess, word);
 
         if (guessResult.isWord) {
-            dbi.addChallengeGuess(player_id, wordEntry!.word_id, guess);
+            addChallengeGuess(player_id, wordEntry!.word_id, guess, dbi);
             tries += 1;
         }
 
@@ -67,9 +70,9 @@ challenge.post('/validate', async (req, res, next) => {
             guessResult.correctWord = word;
         }
         if (tries == 6 || guessResult.isGuessed) {
-            var val = await dbi.getWord();
+            var val = await getWord(dbi);
             var new_word = val[0].word;
-            await dbi.addNewPlayerWord(player_id, new_word, 0);
+            await addNewPlayerWord(player_id, new_word, 0, dbi);
         }
         console.log(guessResult);
         res.json(guessResult);
@@ -82,7 +85,7 @@ challenge.post('/validate', async (req, res, next) => {
 
 async function validateGuess(guess:string, word:string) {
     const guessed = (guess == word);
-    const isWord = await dbi.isWordValid(guess);
+    const isWord = await isWordValid(guess, dbi);
    
     console.log("Guessed word: %s, actual word: %s", guess, word)
 

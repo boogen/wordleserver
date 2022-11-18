@@ -1,5 +1,6 @@
 import { Send } from "express-serve-static-core";
-import WordleDBI, { RankingEntry } from "../../DBI";
+import WordleDBI from "./DBI/DBI";
+import { RankingEntry } from "./DBI/ranks/RankingEntry";
 import { get_nick } from "./player_common";
 
 export async function get_ranking(player_id:number, ranking:RankingEntry[], dbi:WordleDBI):Promise<RankingReply> {

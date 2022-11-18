@@ -1,9 +1,15 @@
 import express from 'express';
 import * as Sentry from "@sentry/node"
-import WordleDBI, { PlayerCrosswordState, PossibleCrossword } from '../../DBI';
+import WordleDBI from './DBI/DBI';
+import { PlayerCrosswordState } from "./DBI/crosswords/PlayerCrosswordState";
 import BaseGuessRequest from './types/BaseGuessRequest';
 import AuthIdRequest from './types/AuthIdRequest';
 import { Stats } from '../../WordleStatsDBI';
+import { PossibleCrossword } from './DBI/crosswords/PossibleCrossword';
+import { getCrossword, getFirstCrossword, getRandomCrossword } from './DBI/crosswords/model';
+import { resolvePlayerId } from './DBI/player/player';
+import { isWordValid } from './DBI/wordle/model';
+import { getCrosswordState, setCrosswordState } from './DBI/crosswords/crossword';
 
 export const crossword = express.Router();
 
@@ -54,7 +60,7 @@ async function stateToReply(grid:String[][], word_list:string[], crossword:Possi
 
 crossword.post('/mock', async (req, res, next) => {
     try {
-        const crossword = await dbi.getFirstCrossword();
+        const crossword = await getFirstCrossword(dbi);
         var letterList = new Set(crossword!.word_list.map(c => c.word).join(""))
         console.log(crossword!.letter_grid)
         var grid:string[][] = []
@@ -89,13 +95,13 @@ crossword.post('/mock', async (req, res, next) => {
 crossword.post('/guess', async (req, res, next) => {
     try {
         const value = new BaseGuessRequest(req);
-        const playerId = await dbi.resolvePlayerId(value.auth_id);
+        const playerId = await resolvePlayerId(value.auth_id, dbi);
         const players_word = value.guess.toLowerCase();
-        const isWord = await dbi.isWordValid(players_word);
-        var crosswordState = await dbi.getCrosswordState(playerId);
+        const isWord = await isWordValid(players_word, dbi);
+        var crosswordState = await getCrosswordState(playerId, dbi);
         var grid = crosswordState!.grid;
         var guessed_words = new Set(crosswordState!.guessed_words)
-        const crossword = await dbi.getCrossword(crosswordState!.crossword_id)
+        const crossword = await getCrossword(crosswordState!.crossword_id, dbi)
         if (!isWord) {
             await stats.addCrosswordGuessEvent(playerId, crosswordState!.guessed_words.length, crosswordState!.tries.length + crosswordState!.guessed_words.length, isFinished(crosswordState!), false)
             res.json({isWord:false, guessed_word: false, state: (await stateToReply(grid, crosswordState!.words, crossword!, isFinished(crosswordState!)))})
@@ -150,7 +156,7 @@ crossword.post('/guess', async (req, res, next) => {
             convertedOriginalGrid[indexToFill.x][indexToFill.y] = original_grid[indexToFill.x][indexToFill.y]
         }
         
-        const newState = await dbi.setCrosswordState(playerId, crosswordState!.words, guessed_words_array, convertedOriginalGrid, crosswordState!.crossword_id, Array.from(tries))
+        const newState = await setCrosswordState(playerId, crosswordState!.words, guessed_words_array, convertedOriginalGrid, crosswordState!.crossword_id, Array.from(tries), dbi)
         await stats.addCrosswordGuessEvent(playerId, guessed_words_array.length, tries.size + guessed_words_array.length, isFinished(newState!), true)
         res.json({isWord:true, guessed_word: guessed_word, state: (await stateToReply(convertedOriginalGrid, crosswordState!.words, crossword!, isFinished(newState!)))})
     }
@@ -165,8 +171,8 @@ crossword.post('/guess', async (req, res, next) => {
 crossword.post('/init', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
-        const playerId = await dbi.resolvePlayerId(value.auth_id);
-        var crosswordState = await dbi.getCrosswordState(playerId);
+        const playerId = await resolvePlayerId(value.auth_id, dbi);
+        var crosswordState = await getCrosswordState(playerId, dbi);
         var grid = []
         var word_list = []
         var tries:string[] = []
@@ -174,7 +180,7 @@ crossword.post('/init', async (req, res, next) => {
         var guessed_words:string[] = []
 
         if (crosswordState == null || isFinished(crosswordState)) {
-            const crossword = await dbi.getRandomCrossword();
+            const crossword = await getRandomCrossword(dbi);
             console.log(crossword)
             console.log(crossword.letter_grid)
             grid = convertGrid(crossword.letter_grid)
@@ -191,8 +197,8 @@ crossword.post('/init', async (req, res, next) => {
             guessed_words = crosswordState.guessed_words
         }
 
-        const crossword = await dbi.getCrossword(crossword_id)
-        const newState = await dbi.setCrosswordState(playerId, word_list, guessed_words, grid, crossword_id, tries)
+        const crossword = await getCrossword(crossword_id, dbi)
+        const newState = await setCrosswordState(playerId, word_list, guessed_words, grid, crossword_id, tries, dbi)
         const state = (await stateToReply(grid, word_list, crossword!, isFinished(newState!)))
         await stats.addCrosswordInitEvent(playerId, crossword_id);
         res.json({

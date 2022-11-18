@@ -1,10 +1,14 @@
 import express from 'express';
 import Sentry from '@sentry/node';
-import WordleDBI, { RankingEntry } from '../../DBI';
+import WordleDBI from './DBI/DBI';
+import { RankingEntry } from "./DBI/ranks/RankingEntry";
 import AuthIdRequest from './types/AuthIdRequest';
 import BaseGuessRequest from './types/BaseGuessRequest';
 import { string } from '@hapi/joi';
 import { Stats } from '../../WordleStatsDBI';
+import { getWord, isWordValid } from './DBI/wordle/model';
+import { getProfile, resolvePlayerId } from './DBI/player/player';
+import { addGuess, getGlobalWord, getOrCreateGlobalWord, getPlayerTries, getPlayerTriesForWord } from './DBI/wordle/wordle';
 const WORD_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
 
@@ -16,8 +20,8 @@ const stats:Stats = new Stats();
 wordle.post('/getState', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.auth_id);
-        var val = await dbi.getWord();
+        const player_id = await resolvePlayerId(value.auth_id, dbi);
+        var val = await getWord(dbi);
         var word = val[0].word;
         console.log("word %s player id %s", word, player_id);
 
@@ -30,8 +34,8 @@ wordle.post('/getState', async (req, res, next) => {
         // if (existing == null || existing.expiration <= timestamp) {
         //     existing = await dbi.addNewPlayerWord(player_id, word, timestamp + WORD_VALIDITY);
         // }
-        const existing = await dbi.getOrCreateGlobalWord(timestamp, new_validity_timestamp, word);
-        const tries = await dbi.getPlayerTries(player_id, existing!.word_id, timestamp);
+        const existing = await getOrCreateGlobalWord(timestamp, new_validity_timestamp, word, dbi);
+        const tries = await getPlayerTries(player_id, existing!.word_id, timestamp, dbi);
         stats.addWordleInitEvent(player_id, existing!.word_id)
         res.json({
             message: 'ok',
@@ -50,15 +54,15 @@ wordle.post('/getState', async (req, res, next) => {
 wordle.post('/validate', async (req, res, next) => {
     try {
         const value = new BaseGuessRequest(req);
-        const player_id = await dbi.resolvePlayerId(value.auth_id)
+        const player_id = await resolvePlayerId(value.auth_id, dbi)
         const timestamp = Date.now() / 1000;
-        const wordEntry = await dbi.getGlobalWord(timestamp);
+        const wordEntry = await getGlobalWord(timestamp, dbi);
 
         const guess = value.guess;
 
         const word = wordEntry!.word;
         
-        const t = await dbi.getPlayerTriesForWord(player_id, wordEntry!.word_id);
+        const t = await getPlayerTriesForWord(player_id, wordEntry!.word_id, dbi);
         var tries = t!.guesses.length;
         if (t!.guesses.includes(guess) || tries >=6) {
             stats.addWordleGuessEvent(player_id, tries, guess == word)
@@ -70,7 +74,7 @@ wordle.post('/validate', async (req, res, next) => {
         const guessResult = await validateGuess(guess, word);
 
         if (guessResult.isWord) {
-            dbi.addGuess(player_id, wordEntry!.word_id, guess);
+            addGuess(player_id, wordEntry!.word_id, guess, dbi);
             tries += 1;
         }
 
@@ -98,7 +102,7 @@ async function getMyPositionInRank(player_id:number, rank:RankingEntry[], dbi:Wo
     for (const index in rank) {
         const rankEntry = rank[index]
         if (rankEntry.player_id === player_id) {
-            return {position: parseInt(index) + 1, score: rankEntry.score, player: (((await dbi.getProfile(player_id)))|| {nick: null}).nick}
+            return {position: parseInt(index) + 1, score: rankEntry.score, player: (((await getProfile(player_id, dbi)))|| {nick: null}).nick}
         }
     }
     return null;
@@ -106,7 +110,7 @@ async function getMyPositionInRank(player_id:number, rank:RankingEntry[], dbi:Wo
 
 async function validateGuess(guess:string, word:string) {
     const guessed = (guess == word);
-    const isWord = await dbi.isWordValid(guess);
+    const isWord = await isWordValid(guess, dbi);
    
     console.log("Guessed word: %s, actual word: %s", guess, word)
 

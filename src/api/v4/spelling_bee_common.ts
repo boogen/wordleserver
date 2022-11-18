@@ -1,5 +1,8 @@
 import { func } from "@hapi/joi";
-import WordleDBI, { Bee, LetterState } from "../../DBI";
+import WordleDBI from "./DBI/DBI";
+import { Bee } from "./DBI/spelling_bee/Bee";
+import { LetterState } from "./DBI/spelling_bee/LetterState";
+import { wordExists } from "./DBI/spelling_bee/model";
 import { SeasonRules } from "./season_rules";
 
 const POINTS = [0, .02, .05, .08, .15, .25, .4, .5, .7];
@@ -22,9 +25,9 @@ export function getMaxPoints(words:String[], letters:string[]):number {
 
 var extraLetters:LetterState[] = []
 
-export function initExtraLetters(mainLetter:string, other_letters:string[], season_rules:SeasonRules) {
+export function initExtraLetters(requiredLetters:string[], other_letters:string[], season_rules:SeasonRules) {
     extraLetters = []
-    var plainLetters = [mainLetter];
+    var plainLetters = requiredLetters;
     plainLetters = plainLetters.concat(other_letters);
     var possibleLetters = ALPHABET.filter(letter => !plainLetters.includes(letter));
     for (var i = 0; i < season_rules.noOfLetters; i++) {
@@ -38,9 +41,11 @@ export function initExtraLetters(mainLetter:string, other_letters:string[], seas
         extraLetters.push(new LetterState(boughtLetter, -1, 0, true))
 }
 
-export function getNewLetterState(mainLetter:string, letters:string[], rules:SeasonRules):LetterState[] {
+export function getNewLetterState(requiredLetters:string[], letters:string[], rules:SeasonRules):LetterState[] {
     var returnValue:LetterState[] = []
-    returnValue.push(new LetterState(mainLetter, rules.getUsageLimit(mainLetter), rules.getPointsForLetter(mainLetter), true));
+    requiredLetters.forEach(mainLetter => 
+        returnValue.push(new LetterState(mainLetter, rules.getUsageLimit(mainLetter), rules.getPointsForLetter(mainLetter), true))
+    );
     letters.forEach(letter => returnValue.push(new LetterState(letter, rules.getUsageLimit(letter), rules.getPointsForLetter(letter), false)));
     
     return returnValue.concat(extraLetters);
@@ -149,7 +154,7 @@ export async function checkSpellingBeeGuess(guess:string, current_guesses:string
     if (current_guesses.includes(guess)) {
         message = SpellingBeeReplyEnum.already_guessed
     }
-    if (!(await dbi.wordExists(guess, bee!.id))) {
+    if (!(await wordExists(guess, bee!.id, dbi))) {
         message = SpellingBeeReplyEnum.wrong_word
     }
     return message;

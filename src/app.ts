@@ -13,7 +13,7 @@ Sentry.init({dsn: process.env.sentry_dsn});
 import {notFound, errorHandler} from './middlewares';
 import { apiV4 } from './api/v4';
 
-import WordleDBI from './DBI';
+import WordleDBI from './api/v4/DBI/DBI';
 
 export const app = express();
 

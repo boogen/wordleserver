@@ -1,4 +1,5 @@
-import WordleDBI from "../../DBI";
+import WordleDBI from "./DBI/DBI";
+import { getProfile } from "./DBI/player/player";
 
 const POSSIBLE_BOT_NICKS:string[] = ["Krysia", "Zdzichu", "srebrny_puchacz", "123456", "cybertouch", "shockwave", "rockstar"]
 
@@ -19,5 +20,5 @@ export async function get_nick(player_id:number, dbi:WordleDBI):Promise<PlayerNi
     if (player_id < 0) {
         return new PlayerNick(player_id, POSSIBLE_BOT_NICKS[-(player_id + 1)])
     }
-    return dbi.getProfile(player_id).then(profile => new PlayerNick(player_id, profile?.nick));
+    return getProfile(player_id, dbi).then(profile => new PlayerNick(player_id, profile?.nick));
 }
