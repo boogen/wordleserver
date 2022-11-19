@@ -41,15 +41,15 @@ class SpellingBeeSeasonManager {
             return 15
         }
         for (var e of eventList!) {
-            if (new Date(e.start?.dateTime?.toString()!) > now && new Date(e.start?.dateTime?.toString()!).getMilliseconds() < now.getMilliseconds() + 15 * 60000) {
-                return new Date(e.start?.dateTime?.toString()!).getMilliseconds() / 60000
+            if (new Date(e.start?.dateTime?.toString()!) > now && new Date(e.start?.dateTime?.toString()!).getTime() < now.getTime() + 15 * 60000) {
+                return new Date(e.start?.dateTime?.toString()!).getTime() / 60000
             }
         }
         return 15;
     }
 
     async getCurrentDuelSeason() {
-        if (this.spellingBeeDuelRules && (new Date().getMilliseconds() - this.spellingBeeDuelRules!.time.getMilliseconds()) / (1000 * 60) < this.throttleDuelRules ) {
+        if (this.spellingBeeDuelRules && (new Date().getTime() - this.spellingBeeDuelRules!.time.getTime()) / (1000 * 60) < this.throttleDuelRules ) {
             return this.spellingBeeDuelRules.rules;
         }
         await this.initCalendarClient()
@@ -69,7 +69,7 @@ class SpellingBeeSeasonManager {
     }
 
     async getCurrentSeason() {
-        if (this.spellingBeeRules && (new Date().getMilliseconds() - this.spellingBeeRules!.time.getMilliseconds()) / (1000 * 60) < this.throttleRules ) {
+        if (this.spellingBeeRules && (new Date().getTime() - this.spellingBeeRules!.time.getTime()) / (1000 * 60) < this.throttleRules ) {
             return this.spellingBeeRules.rules;
         }
         await this.initCalendarClient()

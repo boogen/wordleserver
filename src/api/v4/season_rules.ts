@@ -138,6 +138,6 @@ export class SeasonRules {
         }
         console.log(this.endTime)
         console.log(new Date())
-        return (this.endTime!.getMilliseconds() - new Date().getMilliseconds())/1000;
+        return (this.endTime!.getTime() - new Date().getTime())/1000;
     }
 }
