@@ -45,14 +45,14 @@ export class SeasonRules {
     public noOfLetters:number;
     public addBlank:boolean;
     public noOfRequiredLetters:number;
-    public duelTag:string|undefined;
+    public duelTag:string|null;
     public id:string;
     public season_title:string;
     public rules:string;
     public endTime:Date|null;
     public points:string;
 
-    constructor(seasonData:any, id:string, season_title:string, rules:string, points:string, endTime:Date|null) {
+    constructor(seasonData:any, id:string, season_title:string, rules:string, points:string, endTime:Date|null, duelTag:string|null) {
         this.points = points;
         this.endTime = endTime;
         this.noOfLetters = 7;
@@ -87,12 +87,7 @@ export class SeasonRules {
         else {
             this.noOfRequiredLetters = 1;
         }
-        if (seasonData.duelTag) {
-            this.duelTag = seasonData.duelTag;
-        }
-        else {
-            this.duelTag = undefined;
-        }
+        this.duelTag = duelTag;
         this.lettersToBuy = seasonData.lettersToBuy?.map((letter: LetterToBuy) => new LetterToBuy(letter.price, letter.useLimit)) ?? []
     }
 

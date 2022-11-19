@@ -1,13 +1,14 @@
 import { string } from "@hapi/joi";
 import { JSONClient } from "google-auth-library/build/src/auth/googleauth";
 import { calendar_v3, drive_v3, google } from "googleapis";
+import WordleDBI from "./api/v4/DBI/DBI";
 import { getSeasonRules, SeasonRules } from "./api/v4/season_rules";
 import { authorize } from "./authenticate_calendar";
 
 export const SPELLING_BEE_CALENDAR_ID = 'c_58d50fa0fa48d9285fcf5ca00f19536bcbbad820b1c5371b318f44fc29b3e2b5@group.calendar.google.com'
 export const SPELLING_BEE_DUEL_CALENDAR_ID = 'c_b43a56a317d5b0484b290862afb98174a2183abea24ce71d9c34929f0debbe1c@group.calendar.google.com'
 
-
+const dbi = new WordleDBI();
 export function getSpellingBeeSeasonManager():SpellingBeeSeasonManager {
     return instance;
 }
@@ -76,11 +77,20 @@ class SpellingBeeSeasonManager {
                     htmlDescription = htmlDescription.replace(match[0], "")
                 }
                 var description = htmlDescription?.split("#####")
-                return_value = new SeasonRules(json, e.id!, e.summary!, description![0], description![1], new Date(e.end!.dateTime?.toString()!))
+                var duelTag = e.recurringEventId ?? e.id!;
+                return_value = new SeasonRules(json, e.id!, e.summary!, description![0], description![1], new Date(e.end!.dateTime?.toString()!), duelTag)
             }
         }
         if (!return_value) {
-            return_value = new SeasonRules({}, "vanilla", "Tryb standardowy", "", "", null)
+            var id = "vanilla";
+            if (type === "duel") {
+                id += "_" + eventList!.filter(e => new Date(e.end?.dateTime?.toString()!) <  now).length;
+            }
+            
+            return_value = new SeasonRules({}, id, "Tryb standardowy", "", "", null, "vanilla")
+        }
+        if (type === "duel") {
+            dbi.spelling_bee_elo_rank(return_value.id).createIndex({player_id:1}, {unique:true})
         }
         this.spellingBeeRules.set(type, new CachedRules(return_value, now))
         return return_value;

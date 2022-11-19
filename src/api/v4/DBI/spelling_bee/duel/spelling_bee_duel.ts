@@ -65,19 +65,20 @@ export async function startDuel(bee_model:Bee, player_id: number, opponent_id:nu
         getNewLetterState(bee_model.required_letters, bee_model.other_letters, seasonRules),
         timestamp,
         false,
-        seasonRules.lettersToBuy
+        seasonRules.lettersToBuy,
+        seasonRules
         );
         dbi.spelling_bee_duels().insert(return_value);
     
     return return_value;
 }
 
-export async function getSpellingBeeDuelMatch(player_id:number, dbi:WordleDBI):Promise<FindOneResult<SpellingBeeDuelMatch>> {
-    return dbi.spelling_bee_duel_prematch().findOne({player_id:player_id});
+export async function getSpellingBeeDuelMatch(player_id:number, season_tag:string, dbi:WordleDBI):Promise<FindOneResult<SpellingBeeDuelMatch>> {
+    return dbi.spelling_bee_duel_prematch().findOne({player_id:player_id, season_tag:season_tag});
 }
 
-export async function addSpellingBeeDuelMatch(player_id:number, opponent_id:number, dbi:WordleDBI) {
-    dbi.spelling_bee_duel_prematch().insert({player_id:player_id, opponent_id:opponent_id})
+export async function addSpellingBeeDuelMatch(player_id:number, opponent_id:number, season_tag:string, dbi:WordleDBI) {
+    dbi.spelling_bee_duel_prematch().insert({player_id:player_id, opponent_id:opponent_id, season_tag:season_tag})
 }
 
 export async function checkForExistingDuel(player_id:number, timestamp:number, duel_duration:number, dbi:WordleDBI):Promise<FindOneResult<SpellingBeeDuel>> {
@@ -89,8 +90,8 @@ export async function checkForUnfinishedDuel(player_id:number, timestamp:number,
     return dbi.spelling_bee_duels().findOne({player_id:player_id, start_timestamp:{$lt:timestamp - duel_duration}, finished:false});
 }
 
-export async function markDuelAsFinished(bee_duel_id:number, player_id:number, dbi:WordleDBI) {
-    dbi.spelling_bee_duel_prematch().findOneAndDelete({player_id:player_id});
+export async function markDuelAsFinished(bee_duel_id:number, player_id:number, season_tag:string, dbi:WordleDBI) {
+    dbi.spelling_bee_duel_prematch().findOneAndDelete({player_id:player_id, season_tag:season_tag});
     dbi.spelling_bee_duels().findOneAndUpdate({bee_duel_id:bee_duel_id}, {$set: {finished:true}});
 }
 

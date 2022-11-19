@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { LetterToBuy } from '../../../season_rules';
+import { LetterToBuy, SeasonRules } from '../../../season_rules';
 import { LetterState } from '../LetterState';
 import { SpellingBeeDuellGuess } from './SpellingBeeDuellGuess';
 
@@ -20,5 +20,6 @@ export class SpellingBeeDuel {
         public start_timestamp: number,
         public finished: boolean,
         public lettersToBuy: LetterToBuy[],
+        public season_rules:SeasonRules,
         public _id?: ObjectId) { }
 }

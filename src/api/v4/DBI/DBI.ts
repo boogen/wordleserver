@@ -42,7 +42,7 @@ export default class WordleDBI {
     bees(noOfRequiredLetters:number):ICollection<Bee> {return _db.get("bees_v2_" + noOfRequiredLetters)}
     extra_bee_words():ICollection<Word> {return _db.get("bees_fallback")}
     spelling_bee_duels():ICollection<SpellingBeeDuel> {return _db.get("spelling_bee_duels_v2")}
-    spelling_bee_elo_rank():ICollection<SpellingBeeDuelEloRankEntry> {return _db.get("elo_rank_spelling_bee_duel");}
+    spelling_bee_elo_rank(rankTag:string):ICollection<SpellingBeeDuelEloRankEntry> {return _db.get("elo_rank_spelling_bee_duel_" + rankTag);}
     spelling_bee_duel_prematch():ICollection<SpellingBeeDuelMatch> { return _db.get("spelling_bee_duel_prematch");}
     social_to_auth():ICollection<SocialToAuth> { return _db.get("social_to_auth")}
     bee_ranking(bee_id:number):ICollection<RawRankingEntry> {
@@ -73,7 +73,6 @@ export default class WordleDBI {
         this.spelling_bee_duels().createIndex({player_id: 1})
         this.spelling_bee_duels().createIndex({bee_id: 1})
         this.spelling_bee_duels().createIndex({bee_duel_id: 1}, {unique:true})
-        this.spelling_bee_elo_rank().createIndex({player_id:1}, {unique:true})
         this.spelling_bee_duel_prematch().createIndex({player_id:1}, {unique:true})
         this.social_to_auth().createIndex({socialId:1}, {unique:true})
     }
@@ -88,24 +87,24 @@ export default class WordleDBI {
     }
 
 
-    async updateSpellingBeeEloRank(player_id:number, score_delta:number) {
-        updateRank(this.spelling_bee_elo_rank(), player_id, score_delta);
+    async updateSpellingBeeEloRank(player_id:number, score_delta:number, rankTag:string) {
+        updateRank(this.spelling_bee_elo_rank(rankTag), player_id, score_delta);
     }
 
-    async getSpellingBeeEloRankWithFilter(friends:number[]):Promise<RankingEntry[]> {
-        return getRankWithFilter(this.spelling_bee_elo_rank(), {player_id:{$in:friends}});
+    async getSpellingBeeEloRankWithFilter(friends:number[], rankTag:string):Promise<RankingEntry[]> {
+        return getRankWithFilter(this.spelling_bee_elo_rank(rankTag), {player_id:{$in:friends}});
     }
 
-    async getSpellingBeeEloRank():Promise<RankingEntry[]> {
-        return getRank(this.spelling_bee_elo_rank());
+    async getSpellingBeeEloRank(rankTag:string):Promise<RankingEntry[]> {
+        return getRank(this.spelling_bee_elo_rank(rankTag));
     }
 
-    async getCurrentSpellingBeeElo(player_id:number):Promise<number> {
-        return getScoreFromRank(player_id, this.spelling_bee_elo_rank(), DEFAULT_ELO);
+    async getCurrentSpellingBeeElo(player_id:number, rankTag:string):Promise<number> {
+        return getScoreFromRank(player_id, this.spelling_bee_elo_rank(rankTag), DEFAULT_ELO);
     }
 
-    async getOpponentsFromSpellingBeeEloRank(player_id:number, score:number, maxDiff:number):Promise<number[]> {
-        const returnValue = this.spelling_bee_elo_rank().find({score:{$gte: score - maxDiff, $lte:score + maxDiff}, player_id:{$ne:player_id}})
+    async getOpponentsFromSpellingBeeEloRank(player_id:number, score:number, maxDiff:number, rankTag:string):Promise<number[]> {
+        const returnValue = this.spelling_bee_elo_rank(rankTag).find({score:{$gte: score - maxDiff, $lte:score + maxDiff}, player_id:{$ne:player_id}})
         return (returnValue.then(r => r.map(entry => entry.player_id)))
     }
 
