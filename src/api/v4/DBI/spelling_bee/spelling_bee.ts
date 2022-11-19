@@ -59,7 +59,7 @@ export async function getSpellingBeeStats(profile_player_id: number, dbi:WordleD
         const bee:Bee|null = await getBeeById(global_bee!.bee_model_id, dbi)
         var letters = bee!.other_letters;
         var points:number = 0;
-        var maxPoints:number = bee!.max_no_of_points
+        var maxPoints:number = bee!.max_points
         for (var word of gw.guesses) {
             points += wordPoints(word, letters).points
         }

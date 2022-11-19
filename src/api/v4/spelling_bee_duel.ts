@@ -106,7 +106,7 @@ async function createBotGuesses(bee_model:Bee, player_id:number, season_rules:Se
     const best_result_percentage:number[] = await getBestResultPercentage(player_id, player_duels_bee_ids, dbi);
     const average_percentage:number = best_result_percentage.reduce((a, b) => a+b, 0) / best_result_percentage.length;
     const return_value:SpellingBeeDuellGuess[] = []
-    var bot_points:number = average_percentage * BOT_THRESHOLD.get_random() * bee_model.max_no_of_points;
+    var bot_points:number = average_percentage * BOT_THRESHOLD.get_random() * bee_model.max_points;
     const bot_guess_points:number[] = []
     const possiblePoints = [1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
     while (bot_points > 0) {

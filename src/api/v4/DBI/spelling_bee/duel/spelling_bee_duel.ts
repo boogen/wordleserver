@@ -121,7 +121,7 @@ export async function getSingleBestResultPercentage(player_id:number, bee_id:num
     const bee_model:Bee|null = await getBeeById(bee_id, dbi);
     const best_duel:SpellingBeeDuel|null = await dbi.spelling_bee_duels().findOne({player_id:player_id, bee_id:bee_id}, {sort:{player_points:-1}, limit:1})
 
-    return best_duel!.player_points/bee_model!.max_no_of_points;
+    return best_duel!.player_points/bee_model!.max_points;
 }
 
 export async function getLastSpellingBeeDuelOpponents(player_id:number, dbi:WordleDBI):Promise<number[]> {
