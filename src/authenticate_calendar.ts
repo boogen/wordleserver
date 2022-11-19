@@ -1,6 +1,6 @@
 import { google } from "googleapis";
 import * as path from "path";
-import * as fs from "fs/promises";
+import { promises as fs } from 'fs';
 import { OAuth2Client } from "google-auth-library";
 import { JSONClient } from "google-auth-library/build/src/auth/googleauth";
 import { SPELLING_BEE_CALENDAR_ID } from "./spelling_bee_season_manager";
