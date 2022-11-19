@@ -92,6 +92,14 @@ export class SeasonRules {
     }
 
 
+    getFixedPoints(length:number):number|null {
+        var fixedPoints = new Map(Object.entries(this.fixedPoints))
+        if (!fixedPoints.has(length.toString())) {
+            return null;
+        }
+        return fixedPoints.get(length.toString())! as number;
+    }
+
     getUsageLimit(letter:string):number {
         var letterUsage = new Map(Object.entries(this.letterUsage))
         if (!letterUsage.has(letter)) {

@@ -137,8 +137,8 @@ export function wordPointsSeason(word:string, letters:string[], extraRules:Seaso
         return 0;
     }
     var pointsForWord = points.points;
-    if (extraRules.fixedPoints.has(word.length)) {
-        pointsForWord = extraRules.fixedPoints.get(word.length)!;
+    if (extraRules.getFixedPoints(word.length)) {
+        pointsForWord = extraRules.getFixedPoints(word.length)!;
     }
     for (var letter of word) {
         if (letters.includes(letter)) {
