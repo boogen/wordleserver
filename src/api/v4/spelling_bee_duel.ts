@@ -225,7 +225,7 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
         const timestamp = Date.now() / 1000;
         var duel:SpellingBeeDuel|null = await checkForExistingDuel(player_id, timestamp, DUEL_DURATION, dbi);
         const bee_model:Bee|null = await getBeeById(duel!.bee_id, dbi)
-        const season_rules:SeasonRules = duel!.season_rules;
+        const season_rules:SeasonRules = duel!.season_rules as SeasonRules;
         const result = await processPlayerGuess(guess, duel!.player_guesses.map(g => g.word), bee_model!, duel!.letters, season_rules, dbi);
         if (result.message != SpellingBeeReplyEnum.ok) {
             res.json(new SpellingBeeDuelGuessReply(result.message, new SpellingBeeDuelStateReply(duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points,Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION, duel!.lettersToBuy), 0));
