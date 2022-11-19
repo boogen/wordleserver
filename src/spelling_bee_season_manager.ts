@@ -48,7 +48,7 @@ class SpellingBeeSeasonManager {
     }
 
     async getCurrentDuelSeason() {
-        return this.getSeasonRules(SPELLING_BEE_CALENDAR_ID, "duel")
+        return this.getSeasonRules(SPELLING_BEE_DUEL_CALENDAR_ID, "duel")
     }
 
     async getCurrentSeason() {
