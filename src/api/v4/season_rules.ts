@@ -35,10 +35,10 @@ export class LetterToBuy {
 }
 
 export class SeasonRules {
-    public fixedPoints:Map<number, number> = new Map();
-    public multiplier:Map<number, number> = new Map();
-    public pointsForLetters:Map<string, number> = new Map();
-    public letterUsage:Map<String, number> = new Map();
+    public fixedPoints:any = {};
+    public multiplier:any = {};
+    public pointsForLetters:any = {};
+    public letterUsage:any = {};
     public panagramsOnly:boolean = false;
     public lettersToBuy:LetterToBuy[];
 
@@ -67,16 +67,16 @@ export class SeasonRules {
             this.addBlank = Boolean(seasonData.addBlank)
         }
         if (seasonData.fixedPoints) {
-            this.addFixedPoints(seasonData.fixedPoints);
+            this.fixedPoints = seasonData.fixedPoints;
         }
         if (seasonData.multipliers) {
-            this.addMultipliers(seasonData.multipliers);
+            this.multiplier = seasonData.multpliers;
         }
         if (seasonData.pointsForLetters) {
-            this.addPointsForLetters(seasonData.pointsForLetters);
+            this.pointsForLetters = seasonData.pointsForLetters;
         }
         if (seasonData.letterUsage) {
-            this.addLetterUsage(seasonData.letterUsage);
+            this.letterUsage = seasonData.letterUsage;
         }
         if (seasonData.panagramsOnly) {
             this.panagramsOnly = seasonData.panagramsOnly;
@@ -91,42 +91,21 @@ export class SeasonRules {
         this.lettersToBuy = seasonData.lettersToBuy?.map((letter: LetterToBuy) => new LetterToBuy(letter.price, letter.useLimit)) ?? []
     }
 
-    addFixedPoints(fixedPoints:any[]) {
-        for (var fixedPoint of fixedPoints) {
-            this.fixedPoints.set(fixedPoint.length, fixedPoint.points);
-        }
-    }
-
-    addMultipliers(multipliers:any[]) {
-        for (var multiplier of multipliers) {
-            this.multiplier.set(multiplier.length, multiplier.value);
-        }
-    }
-
-    addPointsForLetters(pointsForLetters:any[]) {
-        for (var pfl of pointsForLetters) {
-            this.pointsForLetters.set(pfl.letter, pfl.points);
-        }
-    }
-
-    addLetterUsage(letterUsage:any[]) {
-        for (var lu of letterUsage) {
-            this.letterUsage.set(lu.letter, lu.limit);
-        }
-    }
 
     getUsageLimit(letter:string):number {
-        if (!this.letterUsage.has(letter)) {
+        var letterUsage = new Map(Object.entries(this.letterUsage))
+        if (!letterUsage.has(letter)) {
             return -1;
         }
-        return this.letterUsage.get(letter)!;
+        return letterUsage.get(letter)! as number;
     }
 
     getPointsForLetter(letter:string):number {
-        if (!this.pointsForLetters.has(letter)) {
+        var pointsForLetters = new Map(Object.entries(this.pointsForLetters))
+        if (!pointsForLetters.has(letter)) {
             return 0;
         }
-        return this.pointsForLetters.get(letter)!;
+        return pointsForLetters.get(letter)! as number;
     }
 
     getSecondsToEnd():number {
