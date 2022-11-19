@@ -49,7 +49,7 @@ class SpellingBeeSeasonManager {
     }
 
     async getCurrentDuelSeason() {
-        if (this.spellingBeeDuelRules && (new Date().getTime() - this.spellingBeeDuelRules!.time.getTime()) / (1000 * 60) < this.throttleDuelRules ) {
+        if (this.spellingBeeDuelRules && (new Date().getTime() - this.spellingBeeDuelRules!.time.getTime()) / (1000 * 60) > this.throttleDuelRules ) {
             return this.spellingBeeDuelRules.rules;
         }
         await this.initCalendarClient()
@@ -69,7 +69,7 @@ class SpellingBeeSeasonManager {
     }
 
     async getCurrentSeason() {
-        if (this.spellingBeeRules && (new Date().getTime() - this.spellingBeeRules!.time.getTime()) / (1000 * 60) < this.throttleRules ) {
+        if (this.spellingBeeRules && (new Date().getTime() - this.spellingBeeRules!.time.getTime()) / (1000 * 60) > this.throttleRules ) {
             return this.spellingBeeRules.rules;
         }
         await this.initCalendarClient()
