@@ -41,8 +41,8 @@ class SpellingBeeSeasonManager {
             return 15
         }
         for (var e of eventList!) {
-            if (new Date(e.start?.dateTime?.toString()!) > now && new Date(e.start?.dateTime?.toString()!).getTime() < now.getTime() + 15 * 60000) {
-                return new Date(e.start?.dateTime?.toString()!).getTime() / 60000
+            if (new Date(e.start?.dateTime?.toString()!) > now && new Date(e.start?.dateTime?.toString()!).getTime() < now.getTime() + (15 * 60000)) {
+                return (new Date(e.start?.dateTime?.toString()!).getTime() - now.getTime()) / 60000
             }
         }
         return 15;
@@ -69,6 +69,9 @@ class SpellingBeeSeasonManager {
     }
 
     async getCurrentSeason() {
+        console.log(this.spellingBeeRules)
+        console.log((new Date().getTime() - this.spellingBeeRules!.time.getTime()) / (1000 * 60))
+        console.log(this.throttleRules)
         if (this.spellingBeeRules && (new Date().getTime() - this.spellingBeeRules!.time.getTime()) / (1000 * 60) > this.throttleRules ) {
             return this.spellingBeeRules.rules;
         }
