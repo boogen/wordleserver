@@ -50,8 +50,10 @@ export class SeasonRules {
     public season_title:string;
     public rules:string;
     public endTime:Date|null;
+    public points:string;
 
-    constructor(seasonData:any, id:string, season_title:string, rules:string, endTime:Date|null) {
+    constructor(seasonData:any, id:string, season_title:string, rules:string, points:string, endTime:Date|null) {
+        this.points = points;
         this.endTime = endTime;
         this.noOfLetters = 7;
         this.addBlank = false;

@@ -67,11 +67,12 @@ class SpellingBeeSeasonManager {
         for (var e of eventList!) {
             if (new Date(e.start?.dateTime?.toString()!) < now && new Date(e.end?.dateTime?.toString()!) > now) {
                 var json = (await this.driveClient?.files.get({fileId:e.attachments![0].fileId!, alt:'media'}))?.data as any
-                return_value = new SeasonRules(json, e.id!, e.summary!, e.description!, new Date(e.end!.dateTime?.toString()!))
+                var description = e.description?.split("####")
+                return_value = new SeasonRules(json, e.id!, e.summary!, description![0], description![1], new Date(e.end!.dateTime?.toString()!))
             }
         }
         if (!return_value) {
-            return_value = new SeasonRules({}, "vanilla", "", "", null)
+            return_value = new SeasonRules({}, "vanilla", "", "", "", null)
         }
         this.spellingBeeRules.set(type, new CachedRules(return_value, now))
         return return_value;
