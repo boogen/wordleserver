@@ -67,7 +67,12 @@ class SpellingBeeSeasonManager {
         for (var e of eventList!) {
             if (new Date(e.start?.dateTime?.toString()!) < now && new Date(e.end?.dateTime?.toString()!) > now) {
                 var json = (await this.driveClient?.files.get({fileId:e.attachments![0].fileId!, alt:'media'}))?.data as any
-                var description = e.description?.split("####")
+                var htmlDescription = e.description!;
+                while(htmlDescription.includes("<br>")) {
+                    htmlDescription = htmlDescription.replace("<br>", "\n")
+                }
+                htmlDescription.replaceAll("<[^>]*>", "")
+                var description = e.description?.split("#####")
                 return_value = new SeasonRules(json, e.id!, e.summary!, description![0], description![1], new Date(e.end!.dateTime?.toString()!))
             }
         }
