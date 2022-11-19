@@ -71,6 +71,11 @@ class SpellingBeeSeasonManager {
                 while(htmlDescription.includes("<br>")) {
                     htmlDescription = htmlDescription.replace("<br>", "\n")
                 }
+                var match;
+                while (match = htmlDescription.match("<[^>]*>")) {
+                    htmlDescription = htmlDescription.replace(match[0], "")
+                    console.log(match[0])
+                }
                 //htmlDescription.replaceAll("<[^>]*>", "")
                 var description = htmlDescription?.split("#####")
                 return_value = new SeasonRules(json, e.id!, e.summary!, description![0], description![1], new Date(e.end!.dateTime?.toString()!))
