@@ -80,7 +80,7 @@ class SpellingBeeSeasonManager {
             }
         }
         if (!return_value) {
-            return_value = new SeasonRules({}, "vanilla", "", "", "", null)
+            return_value = new SeasonRules({}, "vanilla", "Tryb standardowy", "", "", null)
         }
         this.spellingBeeRules.set(type, new CachedRules(return_value, now))
         return return_value;
