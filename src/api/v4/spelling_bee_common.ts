@@ -171,12 +171,12 @@ export function checkGuessForIncorrectLetters(guess:string, bee:Bee, letters:Let
         letterOccurences.set(singleLetter, i + 1)
     }
     for (var requiredLetter of letters.filter(LetterState => LetterState.required))
-    if (!guess.includes(requiredLetter.letter)) {
+    if (!guess.includes(requiredLetter.letter.toLowerCase())) {
         message = SpellingBeeReplyEnum.no_main_letter
     }
     for (var singleLetter of guess) {
         if (letters
-            .filter(letterState => singleLetter === letterState.letter &&
+            .filter(letterState => singleLetter === letterState.letter.toLowerCase() &&
                  (letterState.usageLimit >= letterOccurences.get(singleLetter)! || letterState.usageLimit < 0))
                  .length == 0) {
             message = SpellingBeeReplyEnum.invalid_letter_used
