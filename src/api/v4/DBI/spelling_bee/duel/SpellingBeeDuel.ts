@@ -21,5 +21,10 @@ export class SpellingBeeDuel {
         public finished: boolean,
         public lettersToBuy: LetterToBuy[],
         public season_rules:SeasonRules,
-        public _id?: ObjectId) { }
+        public _id?: ObjectId) { 
+            season_rules.fixedPoints = new Map(Object.entries(season_rules.fixedPoints)) as unknown as Map<number, number>;
+            season_rules.multiplier = new Map(Object.entries(season_rules.multiplier)) as unknown as Map<number, number>;
+            season_rules.pointsForLetters = new Map(Object.entries(season_rules.pointsForLetters)) as unknown as Map<string, number>;
+            season_rules.letterUsage = new Map(Object.entries(season_rules.letterUsage)) as unknown as Map<string, number>;
+        }
 }

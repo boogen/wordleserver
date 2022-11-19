@@ -263,7 +263,7 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
             return
         }
         const season_rules:SeasonRules = duel!.season_rules;
-        await markDuelAsFinished(duel.bee_duel_id, player_id, season_rules.duelTag!, dbi)
+        await markDuelAsFinished(duel.bee_duel_id, player_id, season_rules?.duelTag ?? "vanilla", dbi)
         var result = DuelResult.draw
         if (duel.player_points > duel.opponent_points) {
             result = DuelResult.win
