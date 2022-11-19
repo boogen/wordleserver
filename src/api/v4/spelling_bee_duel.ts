@@ -189,7 +189,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
                 opponent_guesses = opponent_guesses.concat(bot_guesses);
             }
             else {
-                spelling_bee_model = (await getRandomDuelBee(opponent_id, dbi));
+                spelling_bee_model = (await getRandomDuelBee(opponent_id, season_rules, dbi));
                 var best_duel:SpellingBeeDuel|null = (await getDuelsForGivenBee(spelling_bee_model!.id, opponent_id, timestamp, DUEL_DURATION, dbi));
                 opponent_guesses = opponent_guesses.concat(best_duel!.player_guesses).map(g => g = new SpellingBeeDuellGuess(g.word, g.timestamp - best_duel!.start_timestamp ,g.points_after_guess));
             }

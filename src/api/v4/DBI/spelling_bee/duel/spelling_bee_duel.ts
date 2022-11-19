@@ -36,13 +36,17 @@ export async function getSpellingBeeDuelStats(player_id: number, profile_player_
     return return_value;
 }
 
-export async function getRandomDuelBee(opponent_id:number, dbi:WordleDBI):Promise<Bee|null> {
+export async function getRandomDuelBee(opponent_id:number, season_rules:SeasonRules, dbi:WordleDBI):Promise<Bee|null> {
     if (opponent_id < 0) {
-        return getRandomBee(dbi, await getSeasonRules());
+        return getRandomBee(dbi, season_rules);
     }
     var possibleNotRandom = (await dbi.spelling_bee_duels().find({player_id:opponent_id},)).map(d => d.bee_id);
     possibleNotRandom = Array.from(new Set(possibleNotRandom));
     
+    if (possibleNotRandom.length === 0) {
+        return getRandomBee(dbi, season_rules)
+    }
+
     return (await getBeeById(possibleNotRandom[Math.floor(possibleNotRandom.length * Math.random())], dbi));
 }
 
