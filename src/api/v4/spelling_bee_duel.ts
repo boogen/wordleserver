@@ -10,7 +10,7 @@ import { get_bot_id, get_nick } from './player_common';
 import { ELO_COEFFICIENT, DUEL_DURATION, BOT_THRESHOLD, MATCH_ELO_DIFF, CHANCE_FOR_BOT } from './duel_settings';
 import { get_ranking } from './ranking_common';
 import { Stats } from '../../WordleStatsDBI';
-import { getDuelSeasonRules, LetterToBuy, SeasonRules } from './season_rules';
+import { fromOtherSeasonRules, getDuelSeasonRules, LetterToBuy, SeasonRules } from './season_rules';
 import { notifyAboutRankingChange } from './ranking';
 import { addNewLetterToSpellingBeeDuel, addPlayerGuessInSpellingBeeDuel, addSpellingBeeDuelMatch, checkForExistingDuel, checkForUnfinishedDuel, getAllPlayerDuelsBeeIds, getBestResultPercentage, getDuelsForGivenBee, getLastSpellingBeeDuelOpponents, getRandomDuelBee, getSpellingBeeDuelMatch, markDuelAsFinished, startDuel } from './DBI/spelling_bee/duel/spelling_bee_duel';
 import { SpellingBeeDuellGuess } from './DBI/spelling_bee/duel/SpellingBeeDuellGuess';
@@ -225,7 +225,7 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
         const timestamp = Date.now() / 1000;
         var duel:SpellingBeeDuel|null = await checkForExistingDuel(player_id, timestamp, DUEL_DURATION, dbi);
         const bee_model:Bee|null = await getBeeById(duel!.bee_id, dbi)
-        const season_rules:SeasonRules = duel!.season_rules as SeasonRules;
+        const season_rules:SeasonRules = fromOtherSeasonRules(duel!.season_rules);
         const result = await processPlayerGuess(guess, duel!.player_guesses.map(g => g.word), bee_model!, duel!.letters, season_rules, dbi);
         if (result.message != SpellingBeeReplyEnum.ok) {
             res.json(new SpellingBeeDuelGuessReply(result.message, new SpellingBeeDuelStateReply(duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points,Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION, duel!.lettersToBuy), 0));
@@ -262,7 +262,7 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
             }
             return
         }
-        const season_rules:SeasonRules = duel!.season_rules;
+        const season_rules:SeasonRules = fromOtherSeasonRules(duel!.season_rules);
         await markDuelAsFinished(duel.bee_duel_id, player_id, season_rules?.duelTag ?? "vanilla", dbi)
         var result = DuelResult.draw
         if (duel.player_points > duel.opponent_points) {

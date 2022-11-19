@@ -1,4 +1,4 @@
-import joi, { required } from '@hapi/joi';
+import joi, { func, required } from '@hapi/joi';
 import * as fs from 'fs';
 import { getSpellingBeeSeasonManager } from '../../spelling_bee_season_manager';
 //import { file } from 'googleapis/build/src/apis/file';
@@ -32,6 +32,10 @@ export async function getSeasonRules():Promise<SeasonRules> {
 
 export class LetterToBuy {
     constructor(public price:number, public useLimit:number) {}
+}
+
+export function fromOtherSeasonRules(season_rules:SeasonRules) {
+    return new SeasonRules(season_rules, season_rules.id, season_rules.season_title, season_rules.rules, season_rules.points, season_rules.endTime, season_rules.duelTag);
 }
 
 export class SeasonRules {
