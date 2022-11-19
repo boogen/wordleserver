@@ -70,8 +70,10 @@ class SpellingBeeSeasonManager {
 
     async getCurrentSeason() {
         console.log(this.spellingBeeRules)
+        if (this.spellingBeeRules){
         console.log((new Date().getTime() - this.spellingBeeRules!.time.getTime()) / (1000 * 60))
         console.log(this.throttleRules)
+        }
         if (this.spellingBeeRules && (new Date().getTime() - this.spellingBeeRules!.time.getTime()) / (1000 * 60) > this.throttleRules ) {
             return this.spellingBeeRules.rules;
         }
