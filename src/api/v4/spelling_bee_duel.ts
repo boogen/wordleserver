@@ -56,8 +56,12 @@ class SpellingBeeDuelPrematchPlayerInfo {
     constructor(public id:number, public player:string, public elo:number) {}
 }
 
+class SpellingBeeDuelSeasonInfo {
+    constructor(public season_title:string, public seconds_to_end:number, public rules:string){}
+}
+
 class SpellingBeeDuelPrematchReply {
-    constructor(public message:string, public player:SpellingBeeDuelPrematchPlayerInfo, public opponent:SpellingBeeDuelPrematchPlayerInfo) {}
+    constructor(public message:string, public player:SpellingBeeDuelPrematchPlayerInfo, public opponent:SpellingBeeDuelPrematchPlayerInfo, public season_info:SpellingBeeDuelSeasonInfo) {}
 }
 
 
@@ -135,13 +139,14 @@ spelling_bee_duel.post('/prematch', async (req:express.Request, res:express.Resp
         const player_id = await resolvePlayerId(request.auth_id, dbi);
         const timestamp:number = Date.now() / 1000;
         const existing_duell = await checkForUnfinishedDuel(player_id, timestamp, DUEL_DURATION, dbi);
+        var season_rules = getDuelSeasonRules();
         if (existing_duell !== null) {
-            res.json(new SpellingBeeDuelPrematchReply('ok', await getSpellingBeeDuelPrematchPlayerInfo(player_id), await getSpellingBeeDuelPrematchPlayerInfo(existing_duell.opponent_id)))
+            res.json(new SpellingBeeDuelPrematchReply('ok', await getSpellingBeeDuelPrematchPlayerInfo(player_id), await getSpellingBeeDuelPrematchPlayerInfo(existing_duell.opponent_id), new SpellingBeeDuelSeasonInfo(season_rules.season_title, season_rules.getSecondsToEnd(), season_rules.rules)))
             return;
         }
         const existing_match = await getSpellingBeeDuelMatch(player_id, dbi);
         if (existing_match !== null) {
-            res.json(new SpellingBeeDuelPrematchReply('ok', await getSpellingBeeDuelPrematchPlayerInfo(player_id), await getSpellingBeeDuelPrematchPlayerInfo(existing_match.opponent_id)))
+            res.json(new SpellingBeeDuelPrematchReply('ok', await getSpellingBeeDuelPrematchPlayerInfo(player_id), await getSpellingBeeDuelPrematchPlayerInfo(existing_match.opponent_id), new SpellingBeeDuelSeasonInfo(season_rules.season_title, season_rules.getSecondsToEnd(), season_rules.rules)))
             return;
         }
         const opponentsCandidates:number[] = await dbi.getOpponentsFromSpellingBeeEloRank(player_id, (await dbi.getCurrentSpellingBeeElo(player_id)), MATCH_ELO_DIFF)
@@ -156,7 +161,7 @@ spelling_bee_duel.post('/prematch', async (req:express.Request, res:express.Resp
         }
         await addSpellingBeeDuelMatch(player_id, opponent_id, dbi);
         stats.addSpellingBeeDuelPrematchEvent(player_id, opponent_id);
-        res.json(new SpellingBeeDuelPrematchReply('ok', await getSpellingBeeDuelPrematchPlayerInfo(player_id), await getSpellingBeeDuelPrematchPlayerInfo(opponent_id)))
+        res.json(new SpellingBeeDuelPrematchReply('ok', await getSpellingBeeDuelPrematchPlayerInfo(player_id), await getSpellingBeeDuelPrematchPlayerInfo(opponent_id), new SpellingBeeDuelSeasonInfo(season_rules.season_title, season_rules.getSecondsToEnd(), season_rules.rules)))
     }
     catch (error) {
         console.log(error);

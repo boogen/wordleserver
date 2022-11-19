@@ -23,23 +23,23 @@ export function getMaxPoints(words:String[], letters:string[]):number {
     return sum
 }
 
-var extraLetters:LetterState[] = []
+//var extraLetters:LetterState[] = []
 
-export function initExtraLetters(requiredLetters:string[], other_letters:string[], season_rules:SeasonRules) {
-    extraLetters = []
-    var plainLetters = requiredLetters;
-    plainLetters = plainLetters.concat(other_letters);
-    var possibleLetters = ALPHABET.filter(letter => !plainLetters.includes(letter));
-    for (var i = 0; i < season_rules.noOfLetters; i++) {
-        var boughtLetterIndex:number = Math.floor(Math.random() * possibleLetters.length)
-        var boughtLetter:string = possibleLetters[boughtLetterIndex]
-        extraLetters.push(new LetterState(boughtLetter, -1, 0, false))
-        }
+// export function initExtraLetters(requiredLetters:string[], other_letters:string[], season_rules:SeasonRules) {
+//     extraLetters = []
+//     var plainLetters = requiredLetters;
+//     plainLetters = plainLetters.concat(other_letters);
+//     var possibleLetters = ALPHABET.filter(letter => !plainLetters.includes(letter));
+//     for (var i = 0; i < season_rules.noOfLetters; i++) {
+//         var boughtLetterIndex:number = Math.floor(Math.random() * possibleLetters.length)
+//         var boughtLetter:string = possibleLetters[boughtLetterIndex]
+//         extraLetters.push(new LetterState(boughtLetter, -1, 0, false))
+//         }
     
-        var boughtLetterIndex:number = Math.floor(Math.random() * possibleLetters.length)
-        var boughtLetter:string = possibleLetters[boughtLetterIndex]
-        extraLetters.push(new LetterState(boughtLetter, -1, 0, true))
-}
+//         var boughtLetterIndex:number = Math.floor(Math.random() * possibleLetters.length)
+//         var boughtLetter:string = possibleLetters[boughtLetterIndex]
+//         extraLetters.push(new LetterState(boughtLetter, -1, 0, true))
+// }
 
 export function getNewLetterState(requiredLetters:string[], letters:string[], rules:SeasonRules):LetterState[] {
     var returnValue:LetterState[] = []
@@ -48,7 +48,7 @@ export function getNewLetterState(requiredLetters:string[], letters:string[], ru
     );
     letters.forEach(letter => returnValue.push(new LetterState(letter, rules.getUsageLimit(letter), rules.getPointsForLetter(letter), false)));
     
-    return returnValue.concat(extraLetters);
+    return returnValue;
 }
 
 export function getMaxPointsSeason(words:string[], letters:string[], extraRules:SeasonRules):number {

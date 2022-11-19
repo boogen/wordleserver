@@ -48,12 +48,18 @@ export class SeasonRules {
     public addBlank:boolean;
     public noOfRequiredLetters:number;
     public duelTag:string|undefined;
+    public id:string;
+    public season_title:string;
+    public rules:string;
     constructor(json:string) {
         profileSchema.validate(json);
         
         this.noOfLetters = 7;
         this.addBlank = false;
         var seasonData = JSON.parse(json)
+        this.id = seasonData.id;
+        this.season_title = seasonData.season_title
+        this.rules = seasonData.rules
         if (seasonData.noOfLetters != undefined) {
             this.noOfLetters = Number.parseInt(seasonData.noOfLetters);
         }
@@ -126,5 +132,9 @@ export class SeasonRules {
             return 0;
         }
         return this.pointsForLetters.get(letter)!;
+    }
+
+    getSecondsToEnd():number {
+        return 60;
     }
 }

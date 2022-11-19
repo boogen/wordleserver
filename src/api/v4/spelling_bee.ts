@@ -7,7 +7,7 @@ import { LetterState } from "./DBI/spelling_bee/LetterState";
 import { GlobalBee } from "./DBI/spelling_bee/GlobalBee";
 import AuthIdRequest from './types/AuthIdRequest';
 import SpellingBeeGuessRequest from './types/SpellingBeeGuessRequest';
-import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess, JOKER, ALPHABET, getNewLetterState, checkGuessForIncorrectLetters, wordPointsSeason, processPlayerGuess, initExtraLetters} from './spelling_bee_common';
+import { getMaxPoints, wordPoints, SpellingBeeStateReply, SpellingBeeReplyEnum, SuccessfullSpellingBeeStateReply, checkSpellingBeeGuess, JOKER, ALPHABET, getNewLetterState, checkGuessForIncorrectLetters, wordPointsSeason, processPlayerGuess} from './spelling_bee_common';
 import { get_ranking, RankingReply } from './ranking_common';
 import { getSeasonRules, SeasonRules } from './season_rules';
 import * as fs from 'fs';
@@ -51,7 +51,7 @@ spelling_bee.post('/getState', async (req, res, next) => {
         var season_rules = getSeasonRules()
         if (null === letters) {
             letters = await createLettersForBee(new_validity_timestamp, season_rules, dbi);
-            initExtraLetters(letters!.required_letters, letters!.letters, season_rules);
+            //initExtraLetters(letters!.required_letters, letters!.letters, season_rules);
         }
         var state:GuessedWordsBee|null = await getBeeState(player_id, letters.bee_id, dbi);
         var guesses:string[] = []
@@ -71,6 +71,11 @@ spelling_bee.post('/getState', async (req, res, next) => {
         Sentry.captureException(error);
     }
 });
+
+spelling_bee.post('/season_info',async (req, res, next) => {
+    var season_rules = getSeasonRules();
+    res.json({season_id: season_rules.id, season_title: season_rules.season_title, rules:season_rules, seconds_to_end:season_rules.getSecondsToEnd()})
+})
 
 spelling_bee.post('/guess', async (req, res, next) => {
     try {
