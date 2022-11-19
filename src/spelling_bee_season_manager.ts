@@ -56,6 +56,8 @@ class SpellingBeeSeasonManager {
     }
 
     async getSeasonRules(calendarId:string, type:string) {
+        console.log(this.spellingBeeRules)
+        console.log(this.rulesThrottle)
         if (this.spellingBeeRules.has(type) && (new Date().getTime() - this.spellingBeeRules.get(type)!.time.getTime()) / (1000 * 60) > this.rulesThrottle.get(type)! ) {
             return this.spellingBeeRules.get(type)!.rules;
         }
