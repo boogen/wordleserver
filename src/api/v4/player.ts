@@ -48,7 +48,7 @@ player.post("/register", async (req, res, next) => {
         const playerId = await dbi.getNextSequenceValue("player_id");
         await addPlayerToAuthMap(authId, playerId, dbi);
         await stats.addRegistrationEvent(authId, playerId);
-        res.json({message:'ok', authId: authId})
+        res.json({message:'ok', auth_id: authId})
     }
     catch(error) {
         console.log(error);

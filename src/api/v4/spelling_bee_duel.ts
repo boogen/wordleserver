@@ -10,7 +10,7 @@ import { get_bot_id, get_nick } from './player_common';
 import { ELO_COEFFICIENT, DUEL_DURATION, BOT_THRESHOLD, MATCH_ELO_DIFF, CHANCE_FOR_BOT } from './duel_settings';
 import { get_ranking } from './ranking_common';
 import { Stats } from '../../WordleStatsDBI';
-import { getDuelSeasonRules, getSeasonRules, LetterToBuy, SeasonRules } from './season_rules';
+import { getDuelSeasonRules, LetterToBuy, SeasonRules } from './season_rules';
 import { notifyAboutRankingChange } from './ranking';
 import { addNewLetterToSpellingBeeDuel, addPlayerGuessInSpellingBeeDuel, addSpellingBeeDuelMatch, checkForExistingDuel, checkForUnfinishedDuel, getAllPlayerDuelsBeeIds, getBestResultPercentage, getDuelsForGivenBee, getLastSpellingBeeDuelOpponents, getRandomDuelBee, getSpellingBeeDuelMatch, markDuelAsFinished, startDuel } from './DBI/spelling_bee/duel/spelling_bee_duel';
 import { SpellingBeeDuellGuess } from './DBI/spelling_bee/duel/SpellingBeeDuellGuess';
@@ -139,7 +139,7 @@ spelling_bee_duel.post('/prematch', async (req:express.Request, res:express.Resp
         const player_id = await resolvePlayerId(request.auth_id, dbi);
         const timestamp:number = Date.now() / 1000;
         const existing_duell = await checkForUnfinishedDuel(player_id, timestamp, DUEL_DURATION, dbi);
-        var season_rules = getDuelSeasonRules();
+        var season_rules = await getDuelSeasonRules();
         if (existing_duell !== null) {
             res.json(new SpellingBeeDuelPrematchReply('ok', await getSpellingBeeDuelPrematchPlayerInfo(player_id), await getSpellingBeeDuelPrematchPlayerInfo(existing_duell.opponent_id), new SpellingBeeDuelSeasonInfo(season_rules.season_title, season_rules.getSecondsToEnd(), season_rules.rules)))
             return;
@@ -171,7 +171,7 @@ spelling_bee_duel.post('/prematch', async (req:express.Request, res:express.Resp
 spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Response, next:Function) => {
     try {
         const request = new AuthIdRequest(req);
-        const season_rules = getDuelSeasonRules();
+        const season_rules = await getDuelSeasonRules();
         const player_id = await resolvePlayerId(request.auth_id, dbi);
         const timestamp:number = Date.now() / 1000;
         var duel:SpellingBeeDuel|null = await checkForUnfinishedDuel(player_id, timestamp, DUEL_DURATION, dbi);
@@ -197,7 +197,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
             if (opponent_guesses.length > 0) {
                opponent_points = opponent_guesses[opponent_guesses.length - 1].points_after_guess;
             }
-            duel = (await startDuel(spelling_bee_model!, player_id, opponent_id, opponent_guesses, opponent_points, timestamp, getDuelSeasonRules(), dbi));
+            duel = (await startDuel(spelling_bee_model!, player_id, opponent_id, opponent_guesses, opponent_points, timestamp, season_rules, dbi));
         }
         else {
             opponent_guesses = opponent_guesses.concat(duel.opponent_guesses)
@@ -225,7 +225,7 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
         const timestamp = Date.now() / 1000;
         var duel:SpellingBeeDuel|null = await checkForExistingDuel(player_id, timestamp, DUEL_DURATION, dbi);
         const bee_model:Bee|null = await getBeeById(duel!.bee_id, dbi)
-        const result = await processPlayerGuess(guess, duel!.player_guesses.map(g => g.word), bee_model!, duel!.letters, getDuelSeasonRules(), dbi);
+        const result = await processPlayerGuess(guess, duel!.player_guesses.map(g => g.word), bee_model!, duel!.letters, await getDuelSeasonRules(), dbi);
         if (result.message != SpellingBeeReplyEnum.ok) {
             res.json(new SpellingBeeDuelGuessReply(result.message, new SpellingBeeDuelStateReply(duel!.letters, duel!.player_guesses.map(g => g.word), duel!.player_points,Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp), DUEL_DURATION, duel!.lettersToBuy), 0));
             return;

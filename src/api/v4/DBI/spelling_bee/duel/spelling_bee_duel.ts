@@ -38,7 +38,7 @@ export async function getSpellingBeeDuelStats(player_id: number, profile_player_
 
 export async function getRandomDuelBee(opponent_id:number, dbi:WordleDBI):Promise<Bee|null> {
     if (opponent_id < 0) {
-        return getRandomBee(dbi, getSeasonRules());
+        return getRandomBee(dbi, await getSeasonRules());
     }
     var possibleNotRandom = (await dbi.spelling_bee_duels().find({player_id:opponent_id},)).map(d => d.bee_id);
     possibleNotRandom = Array.from(new Set(possibleNotRandom));

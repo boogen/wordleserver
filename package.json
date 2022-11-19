@@ -23,6 +23,7 @@
   "dependencies": {
     "@google-cloud/local-auth": "^2.1.1",
     "@googleapis/calendar": "^3.0.0",
+    "@googleapis/drive": "^4.0.0",
     "@hapi/joi": "^17.1.1",
     "@sentry/node": "^6.19.7",
     "@types/gapi": "^0.0.43",

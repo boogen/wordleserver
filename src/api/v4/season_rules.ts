@@ -1,5 +1,6 @@
 import joi, { required } from '@hapi/joi';
 import * as fs from 'fs';
+import { getSpellingBeeSeasonManager } from '../../spelling_bee_season_manager';
 //import { file } from 'googleapis/build/src/apis/file';
 
 const fixedPointsSchema = joi.object({length: joi.number().required(), points: joi.number().required()})
@@ -21,15 +22,12 @@ const profileSchema = joi.object({
     lettersToBuy: joi.array().items(letterToBuySchema)
 });
 
-export function getDuelSeasonRules():SeasonRules {
-    return getSeasonRules("duel_season.json");
+export async function getDuelSeasonRules():Promise<SeasonRules> {
+    return await getSpellingBeeSeasonManager().getCurrentDuelSeason();
 }
 
-export function getSeasonRules(filename:string = "season.json"):SeasonRules {
-    if (fs.existsSync('model/' + filename)) {
-        return new SeasonRules(fs.readFileSync('model/' + filename,'utf8'))
-    }
-    return new SeasonRules('{}');
+export async function getSeasonRules():Promise<SeasonRules> {
+    return await getSpellingBeeSeasonManager().getCurrentSeason();
 }
 
 export class LetterToBuy {
@@ -51,15 +49,15 @@ export class SeasonRules {
     public id:string;
     public season_title:string;
     public rules:string;
-    constructor(json:string) {
-        profileSchema.validate(json);
-        
+    public endTime:Date|null;
+
+    constructor(seasonData:any, id:string, season_title:string, rules:string, endTime:Date|null) {
+        this.endTime = endTime;
         this.noOfLetters = 7;
         this.addBlank = false;
-        var seasonData = JSON.parse(json)
-        this.id = seasonData.id;
-        this.season_title = seasonData.season_title
-        this.rules = seasonData.rules
+        this.id = id;
+        this.season_title = season_title
+        this.rules = rules
         if (seasonData.noOfLetters != undefined) {
             this.noOfLetters = Number.parseInt(seasonData.noOfLetters);
         }
@@ -135,6 +133,9 @@ export class SeasonRules {
     }
 
     getSecondsToEnd():number {
-        return 60;
+        if (this.endTime === null) {
+            return -1;
+        }
+        return (this.endTime!.getMilliseconds() - new Date().getMilliseconds())/1000;
     }
 }

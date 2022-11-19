@@ -48,7 +48,7 @@ spelling_bee.post('/getState', async (req, res, next) => {
             new_validity_timestamp += BEE_VALIDITY;
         }
         var letters:GlobalBee|null = await getLettersForBee(timestamp, dbi);
-        var season_rules = getSeasonRules()
+        var season_rules = await getSeasonRules()
         if (null === letters) {
             letters = await createLettersForBee(new_validity_timestamp, season_rules, dbi);
             //initExtraLetters(letters!.required_letters, letters!.letters, season_rules);
@@ -73,7 +73,7 @@ spelling_bee.post('/getState', async (req, res, next) => {
 });
 
 spelling_bee.post('/season_info',async (req, res, next) => {
-    var season_rules = getSeasonRules();
+    var season_rules = await getSeasonRules();
     res.json({season_id: season_rules.id, season_title: season_rules.season_title, rules:season_rules, seconds_to_end:season_rules.getSecondsToEnd()})
 })
 
@@ -87,7 +87,7 @@ spelling_bee.post('/guess', async (req, res, next) => {
         const letters = await getLettersForBee(timestamp, dbi);
         const bee_model:Bee|null = await getBeeById(letters!.bee_model_id, dbi);
         var state = await getBeeState(player_id, letters!.bee_id, dbi)
-        var result = await processPlayerGuess(player_guess, state!.guesses, bee_model!, state!.letters, season_rules, dbi);
+        var result = await processPlayerGuess(player_guess, state!.guesses, bee_model!, state!.letters, await season_rules, dbi);
 
         if (result.message != SpellingBeeReplyEnum.ok) {
             res.json(new GlobalSpellingBeeStateReply(result.message,

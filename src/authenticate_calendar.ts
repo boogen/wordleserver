@@ -3,14 +3,14 @@ import * as path from "path";
 import * as fs from "fs/promises";
 import { OAuth2Client } from "google-auth-library";
 import { JSONClient } from "google-auth-library/build/src/auth/googleauth";
-import { WORDLE_CALENDAR_ID } from "./spelling_bee_season_manager";
-const {authenticate} = require('@google-cloud/local-auth');
+import { SPELLING_BEE_CALENDAR_ID } from "./spelling_bee_season_manager";
+import { authenticate } from '@google-cloud/local-auth';
 
 const TOKEN_PATH = path.join(process.cwd(), 'token.json');
 const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
-const SCOPES = ['https://www.googleapis.com/auth/calendar.events.readonly', 'https://www.googleapis.com/auth/calendar.readonly'];
+const SCOPES = ['https://www.googleapis.com/auth/calendar.events.readonly', 'https://www.googleapis.com/auth/calendar.readonly', 'https://www.googleapis.com/auth/drive.readonly'];
 
-async function loadSavedCredentialsIfExist() {
+async function loadSavedCredentialsIfExist():Promise<any> {
   try {
     const content = await fs.readFile(TOKEN_PATH, 'utf-8');
     const credentials = JSON.parse(content);
@@ -48,16 +48,4 @@ export async function authorize() {
   return client;
 }
 
-async function listFiles(authClient:JSONClient|null) {
-  const calendarClient = google.calendar({version: 'v3', auth: authClient!});
-  var eventList = (await calendarClient.events.list({calendarId:WORDLE_CALENDAR_ID})).data.items
-  var now  = new Date()
-  for (var e of eventList!) {
-    if (new Date(e.start?.dateTime?.toString()!) < now && new Date(e.end?.dateTime?.toString()!) > now) {
-      console.log(e)
-    }
-  }
-//  console.log(await (await calendarClient.calendarList.list()).data.items?.map(i => i.id))
-}
-
-authorize().then(listFiles).catch(console.error);
+//authorize()
