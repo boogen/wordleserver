@@ -182,6 +182,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
         const existing_match = await getSpellingBeeDuelMatch(player_id, dbi);
         var opponent_id:number = existing_match!.opponent_id
         if (duel === null) {
+            console.log(season_rules)
             var spelling_bee_model:Bee|null = await getRandomBee(dbi, season_rules);
             if (opponent_id < 0) {
                 const bot_guesses = await createBotGuesses((await getRandomBee(dbi, season_rules))!, player_id, season_rules);
