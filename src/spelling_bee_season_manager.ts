@@ -84,7 +84,7 @@ class SpellingBeeSeasonManager {
             }
         }
         return_value = new SeasonRules({}, "vanilla", "", "", null)
-        this.spellingBeeDuelRules = new CachedRules(return_value, now)
+        this.spellingBeeRules = new CachedRules(return_value, now)
         return return_value;
     }
 
