@@ -93,7 +93,7 @@ export class SeasonRules {
         else {
             this.duelTag = undefined;
         }
-        this.lettersToBuy = seasonData.lettersToBuy?.map((letter: LetterToBuy) => new LetterToBuy(letter.price, letter.useLimit))
+        this.lettersToBuy = seasonData.lettersToBuy?.map((letter: LetterToBuy) => new LetterToBuy(letter.price, letter.useLimit)) ?? []
     }
 
     addFixedPoints(fixedPoints:any[]) {
