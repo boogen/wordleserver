@@ -12,6 +12,7 @@ import { checkIfFriends, friendList } from "./DBI/friends/friends";
 import { resolvePlayerId } from "./DBI/player/player";
 import { getLettersForBee } from "./DBI/spelling_bee/spelling_bee";
 import { getGlobalWord } from "./DBI/wordle/wordle";
+import { getDuelSeasonRules } from "./season_rules";
 const dbi = new WordleDBI();
 
 export const ranking = express.Router();
@@ -44,7 +45,7 @@ ranking.post('/spelling_bee_duel/global', async (req:express.Request, res:expres
     try {
         const request = new AuthIdRequest(req);
         const player_id = await resolvePlayerId(request.auth_id, dbi);
-        var rank = await dbi.getSpellingBeeEloRank();
+        var rank = await dbi.getSpellingBeeEloRank((await getDuelSeasonRules()).duelTag!);
         res.json((await get_ranking(player_id, rank, dbi)));
     } catch (error) {
         console.log(error)
@@ -60,7 +61,7 @@ ranking.post('/spelling_bee_duel/friends', async (req:express.Request, res:expre
         const player_id = await resolvePlayerId(request.auth_id, dbi);
         var friends = await friendList(player_id, dbi);
         friends.push(player_id)
-        var rank = await dbi.getSpellingBeeEloRankWithFilter(friends);
+        var rank = await dbi.getSpellingBeeEloRankWithFilter(friends, (await getDuelSeasonRules()).duelTag!);
         res.json((await get_ranking(player_id, rank, dbi)));
     } catch (error) {
         console.log(error)
