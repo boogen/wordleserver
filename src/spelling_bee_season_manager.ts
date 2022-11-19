@@ -1,6 +1,7 @@
+import { string } from "@hapi/joi";
 import { JSONClient } from "google-auth-library/build/src/auth/googleauth";
 import { calendar_v3, drive_v3, google } from "googleapis";
-import { SeasonRules } from "./api/v4/season_rules";
+import { getSeasonRules, SeasonRules } from "./api/v4/season_rules";
 import { authorize } from "./authenticate_calendar";
 
 export const SPELLING_BEE_CALENDAR_ID = 'c_58d50fa0fa48d9285fcf5ca00f19536bcbbad820b1c5371b318f44fc29b3e2b5@group.calendar.google.com'
@@ -21,10 +22,8 @@ class CachedRules {
 class SpellingBeeSeasonManager {
     calendarClient:calendar_v3.Calendar|null;
     driveClient:drive_v3.Drive|null;
-    spellingBeeRules:CachedRules|null = null;
-    spellingBeeDuelRules:CachedRules|null = null;
-    throttleDuelRules:number = 0;
-    throttleRules:number = 0;
+    spellingBeeRules:Map<string, CachedRules> = new Map();
+    rulesThrottle:Map<string, number> = new Map(); 
     constructor() {
         this.calendarClient = null; 
         this.driveClient = null;
@@ -49,47 +48,32 @@ class SpellingBeeSeasonManager {
     }
 
     async getCurrentDuelSeason() {
-        if (this.spellingBeeDuelRules && (new Date().getTime() - this.spellingBeeDuelRules!.time.getTime()) / (1000 * 60) > this.throttleDuelRules ) {
-            return this.spellingBeeDuelRules.rules;
+        return this.getSeasonRules(SPELLING_BEE_CALENDAR_ID, "duel")
+    }
+
+    async getCurrentSeason() {
+        return this.getSeasonRules(SPELLING_BEE_CALENDAR_ID, "regular")
+    }
+
+    async getSeasonRules(calendarId:string, type:string) {
+        if (this.spellingBeeRules.has(type) && (new Date().getTime() - this.spellingBeeRules.get(type)!.time.getTime()) / (1000 * 60) > this.rulesThrottle.get(type)! ) {
+            return this.spellingBeeRules.get(type)!.rules;
         }
         await this.initCalendarClient()
-        var eventList = (await this.calendarClient!.events.list({calendarId:SPELLING_BEE_DUEL_CALENDAR_ID})).data.items
+        var eventList = (await this.calendarClient!.events.list({calendarId:calendarId})).data.items
         var now  = new Date()
-        var return_value:SeasonRules;
-        this.throttleDuelRules = this.timeToNextSeason(eventList, now)
+        var return_value:SeasonRules|null = null;
+        this.rulesThrottle.set(type, this.timeToNextSeason(eventList, now))
         for (var e of eventList!) {
             if (new Date(e.start?.dateTime?.toString()!) < now && new Date(e.end?.dateTime?.toString()!) > now) {
                 var json = (await this.driveClient?.files.get({fileId:e.attachments![0].fileId!, alt:'media'}))?.data as any
                 return_value = new SeasonRules(json, e.id!, e.summary!, e.description!, new Date(e.end!.dateTime?.toString()!))
             }
         }
-        return_value = new SeasonRules({}, "vanilla", "", "", null)
-        this.spellingBeeDuelRules = new CachedRules(return_value, now)
-        return return_value;
-    }
-
-    async getCurrentSeason() {
-        console.log(this.spellingBeeRules)
-        if (this.spellingBeeRules){
-        console.log((new Date().getTime() - this.spellingBeeRules!.time.getTime()) / (1000 * 60))
-        console.log(this.throttleRules)
+        if (!return_value) {
+            return_value = new SeasonRules({}, "vanilla", "", "", null)
         }
-        if (this.spellingBeeRules && (new Date().getTime() - this.spellingBeeRules!.time.getTime()) / (1000 * 60) > this.throttleRules ) {
-            return this.spellingBeeRules.rules;
-        }
-        await this.initCalendarClient()
-        var eventList = (await this.calendarClient!.events.list({calendarId:SPELLING_BEE_CALENDAR_ID})).data.items
-        var now  = new Date()
-        this.throttleRules = this.timeToNextSeason(eventList, now)
-        var return_value:SeasonRules;
-        for (var e of eventList!) {
-            if (new Date(e.start?.dateTime?.toString()!) < now && new Date(e.end?.dateTime?.toString()!) > now) {
-                var json = (await this.driveClient?.files.get({fileId:e.attachments![0].fileId!, alt:'media'}))?.data as any
-                return new SeasonRules(json, e.id!, e.summary!, e.description!, new Date(e.end!.dateTime?.toString()!))
-            }
-        }
-        return_value = new SeasonRules({}, "vanilla", "", "", null)
-        this.spellingBeeRules = new CachedRules(return_value, now)
+        this.spellingBeeRules.set(type, new CachedRules(return_value, now))
         return return_value;
     }
 
