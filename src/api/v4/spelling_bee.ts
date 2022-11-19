@@ -74,7 +74,7 @@ spelling_bee.post('/getState', async (req, res, next) => {
 
 spelling_bee.post('/season_info',async (req, res, next) => {
     var season_rules = await getSeasonRules();
-    res.json({season_id: season_rules.id, season_title: season_rules.season_title, rules:season_rules, seconds_to_end:season_rules.getSecondsToEnd()})
+    res.json({season_id: season_rules.id, season_title: season_rules.season_title, rules:season_rules.rules, seconds_to_end:season_rules.getSecondsToEnd()})
 })
 
 spelling_bee.post('/guess', async (req, res, next) => {

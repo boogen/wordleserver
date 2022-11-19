@@ -136,6 +136,8 @@ export class SeasonRules {
         if (this.endTime === null) {
             return -1;
         }
+        console.log(this.endTime)
+        console.log(new Date())
         return (this.endTime!.getMilliseconds() - new Date().getMilliseconds())/1000;
     }
 }
