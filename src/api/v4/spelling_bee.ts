@@ -19,12 +19,14 @@ import { resolvePlayerId } from './DBI/player/player';
 import { addBeeGuess, addNewLetterToSpellingBeeState, createBeeState, createLettersForBee, getBeeState, getLettersForBee, saveLettersState } from './DBI/spelling_bee/spelling_bee';
 import { GuessedWordsBee } from './DBI/spelling_bee/GuessedWordsBee';
 import { getBeeById } from './DBI/spelling_bee/model';
+import { Stats } from '../../WordleStatsDBI';
 
 export const spelling_bee = express.Router();
 const dbi = new WordleDBI()
 const BEE_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
 
+const stats:Stats = new Stats();
 
 class GlobalSpellingBeeStateReply extends SpellingBeeStateReply {
     constructor(public messageEnum:SpellingBeeReplyEnum, public letters:LetterState[], public guessed_words:string[], public player_points:number, public max_points:number, public letters_to_buy_prices:number[]) {
@@ -90,6 +92,8 @@ spelling_bee.post('/guess', async (req, res, next) => {
         var result = await processPlayerGuess(player_guess, state!.guesses, bee_model!, state!.letters, await season_rules, dbi);
 
         if (result.message != SpellingBeeReplyEnum.ok) {
+            var playerPoints = (await dbi.getBeePlayerPoints(player_id, letters!.bee_id));
+            stats.addSpellingBeeGuessEvent(player_id, player_guess, false, 0, playerPoints);
             res.json(new GlobalSpellingBeeStateReply(result.message,
                 state!.letters,
                 state!.guesses,
@@ -111,10 +115,12 @@ spelling_bee.post('/guess', async (req, res, next) => {
         notifyAboutRankingChange(player_id, oldRank, newRankingEntry.score - totalPointsAdded, newRankingEntry.score, "Wspólna litera")
         const max_points = bee_model!.max_points;
         state = await saveLettersState(player_id, letters!.bee_id, result.newLetterState, dbi)
+        var player_points = (await dbi.getBeePlayerPoints(player_id, letters!.bee_id));
+        stats.addSpellingBeeGuessEvent(player_id, result.guessesAdded.join(","), true, totalPointsAdded, player_points);
         res.json(new SuccessfullGlobalSpellingBeeStateReply(
             state!.letters,
             state!.guesses,
-            (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
+            player_points,
             max_points,
             totalPointsAdded,
             state!.lettersToBuy.map(lb => lb.price)
