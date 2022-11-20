@@ -34,7 +34,7 @@ friend.post('/code', async (req, res, next) => {
         } while (!(friend_code = await addFriendCode(player_id, generated_friend_code, dbi)));
         res.json({
             status: "ok",
-            friendCode: friend_code
+            friendCode: friend_code.friend_code
         })
     }
     catch(error) {
