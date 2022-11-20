@@ -3,8 +3,8 @@ import WordleDBI from "../DBI";
 import { FriendCode } from "./FriendCode";
 
 export async function addFriend(player_id:number, friend_code:string, dbi:WordleDBI):Promise<boolean> {
-    const friend_id = (await dbi.friend_codes().findOne({friend_code: friend_code}))!.player_id;
-    if (friend_id == null || player_id === friend_id) {
+    const friend_id = (await dbi.friend_codes().findOne({friend_code: friend_code}))?.player_id;
+    if (friend_id === undefined || player_id === friend_id) {
         return false;
     }
     async function addFriendToList(id:number, friendId:number, db:IMonkManager) {
