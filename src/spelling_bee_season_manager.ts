@@ -21,19 +21,12 @@ class CachedRules {
 }
 
 class SpellingBeeSeasonManager {
-    calendarClient:calendar_v3.Calendar|null;
-    driveClient:drive_v3.Drive|null;
     spellingBeeRules:Map<string, CachedRules> = new Map();
     rulesThrottle:Map<string, number> = new Map(); 
-    constructor() {
-        this.calendarClient = null; 
-        this.driveClient = null;
-    }
 
     async initCalendarClient() {
         var auth_client = await authorize()
-        this.calendarClient = google.calendar({version: 'v3', auth: auth_client!})
-        this.driveClient = google.drive({version:'v3', auth:auth_client})
+        return {calendarClient: google.calendar({version: 'v3', auth: auth_client!}), driveClient: google.drive({version:'v3', auth:auth_client})}
     }
 
     timeToNextSeason(eventList:calendar_v3.Schema$Event[]|undefined, now:Date):number {
@@ -60,14 +53,14 @@ class SpellingBeeSeasonManager {
         if (this.spellingBeeRules.has(type) && (new Date().getTime() - this.spellingBeeRules.get(type)!.time.getTime()) / (1000 * 60) < this.rulesThrottle.get(type)! ) {
             return this.spellingBeeRules.get(type)!.rules;
         }
-        await this.initCalendarClient()
-        var eventList = (await this.calendarClient!.events.list({calendarId:calendarId})).data.items
+        const clients = await this.initCalendarClient()
+        var eventList = (await clients.calendarClient!.events.list({calendarId:calendarId})).data.items
         var now  = new Date()
         var return_value:SeasonRules|null = null;
         this.rulesThrottle.set(type, this.timeToNextSeason(eventList, now))
         for (var e of eventList!) {
             if (new Date(e.start?.dateTime?.toString()!) < now && new Date(e.end?.dateTime?.toString()!) > now) {
-                var json = (await this.driveClient?.files.get({fileId:e.attachments![0].fileId!, alt:'media'}))?.data as any
+                var json = (await clients.driveClient?.files.get({fileId:e.attachments![0].fileId!, alt:'media'}))?.data as any
                 var htmlDescription = e.description!;
                 while(htmlDescription.includes("<br>")) {
                     htmlDescription = htmlDescription.replace("<br>", "\n")
