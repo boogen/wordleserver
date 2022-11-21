@@ -5,7 +5,6 @@ import helmet from 'helmet';
 import cors from 'cors';
 import {metrics} from './metrics'
 import * as Sentry from "@sentry/node"
-var heapdump = require('heapdump');
 
 require('dotenv').config();
 
@@ -13,9 +12,8 @@ Sentry.init({dsn: process.env.sentry_dsn});
 
 import {notFound, errorHandler} from './middlewares';
 import { apiV4 } from './api/v4';
-import { apiV3 } from './api/v3';
+
 import WordleDBI from './api/v4/DBI/DBI';
-import memwatch from 'node-memwatch';
 
 export const app = express();
 
@@ -51,16 +49,8 @@ app.use((req, res, next) => {
 })
 
 app.use('/api/v4', apiV4)
-app.use('/api/v3', apiV3)
 app.use('/', metrics)
 
 app.use(notFound);
 app.use(errorHandler);
-
-
-
-memwatch.on('leak', function(info) { 
-  console.log(info)
-  heapdump.writeSnapshot('/root/' + Date.now() + '.heapsnapshot');
-});
 
