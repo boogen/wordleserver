@@ -15,7 +15,7 @@ import {notFound, errorHandler} from './middlewares';
 import { apiV4 } from './api/v4';
 import { apiV3 } from './api/v3';
 import WordleDBI from './api/v4/DBI/DBI';
-var memwatch = require('@airbnb/node-memwatch');
+import memwatch from 'node-memwatch';
 
 export const app = express();
 
@@ -59,7 +59,7 @@ app.use(errorHandler);
 
 
 
-memwatch.on('leak', function(info:any) { 
+memwatch.on('leak', function(info) { 
   console.log(info)
   heapdump.writeSnapshot('/root/' + Date.now() + '.heapsnapshot');
 });
