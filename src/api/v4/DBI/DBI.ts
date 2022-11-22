@@ -153,7 +153,7 @@ export default class WordleDBI {
         const rank =  this.db().get("word#" + word_id + "_ranking");
         rank.createIndex({player_id: 1})
         rank.createIndex({score: 1});
-        return rank.find({playerId:{$in: friends}}, {sort: {score:1, time: 1}, limit:100})
+        return rank.find({player_id:{$in: friends}}, {sort: {score:1, time: 1}, limit:100})
     }
 
     async increase_request_counter(path:string, last_midnight:number) {
