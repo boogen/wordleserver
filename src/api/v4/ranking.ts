@@ -13,6 +13,7 @@ import { resolvePlayerId } from "./DBI/player/player";
 import { getLettersForBee } from "./DBI/spelling_bee/spelling_bee";
 import { getGlobalWord } from "./DBI/wordle/wordle";
 import { getDuelSeasonRules } from "./season_rules";
+import { Console } from "@sentry/node/types/integrations";
 const dbi = new WordleDBI();
 
 export const ranking = express.Router();
@@ -151,6 +152,8 @@ ranking.post('/wordle_daily_challenge/friends', async (req, res, next) => {
         }
         var friends = await friendList(player_id, dbi);
         friends.push(player_id)
+        console.log("Friends: " + friends)
+        console.log("Word entry id: " + wordEntry.id)
         const ranking = await dbi.getWordleRankingWithFilter(wordEntry.word_id, friends)
         res.json((await get_ranking(player_id, ranking, dbi)))
     }
