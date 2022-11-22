@@ -122,6 +122,7 @@ ranking.post('/wordle_daily_challenge/global', async (req, res, next) => {
         const player_id = await resolvePlayerId(value.auth_id, dbi);
         const timestamp = Date.now() / 1000;
         const wordEntry = await getGlobalWord(timestamp, dbi);
+        console.log(wordEntry)
         if (wordEntry === null) {
             res.json({message: 'ok', ranking:[]})
             return
