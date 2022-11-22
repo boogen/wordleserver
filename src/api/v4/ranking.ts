@@ -45,8 +45,8 @@ ranking.post('/spelling_bee_duel/global', async (req:express.Request, res:expres
     try {
         const request = new AuthIdRequest(req);
         const player_id = await resolvePlayerId(request.auth_id, dbi);
-        console.log("Duel tag:" + (await getDuelSeasonRules()).duelTag!)
-        var rank = await dbi.getSpellingBeeEloRank((await getDuelSeasonRules()).duelTag!);
+        console.log("Duel tag:" + (await getDuelSeasonRules()).id!)
+        var rank = await dbi.getSpellingBeeEloRank((await getDuelSeasonRules()).id!);
         res.json((await get_ranking(player_id, rank, dbi)));
     } catch (error) {
         console.log(error)
@@ -62,7 +62,7 @@ ranking.post('/spelling_bee_duel/friends', async (req:express.Request, res:expre
         const player_id = await resolvePlayerId(request.auth_id, dbi);
         var friends = await friendList(player_id, dbi);
         friends.push(player_id)
-        var rank = await dbi.getSpellingBeeEloRankWithFilter(friends, (await getDuelSeasonRules()).duelTag!);
+        var rank = await dbi.getSpellingBeeEloRankWithFilter(friends, (await getDuelSeasonRules()).id!);
         res.json((await get_ranking(player_id, rank, dbi)));
     } catch (error) {
         console.log(error)
