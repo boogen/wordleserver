@@ -45,6 +45,7 @@ ranking.post('/spelling_bee_duel/global', async (req:express.Request, res:expres
     try {
         const request = new AuthIdRequest(req);
         const player_id = await resolvePlayerId(request.auth_id, dbi);
+        console.log("Duel tag:" + (await getDuelSeasonRules()).duelTag!)
         var rank = await dbi.getSpellingBeeEloRank((await getDuelSeasonRules()).duelTag!);
         res.json((await get_ranking(player_id, rank, dbi)));
     } catch (error) {
