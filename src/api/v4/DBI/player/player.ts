@@ -5,7 +5,7 @@ import { SocialToAuth } from "./SocialToAuth";
 
 export async function checkSocialId(authId:string, socialId:string, dbi:WordleDBI):Promise<FindOneResult<SocialToAuth>> {
     var result = await dbi.social_to_auth().findOneAndUpdate({socialId:socialId}, {$setOnInsert:{authId:authId, socialId:socialId}}, {upsert:true})
-    if (result?.authId === "") {
+    if (result?.authId === null) {
         return dbi.social_to_auth().findOneAndUpdate({socialId:socialId}, {$set:{authId:authId, socialId:socialId}}, {upsert:true})
     }
     return result;
