@@ -87,7 +87,7 @@ player.post("/getNick", async (req:express.Request, res:express.Response, next) 
 
 player.post("/setSocialId",  async (req:express.Request, res:express.Response, next) => {
     var value = new SetSocialIdRequest(req);
-    const social_to_auth = await checkSocialId(value.authId, value.socialId, dbi);
+    const social_to_auth = await checkSocialId(value.auth_id, value.socialId, dbi);
     console.log(social_to_auth)
     res.json({message:'ok', authId:social_to_auth!.authId})
 })

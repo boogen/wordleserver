@@ -7,12 +7,12 @@ const socialIdRequestSchema = joi.object({
 });
 
 export default class SetSocialIdRequest {
-    authId:string;
+    auth_id:string;
     socialId:string;
 
     constructor(req:express.Request) {
         socialIdRequestSchema.validate(req.body);
-        this.authId = req.body.authId;
+        this.auth_id = req.body.authId;
         this.socialId = req.body.socialId;
     }
 }
