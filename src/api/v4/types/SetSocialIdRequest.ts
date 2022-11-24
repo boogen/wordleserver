@@ -12,7 +12,7 @@ export default class SetSocialIdRequest {
 
     constructor(req:express.Request) {
         socialIdRequestSchema.validate(req.body);
-        this.auth_id = req.body.authId;
+        this.auth_id = req.body.auth_id;
         this.socialId = req.body.socialId;
     }
 }
