@@ -4,7 +4,11 @@ import { PlayerProfile } from "./PlayerProfile";
 import { SocialToAuth } from "./SocialToAuth";
 
 export async function checkSocialId(authId:string, socialId:string, dbi:WordleDBI):Promise<FindOneResult<SocialToAuth>> {
-    return dbi.social_to_auth().findOneAndUpdate({socialId:socialId}, {$setOnInsert:{authId:authId, socialId:socialId}}, {upsert:true})
+    var result = await dbi.social_to_auth().findOneAndUpdate({socialId:socialId}, {$setOnInsert:{authId:authId, socialId:socialId}}, {upsert:true})
+    if (result?.authId === "") {
+        return dbi.social_to_auth().findOneAndUpdate({socialId:socialId}, {$set:{authId:authId, socialId:socialId}}, {upsert:true})
+    }
+    return result;
 }
 export async function addPlayerToAuthMap(authId:string, playerId:number, dbi:WordleDBI) {
     return await dbi.player_auth().insert({auth_id: authId, player_id: playerId});
