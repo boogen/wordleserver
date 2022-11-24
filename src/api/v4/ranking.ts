@@ -152,8 +152,6 @@ ranking.post('/wordle_daily_challenge/friends', async (req, res, next) => {
         }
         var friends = await friendList(player_id, dbi);
         friends.push(player_id)
-        console.log("Friends: " + friends)
-        console.log("Word entry id(whole): " + wordEntry.word_id)
         const ranking = await dbi.getWordleRankingWithFilter(wordEntry.word_id, friends)
         res.json((await get_ranking(player_id, ranking, dbi)))
     }

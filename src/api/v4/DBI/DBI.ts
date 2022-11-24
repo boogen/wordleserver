@@ -43,7 +43,7 @@ export default class WordleDBI {
     extra_bee_words():ICollection<Word> {return _db.get("bees_fallback")}
     spelling_bee_duels():ICollection<SpellingBeeDuel> {return _db.get("spelling_bee_duels_v2")}
     spelling_bee_elo_rank(rankTag:string):ICollection<SpellingBeeDuelEloRankEntry> {return _db.get("elo_rank_spelling_bee_duel_" + rankTag);}
-    spelling_bee_duel_prematch():ICollection<SpellingBeeDuelMatch> { return _db.get("spelling_bee_duel_prematch");}
+    spelling_bee_duel_prematch():ICollection<SpellingBeeDuelMatch> { return _db.get("spelling_bee_duel_prematch_v2");}
     social_to_auth():ICollection<SocialToAuth> { return _db.get("social_to_auth")}
     bee_ranking(bee_id:number):ICollection<RawRankingEntry> {
         var rank = _db.get("bee#" + bee_id + "_ranking");
@@ -73,7 +73,7 @@ export default class WordleDBI {
         this.spelling_bee_duels().createIndex({player_id: 1})
         this.spelling_bee_duels().createIndex({bee_id: 1})
         this.spelling_bee_duels().createIndex({bee_duel_id: 1}, {unique:true})
-        this.spelling_bee_duel_prematch().createIndex({player_id:1}, {unique:true})
+        this.spelling_bee_duel_prematch().createIndex({player_id:1})
         this.social_to_auth().createIndex({socialId:1}, {unique:true})
     }
 
