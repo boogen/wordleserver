@@ -1,7 +1,7 @@
 import mariadb, { Connection, PoolConfig } from "mariadb";
 
 const poolConfig:PoolConfig = {host:process.env.STATS_DB_HOST, database:process.env.STATS_DB_NAME, user:process.env.STATS_DB_USER, password:process.env.STATS_DB_PASSWORD}
-const _db = mariadb.createPool(poolConfig);
+const _db = poolConfig.host!==undefined?mariadb.createPool(poolConfig):null;
 
 export abstract class StatsEvent {
     getSql():string {
@@ -13,6 +13,9 @@ export abstract class StatsEvent {
 
 export class StatsDBI {
     async addStat(statEvent:StatsEvent) {
+        if (_db === null) {
+            return;
+        }
         var conn:Connection|null = null;
         try {
             conn = await _db.getConnection();

@@ -11,11 +11,12 @@ require('dotenv').config();
 Sentry.init({dsn: process.env.sentry_dsn});
 
 import {notFound, errorHandler} from './middlewares';
-import { apiV3 } from './api/v3';
-import WordleDBI from './DBI';
+import { apiV4 } from './api/v4';
+
+import WordleDBI from './api/v4/DBI/DBI';
 
 export const app = express();
-
+var heapdump = require('heapdump');
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(cors());
@@ -47,9 +48,12 @@ app.use((req, res, next) => {
   next()
 })
 
-app.use('/api/v3', apiV3)
+app.use('/api/v4', apiV4)
 app.use('/', metrics)
 
 app.use(notFound);
 app.use(errorHandler);
 
+process.on("SIGUSR2", function() {
+  heapdump.writeSnapshot('/var/local/' + Date.now() + '.heapsnapshot');
+});

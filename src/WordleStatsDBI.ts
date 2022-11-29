@@ -155,7 +155,7 @@ export class Stats extends StatsDBI {
     }
 
     async addSetNickEvent(playerId:number, nick:string) {
-        this.addStat(new NickSetEvent(playerId, nick, Date.now()/1000))
+        //this.addStat(new NickSetEvent(playerId, nick, Date.now()/1000))
     }
 
     async addWordleInitEvent(playerId:number, wordle_id:number) {
