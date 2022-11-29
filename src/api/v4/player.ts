@@ -60,6 +60,7 @@ player.post("/register", async (req, res, next) => {
 player.post('/login',async (req, res, next) => {
     const value = new AuthIdRequest(req);
     const player_id:number = (await resolvePlayerId(value.auth_id, dbi));
+    await stats.addLoginEvent(player_id);
     res.json({'message':'ok', 'player_id':player_id})
 })
 
