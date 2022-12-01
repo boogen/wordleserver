@@ -22,9 +22,9 @@ export async function createLettersForBee(validityTimestamp:number, season_rules
     // while (season_rules != null && season_rules.noOfLetters < other_letters.length) {
     //     other_letters.splice(Math.floor(Math.random() * other_letters.length), 1);
     // }
-    if (season_rules != null && season_rules.addBlank) {
-        other_letters[Math.floor(Math.random() * other_letters.length)] = JOKER;
-    }
+    // if (season_rules != null && season_rules.addBlank) {
+    //     other_letters[Math.floor(Math.random() * other_letters.length)] = JOKER;
+    // }
     return dbi.global_bee().insert(new GlobalBee(bee_id, bee.id, validityTimestamp, other_letters, bee.required_letters))
 }
 

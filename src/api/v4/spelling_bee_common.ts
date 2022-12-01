@@ -46,8 +46,10 @@ export function getNewLetterState(requiredLetters:string[], letters:string[], ru
     requiredLetters.forEach(mainLetter => 
         returnValue.push(new LetterState(mainLetter, rules.getUsageLimit(mainLetter), rules.getPointsForLetter(mainLetter), true))
     );
+    if (rules != null && rules.addBlank) {
+        letters[Math.floor(Math.random() * letters.length)] = JOKER;
+    }
     letters.forEach(letter => returnValue.push(new LetterState(letter, rules.getUsageLimit(letter), rules.getPointsForLetter(letter), false)));
-    
     return returnValue;
 }
 
