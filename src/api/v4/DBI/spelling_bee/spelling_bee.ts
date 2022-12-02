@@ -1,6 +1,6 @@
 import { FindOneResult } from "monk";
 import { LetterToBuy, SeasonRules } from "../../season_rules";
-import { getMaxPoints, JOKER, pointsToRank, RANKS, wordPoints } from "../../spelling_bee_common";
+import { getMaxPoints, initExtraLetters, JOKER, pointsToRank, RANKS, wordPoints } from "../../spelling_bee_common";
 import WordleDBI from "../DBI";
 import { Bee } from "./Bee";
 import { GlobalBee } from "./GlobalBee";
@@ -18,7 +18,7 @@ export async function createLettersForBee(validityTimestamp:number, season_rules
     var bee:Bee = (await getRandomBee(dbi, season_rules))
     const bee_id = await dbi.getNextSequenceValue("global_bee");
     var other_letters = bee.other_letters;
-    console.log(season_rules)
+    other_letters = other_letters.concat(initExtraLetters(bee.required_letters, other_letters, season_rules))
     // while (season_rules != null && season_rules.noOfLetters < other_letters.length) {
     //     other_letters.splice(Math.floor(Math.random() * other_letters.length), 1);
     // }
