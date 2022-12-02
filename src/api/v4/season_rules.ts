@@ -105,12 +105,12 @@ export class SeasonRules {
     }
 
     getUsageLimit(letter:string):number {
-        var letterUsage = new Map(Object.entries(this.letterUsage))
-        console.log(letterUsage);
-        if (!letterUsage.has(letter)) {
-            return -1;
+        for (var lu of this.letterUsage) {
+            if (lu.letter === letter) {
+                return lu.limit as number;
+            }
         }
-        return letterUsage.get(letter)! as number;
+        return -1;
     }
 
     getPointsForLetter(letter:string):number {
