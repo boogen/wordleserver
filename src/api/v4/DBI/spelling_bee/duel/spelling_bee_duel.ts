@@ -66,7 +66,8 @@ export async function startDuel(bee_model:Bee, player_id: number, opponent_id:nu
         timestamp,
         false,
         seasonRules.lettersToBuy,
-        seasonRules
+        seasonRules,
+        seasonRules.duelTag ?? undefined
         );
         dbi.spelling_bee_duels().insert(return_value);
     
@@ -114,17 +115,17 @@ export async function addNewLetterToSpellingBeeDuel(duel_id:number, newLetterSta
     )
 }
 
-export async function getAllPlayerDuelsBeeIds(player_id:number, dbi:WordleDBI):Promise<number[]> {
-    return dbi.spelling_bee_duels().distinct('bee_id', {player_id:player_id})
+export async function getAllPlayerDuelsBeeIds(player_id:number, duelTag:string|null, dbi:WordleDBI):Promise<number[]> {
+    return dbi.spelling_bee_duels().distinct('bee_id', {player_id:player_id, season_tag:duelTag ?? undefined})
 }
 
-export async function getBestResultPercentage(player_id:number, bees_ids:number[], dbi:WordleDBI):Promise<number[]> {
-    return Promise.all(bees_ids.map(bee_id => getSingleBestResultPercentage(player_id, bee_id, dbi)));
+export async function getBestResultPercentage(player_id:number, bees_ids:number[], duelTag:string|null, dbi:WordleDBI):Promise<number[]> {
+    return Promise.all(bees_ids.map(bee_id => getSingleBestResultPercentage(player_id, bee_id, duelTag, dbi)));
 }
 
-export async function getSingleBestResultPercentage(player_id:number, bee_id:number, dbi:WordleDBI):Promise<number> {
+export async function getSingleBestResultPercentage(player_id:number, bee_id:number, duelTag:string|null, dbi:WordleDBI):Promise<number> {
     const bee_model:Bee|null = await getBeeById(bee_id, dbi);
-    const best_duel:SpellingBeeDuel|null = await dbi.spelling_bee_duels().findOne({player_id:player_id, bee_id:bee_id}, {sort:{player_points:-1}, limit:1})
+    const best_duel:SpellingBeeDuel|null = await dbi.spelling_bee_duels().findOne({player_id:player_id, bee_id:bee_id, season_tag:duelTag ?? undefined}, {sort:{player_points:-1}, limit:1})
 
     return best_duel!.player_points/bee_model!.max_points;
 }

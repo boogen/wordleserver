@@ -21,6 +21,7 @@ export class SpellingBeeDuel {
         public finished: boolean,
         public lettersToBuy: LetterToBuy[],
         public season_rules:SeasonRules,
+        public season_tag?:string,
         public _id?: ObjectId) { 
         }
 }

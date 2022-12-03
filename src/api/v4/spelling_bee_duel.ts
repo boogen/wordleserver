@@ -102,8 +102,8 @@ function calculateNewEloRank(playerScore:number, opponentScore:number, result:Du
 }
 
 async function createBotGuesses(bee_model:Bee, player_id:number, season_rules:SeasonRules):Promise<SpellingBeeDuellGuess[]> {
-    const player_duels_bee_ids:number[] = await getAllPlayerDuelsBeeIds(player_id, dbi);
-    const best_result_percentage:number[] = await getBestResultPercentage(player_id, player_duels_bee_ids, dbi);
+    const player_duels_bee_ids:number[] = await getAllPlayerDuelsBeeIds(player_id, season_rules.duelTag, dbi);
+    const best_result_percentage:number[] = await getBestResultPercentage(player_id, player_duels_bee_ids, season_rules.duelTag, dbi);
     const average_percentage:number = best_result_percentage.reduce((a, b) => a+b, 0) / best_result_percentage.length;
     const return_value:SpellingBeeDuellGuess[] = []
     var bot_points:number = average_percentage * BOT_THRESHOLD.get_random() * bee_model.max_points;
