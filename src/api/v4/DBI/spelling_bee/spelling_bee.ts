@@ -18,6 +18,9 @@ export async function createLettersForBee(validityTimestamp:number, season_rules
     var bee:Bee = (await getRandomBee(dbi, season_rules))
     const bee_id = await dbi.getNextSequenceValue("global_bee");
     var other_letters = bee.other_letters;
+    if (season_rules?.addBlank) {
+        other_letters.push(JOKER);
+    }
     other_letters = other_letters.concat(initExtraLetters(bee.required_letters, other_letters, season_rules))
     // while (season_rules != null && season_rules.noOfLetters < other_letters.length) {
     //     other_letters.splice(Math.floor(Math.random() * other_letters.length), 1);
@@ -25,6 +28,17 @@ export async function createLettersForBee(validityTimestamp:number, season_rules
     // if (season_rules != null && season_rules.addBlank) {
     //     other_letters[Math.floor(Math.random() * other_letters.length)] = JOKER;
     // }
+    var safety = 10000;
+    while (other_letters.length > (season_rules?.noOfLetters ?? 6)) {
+        safety --;
+        var letterToRemove = Math.floor(Math.random() * other_letters.length)
+        if (other_letters[letterToRemove] != JOKER) {
+            other_letters.splice(letterToRemove);
+        }
+        if (safety < 0) {
+            throw "Error creating letters for bee"
+        }
+    }
     return dbi.global_bee().insert(new GlobalBee(bee_id, bee.id, validityTimestamp, other_letters, bee.required_letters))
 }
 
