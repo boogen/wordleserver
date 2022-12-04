@@ -24,7 +24,7 @@ export async function checkIfFriends(player_id:number, potential_friend_id:numbe
     const friends =  dbi.db().get("friends.plr#" + player_id);
     var filteredFriendList = await friends.find({id:potential_friend_id});
     console.log("Player " + player_id + " potential friend " + potential_friend_id + " on list " + filteredFriendList.map(o => o.id).includes(potential_friend_id))
-    return filteredFriendList.length > 0;
+    return filteredFriendList.map(o => o.id).includes(potential_friend_id);
 }
 
 export async function friendList(player_id:number, dbi:WordleDBI):Promise<number[]> {
