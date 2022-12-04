@@ -23,7 +23,7 @@ export async function addFriend(player_id:number, friend_code:string, dbi:Wordle
 export async function checkIfFriends(player_id:number, potential_friend_id:number, dbi:WordleDBI) {
     const friends =  dbi.db().get("friends.plr#" + player_id);
     var filteredFriendList = await friends.find({id:potential_friend_id});
-    console.log("Player " + player_id + " potential friend " + potential_friend_id + " on list " + filteredFriendList)
+    console.log("Player " + player_id + " potential friend " + potential_friend_id + " on list " + filteredFriendList.map(o => o.id).includes(potential_friend_id))
     return filteredFriendList.length > 0;
 }
 
