@@ -36,6 +36,12 @@ export async function notifyAboutRankingChange(player_id:number, oldRank:Ranking
     .filter(async e => await checkIfFriends(e.player_id, player_id, dbi))))
     .map(e => e.player_id)
 
+    if (friendsToSendTo.length === 0) {
+        return;
+    }
+
+    console.log(friendsToSendTo);
+
     oneSignalClient.createNotification(
         createNotification(friendsToSendTo, (await get_nick(player_id, dbi)).nick, heading))
         .then(response => console.log(response.statusCode))
