@@ -32,9 +32,8 @@ function createNotification(playerIds:number[], playerNick:string, heading:strin
     }
 
 export async function notifyAboutRankingChange(player_id:number, oldRank:RankingEntry[], oldPlayerScore:number, newPlayerScore:number, heading:string) {
-    var friendsToSendTo = (await Promise.all(oldRank.filter(e => e.score > oldPlayerScore && e.score < newPlayerScore)
-    .filter(async e => await checkIfFriends(e.player_id, player_id, dbi))))
-    .map(e => e.player_id)
+    var friendsToSendTo = await Promise.all(oldRank.filter(e => e.score > oldPlayerScore && e.score < newPlayerScore)
+    .filter(async e => await checkIfFriends(e.player_id, player_id, dbi)))
 
     if (friendsToSendTo.length === 0) {
         return;
@@ -43,7 +42,7 @@ export async function notifyAboutRankingChange(player_id:number, oldRank:Ranking
     console.log(friendsToSendTo);
 
     oneSignalClient.createNotification(
-        createNotification(friendsToSendTo, (await get_nick(player_id, dbi)).nick, heading))
+        createNotification(friendsToSendTo.map(e => e.player_id), (await get_nick(player_id, dbi)).nick, heading))
         .then(response => console.log(response.statusCode))
         .catch(e => console.log(e.body));
 }
