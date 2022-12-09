@@ -145,6 +145,7 @@ spelling_bee_duel.post('/prematch', async (req:express.Request, res:express.Resp
             return;
         }
         const existing_match = await getSpellingBeeDuelMatch(player_id, season_rules.duelTag!, dbi);
+        console.log("Duel tag: "  + season_rules.duelTag!)
         if (existing_match !== null) {
             res.json(new SpellingBeeDuelPrematchReply('ok', await getSpellingBeeDuelPrematchPlayerInfo(player_id, season_rules), await getSpellingBeeDuelPrematchPlayerInfo(existing_match.opponent_id, season_rules), new SpellingBeeDuelSeasonInfo(season_rules.season_title, season_rules.getSecondsToEnd(), season_rules.rules, season_rules.points)))
             return;
@@ -179,6 +180,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
         }
         var opponent_guesses:SpellingBeeDuellGuess[] = []
         const season_rules = await getDuelSeasonRules();
+        console.log("Duel tag: "  + season_rules.duelTag!)
         const existing_match = await getSpellingBeeDuelMatch(player_id, season_rules.duelTag!, dbi);
         var opponent_id:number = existing_match!.opponent_id
         if (duel === null) {
