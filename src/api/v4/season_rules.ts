@@ -41,8 +41,8 @@ export function fromOtherSeasonRules(season_rules:SeasonRules) {
 export class SeasonRules {
     public fixedPoints:any = {};
     public multiplier:any = {};
-    public pointsForLetters:any = {};
-    public letterUsage:any = {};
+    public pointsForLetters:any = [];
+    public letterUsage:any = [];
     public panagramsOnly:boolean = false;
     public lettersToBuy:LetterToBuy[];
 
