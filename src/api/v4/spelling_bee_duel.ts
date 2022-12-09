@@ -140,7 +140,7 @@ spelling_bee_duel.post('/prematch', async (req:express.Request, res:express.Resp
         const timestamp:number = Date.now() / 1000;
         const existing_duell = await checkForUnfinishedDuel(player_id, timestamp, DUEL_DURATION, dbi);
         var season_rules = await getDuelSeasonRules();
-        if (existing_duell !== null) {
+        if (existing_duell !== null && existing_duell.season_tag === season_rules.duelTag) {
             res.json(new SpellingBeeDuelPrematchReply('ok', await getSpellingBeeDuelPrematchPlayerInfo(player_id, season_rules), await getSpellingBeeDuelPrematchPlayerInfo(existing_duell.opponent_id, season_rules), new SpellingBeeDuelSeasonInfo(season_rules.season_title, season_rules.getSecondsToEnd(), season_rules.rules, season_rules.points)))
             return;
         }
