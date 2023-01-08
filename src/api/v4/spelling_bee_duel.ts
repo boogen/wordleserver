@@ -73,7 +73,7 @@ function calculateNewSimpleRank(playerScore:number, result:DuelResult):number {
             return playerScore + 50;
             break;
         case DuelResult.lose:
-            return playerScore - 30;
+            return Math.max(playerScore - 30, 0);
         default:
             throw new Error("Cannot calculate new elo - incorrect result");
     }
