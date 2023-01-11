@@ -3,14 +3,9 @@ from pymongo import MongoClient
 from argparse import ArgumentParser
 import pymongo
 
-def get_database(db):
-
-    # Provide the mongodb atlas url to connect python to mongodb using pymongo
-    CONNECTION_STRING = "localhost"
-
-    # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
+def get_database(db, host):
     from pymongo import MongoClient
-    client = MongoClient(CONNECTION_STRING)
+    client = MongoClient(host)
 
     # Create the database for our example (we will use the same database throughout the tutorial
     return client[db]
@@ -97,27 +92,35 @@ if __name__ == "__main__":
     argParser.add_argument("-w", "--wordle-words-file")
     argParser.add_argument("-b", "--bees-file")
     argParser.add_argument("-f", "--fallback-bees-file")
+    argParser.add_argument("-s", "--skip-confirmation", action='store_true')
+    argParser.add_argument("-dh", "--database-host", default="localhost")
 
     args = argParser.parse_args()
 
-    db = get_database(args.db_name)
-    print("Uploading to db: " + args.db_name + ". Is it correct?")
-    answer = None
-    if answer not in ["Y", "N"]:
-        answer = input("[Y]es or [N]o")
-        if answer != "Y":
-            answer = "N"
-    if answer == "N":
-        print("No confirmation, aborting...")
-        exit(-1)
+    db = get_database(args.db_name, args.database_host)
+    if not args.skip_confirmation:
+        print("Uploading to db: " + args.db_name + ". Is it correct?")
+        answer = None
+        if answer not in ["Y", "N"]:
+            answer = input("[Y]es or [N]o")
+            if answer != "Y":
+                answer = "N"
+        if answer == "N":
+            print("No confirmation, aborting...")
+            exit(-1)
 
     if args.crosswords_file is not None:
+        print("Preparing crosswords")
         generate_crosswords(args.crosswords_file, db)
     if args.wordle_possible_words_file is not None:
+        print("Preparing possible words")
         upload_possible_words(args.wordle_possible_words_file, db)
     if args.wordle_words_file is not None:
+        print("Preparing wordle words")
         upload_words(args.wordle_words_file, db)
     if args.bees_file is not None:
+        print("Preparing bees")
         upload_bees(args.bees_file, db)
     if args.fallback_bees_file is not None:
+        print("Preparing fallback bees")
         upload_fallback_bees(args.fallback_bees_file, db)
