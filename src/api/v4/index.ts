@@ -1,12 +1,12 @@
 import express from 'express';
-import {wordle} from './wordle';
-import {friend} from './friend';
-import {player} from './player';
-import {challenge} from './wordle_challenge';
-import {spelling_bee} from './spelling_bee';
-import {spelling_bee_duel} from './spelling_bee_duel'
-import { crossword } from './crossword';
+import {wordle} from './wordle/wordle';
+import {friend} from './friend/friend';
+import {player} from './player/player';
+import {spelling_bee} from './spelling_bee/spelling_bee';
+import {spelling_bee_duel} from './spelling_bee/duel/spelling_bee_duel'
+import { crossword } from './crossword/crossword';
 import {ranking} from './ranking'
+import { challenge } from './wordle/wordle_challenge/wordle_challenge';
 
 export const apiV4 = express.Router();
 

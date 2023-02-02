@@ -1,20 +1,28 @@
-import express from 'express';
-import * as Sentry from "@sentry/node"
-import WordleDBI from './DBI/DBI';
-import AuthIdRequest from './types/AuthIdRequest';
-import BaseGuessRequest from './types/BaseGuessRequest';
-import { resolvePlayerId } from './DBI/player/player';
-import { getWord, isWordValid } from './DBI/wordle/model';
-import { addChallengeGuess, addNewPlayerWord, getPlayerChallengeTries, getPlayerLastWord } from './DBI/wordle/wordle';
+import { Path, Post, Query, Route } from "tsoa";
+import WordleDBI from "../../DBI/DBI";
+import { checkLimit, resolvePlayerId } from "../../DBI/player/player";
+import { getWord, isWordValid } from "../../DBI/wordle/model";
+import { addChallengeGuess, addNewPlayerWord, getPlayerChallengeTries, getPlayerLastWord } from "../../DBI/wordle/wordle";
+import { GuessValidation } from "../wordle_common";
+
+
+interface WordleChallengeStateReply {
+    message:string;
+    guesses?:GuessValidation[];
+    finished?:boolean;
+}
 
 const dbi = new WordleDBI();
 
-export const challenge = express.Router();
-
-challenge.post('/getState', async (req, res, next) => {
-    try {
-        const value = new AuthIdRequest(req);
-        const player_id = await resolvePlayerId(value.auth_id, dbi);
+@Route("api/v4/classic")
+export class WordleChallengeController {
+    @Post("getState")
+    public async getState(@Query() auth_id:string):Promise<WordleChallengeStateReply> {
+        const player_id = await resolvePlayerId(auth_id, dbi);
+        var limitMet = await checkLimit('wordle_challenge_limit', player_id, dbi)
+        if(!limitMet) {
+            return {message: 'limit_exceeded'}
+        }
         var val = await getWord(dbi);
         var word = val[0].word;
         console.log("word %s player id %s", word, player_id);
@@ -25,40 +33,30 @@ challenge.post('/getState', async (req, res, next) => {
             existing = await addNewPlayerWord(player_id, word, 0, dbi);
         }
         const tries = await getPlayerChallengeTries(player_id, existing.word_id, dbi);
-        res.json({
+        return {
             message: 'ok',
-            guesses: await Promise.all(tries!.guesses.map(async function(g) { return validateGuess(g, existing!.word) })),
+            guesses: await Promise.all(tries!.guesses.map(async function(g) { return validateGuess(g, existing!.word, dbi) })),
             finished: tries!.guesses.length == 6 || tries!.guesses.includes(existing.word)
-        });
-    } catch (error) {
-        console.log(error);
-        next(error);
-        Sentry.captureException(error);
+        }
     }
 
-});
-
-challenge.post('/validate', async (req, res, next) => {
-    try {
-        const value = new BaseGuessRequest(req);
-        const player_id = await resolvePlayerId(value.auth_id, dbi)
-        console.log(value);
+    @Post("validate")
+    public async validate(@Query() auth_id:string, @Query() guess:string):Promise<GuessValidation> {
+        const player_id = await resolvePlayerId(auth_id, dbi)
         const timestamp = Date.now() / 1000;
         const wordEntry = await getPlayerLastWord(player_id, dbi);
 
-        const guess = value.guess;
         console.log("Player id: %s", player_id);
         const word = wordEntry!.word;
         
         const t = await getPlayerChallengeTries(player_id, wordEntry!.word_id, dbi);
         var tries = t!.guesses.length;
         if (t!.guesses.includes(guess) || tries >=6) {
-            res.json({isWord: false, guess: guess, answer: [], isGuessed: guess == word});
-            return;
+            return {isWord: false, guess: guess, answer: [], isGuessed: guess == word};
         }
         
 
-        const guessResult = await validateGuess(guess, word);
+        const guessResult = await validateGuess(guess, word, dbi);
 
         if (guessResult.isWord) {
             addChallengeGuess(player_id, wordEntry!.word_id, guess, dbi);
@@ -75,15 +73,14 @@ challenge.post('/validate', async (req, res, next) => {
             await addNewPlayerWord(player_id, new_word, 0, dbi);
         }
         console.log(guessResult);
-        res.json(guessResult);
-    } catch (error) {
-        console.log(error);
-        next(error);
-        Sentry.captureException(error);
+        return guessResult;
     }
-})
+}
 
-async function validateGuess(guess:string, word:string) {
+
+
+
+async function validateGuess(guess:string, word:string, dbi:WordleDBI):Promise<GuessValidation> {
     const guessed = (guess == word);
     const isWord = await isWordValid(guess, dbi);
    

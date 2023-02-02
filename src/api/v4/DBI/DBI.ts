@@ -20,6 +20,9 @@ import { SocialToAuth } from './player/SocialToAuth';
 import { SpellingBeeDuel } from './spelling_bee/duel/SpellingBeeDuel';
 import { RawRankingEntry } from './ranks/RawRankingEntry';
 import { getRank, getRankWithFilter, getScoreFromRank, updateRank } from './ranks/ranks';
+import { PlayerLastLogin } from './player/PlayerLastLogin';
+import { PlayerLimits } from './player/PlayerLimits';
+import { PlayerLimitsModel } from './player/PlayerLimitsModel';
 
 const _db:IMonkManager = monk(process.env.MONGO_URI!);
 
@@ -45,6 +48,9 @@ export default class WordleDBI {
     spelling_bee_elo_rank(rankTag:string):ICollection<SpellingBeeDuelEloRankEntry> {return _db.get("elo_rank_spelling_bee_duel_" + rankTag);}
     spelling_bee_duel_prematch():ICollection<SpellingBeeDuelMatch> { return _db.get("spelling_bee_duel_prematch_v2");}
     social_to_auth():ICollection<SocialToAuth> { return _db.get("social_to_auth")}
+    player_login_timestamp():ICollection<PlayerLastLogin> { return _db.get("player_login_timestamp")}
+    player_limits():ICollection<PlayerLimits> { return _db.get("player_limits")}
+    limits_model():ICollection<PlayerLimitsModel> {return _db.get("player_limits_models") }
     bee_ranking(bee_id:number):ICollection<RawRankingEntry> {
         var rank = _db.get("bee#" + bee_id + "_ranking");
         rank.createIndex({player_id: 1})
@@ -55,7 +61,7 @@ export default class WordleDBI {
     constructor() {
         this.friend_codes().createIndex({friend_code: 1}, {unique:true})
         this.friend_codes().createIndex({player_id: 1}, {unique:true})
-        this.player_word().createIndex({word_id: 1}),
+        this.player_word().createIndex({word_id: 1, player_id:1}),
         this.player_auth().createIndex({auth_id: 1}, {unique: true});
         this.player_profile().createIndex({id: 1}, {unique: true});
         this.global_word().createIndex({validity: 1}, {unique: true});

@@ -7,7 +7,7 @@ import AuthIdRequest from "./types/AuthIdRequest";
 import Sentry from '@sentry/node';
 import { CreateNotificationBody } from "onesignal-node/lib/types";
 import { oneSignalClient } from "../../one_signal";
-import { get_nick } from "./player_common";
+import { get_nick } from "./player/player_common";
 import { checkIfFriends, friendList } from "./DBI/friends/friends";
 import { resolvePlayerId } from "./DBI/player/player";
 import { getLettersForBee } from "./DBI/spelling_bee/spelling_bee";

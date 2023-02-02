@@ -1,5 +1,5 @@
-import WordleDBI from "./DBI/DBI";
-import { getProfile } from "./DBI/player/player";
+import WordleDBI from "../DBI/DBI";
+import { getProfile } from "../DBI/player/player";
 
 const POSSIBLE_BOT_NICKS:string[] = ["Krysia", "Zdzichu", "srebrny_puchacz", "123456", "cybertouch", "shockwave", "rockstar"]
 

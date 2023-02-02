@@ -1,7 +1,7 @@
 import { Send } from "express-serve-static-core";
 import WordleDBI from "./DBI/DBI";
 import { RankingEntry } from "./DBI/ranks/RankingEntry";
-import { get_nick } from "./player_common";
+import { get_nick } from "./player/player_common";
 
 export async function get_ranking(player_id:number, ranking:RankingEntry[], dbi:WordleDBI):Promise<RankingReply> {
     var ranking_with_nicks:PositionInRank[] = await Promise.all(ranking.map(async (e) => new PositionInRank(e.position, e.score, (await get_nick(e.player_id, dbi)).nick, e.player_id)))

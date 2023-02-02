@@ -1,9 +1,9 @@
 import { func } from "@hapi/joi";
-import WordleDBI from "./DBI/DBI";
-import { Bee } from "./DBI/spelling_bee/Bee";
-import { LetterState } from "./DBI/spelling_bee/LetterState";
-import { wordExists } from "./DBI/spelling_bee/model";
-import { SeasonRules } from "./season_rules";
+import WordleDBI from "../DBI/DBI";
+import { Bee } from "../DBI/spelling_bee/Bee";
+import { LetterState } from "../DBI/spelling_bee/LetterState";
+import { wordExists } from "../DBI/spelling_bee/model";
+import { SeasonRules } from "../season_rules";
 
 const POINTS = [0, .02, .05, .08, .15, .25, .4, .5, .7];
 export const RANKS = ["Noob", "Rookie", "Beginner", "Smartiepants", "Rockstar", "Erudite", "Expert", "Master", "Genius"]
@@ -196,7 +196,9 @@ export enum SpellingBeeReplyEnum {
     already_guessed = "already_guessed",
     wrong_word="wrong_word",
     no_main_letter="no_main_letter",
-    invalid_letter_used="invalid_letter_used"
+    invalid_letter_used="invalid_letter_used",
+    no_letters_to_buy="no letters to buy",
+    not_enough_points="not_enough_points"
 }
 
 export class SpellingBeeStateReply {

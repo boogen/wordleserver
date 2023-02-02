@@ -10,6 +10,11 @@ def get_database(db, host):
     # Create the database for our example (we will use the same database throughout the tutorial
     return client[db]
 
+def upload_model(db):
+    player_limits = db["player_limits_models"]
+    player_limits.drop()
+    player_limits.insert_one ({'player_category':'free', 'limits':[{'name':'wordle_challenge_limit', 'limit':-1, 'limitless':True}, {'name':'crosswords_limit', 'limit':-1}, {'name':'spelling_bee_duel_limit', 'limit':-1}]})
+
 def upload_possible_words(words_file, dbname):
     possible_words_db = dbname["possible_words"]
     possible_words_db.drop()
@@ -93,6 +98,7 @@ if __name__ == "__main__":
     argParser.add_argument("-b", "--bees-file")
     argParser.add_argument("-f", "--fallback-bees-file")
     argParser.add_argument("-s", "--skip-confirmation", action='store_true')
+    argParser.add_argument("-m", "--upload-model", action='store_true')
     argParser.add_argument("-dh", "--database-host", default="localhost")
 
     args = argParser.parse_args()
@@ -121,6 +127,9 @@ if __name__ == "__main__":
     if args.bees_file is not None:
         print("Preparing bees")
         upload_bees(args.bees_file, db)
+    if args.upload_model:
+        print("Uploading model")
+        upload_model(db)
     if args.fallback_bees_file is not None:
         print("Preparing fallback bees")
         upload_fallback_bees(args.fallback_bees_file, db)

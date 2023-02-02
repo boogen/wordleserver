@@ -1,6 +1,6 @@
 import { FindOneResult } from "monk";
 import { LetterToBuy, SeasonRules } from "../../season_rules";
-import { getMaxPoints, initExtraLetters, JOKER, pointsToRank, RANKS, wordPoints } from "../../spelling_bee_common";
+import { getMaxPoints, initExtraLetters, JOKER, pointsToRank, RANKS, wordPoints } from "../../spelling_bee/spelling_bee_common";
 import WordleDBI from "../DBI";
 import { Bee } from "./Bee";
 import { GlobalBee } from "./GlobalBee";

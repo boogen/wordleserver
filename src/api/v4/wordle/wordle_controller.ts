@@ -1,64 +1,55 @@
-import express from 'express';
-import Sentry from '@sentry/node';
-import WordleDBI from './DBI/DBI';
-import { RankingEntry } from "./DBI/ranks/RankingEntry";
-import AuthIdRequest from './types/AuthIdRequest';
-import BaseGuessRequest from './types/BaseGuessRequest';
-import { string } from '@hapi/joi';
-import { Stats } from '../../WordleStatsDBI';
-import { getWord, isWordValid } from './DBI/wordle/model';
-import { getProfile, resolvePlayerId } from './DBI/player/player';
-import { addGuess, getGlobalWord, getOrCreateGlobalWord, getPlayerTries, getPlayerTriesForWord } from './DBI/wordle/wordle';
+import { Post, Query, Route } from "tsoa";
+import { Stats } from "../../../WordleStatsDBI";
+import WordleDBI from "../DBI/DBI";
+import { getProfile, resolvePlayerId } from "../DBI/player/player";
+import { RankingEntry } from "../DBI/ranks/RankingEntry";
+import { getWord, isWordValid } from "../DBI/wordle/model";
+import { addGuess, getGlobalWord, getOrCreateGlobalWord, getPlayerTries, getPlayerTriesForWord } from "../DBI/wordle/wordle";
+import { GuessValidation } from "./wordle_common";
+
+const dbi = new WordleDBI();
+const stats:Stats = new Stats();
+
 const WORD_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
 
-export const wordle = express.Router();
-const dbi = new WordleDBI();
+interface WordleStateReply {
+    message:string;
+    guesses?:GuessValidation[];
+    finished?:boolean;
+    timeToNext:number;
+}
 
-const stats:Stats = new Stats();
-
-wordle.post('/getState', async (req, res, next) => {
-    try {
-        const value = new AuthIdRequest(req);
-        const player_id = await resolvePlayerId(value.auth_id, dbi);
+@Route("api/v4/wordle")
+export class WordleController {
+    @Post("getState")
+    public async getState(@Query() auth_id:string):Promise<WordleStateReply> {
+        const player_id = await resolvePlayerId(auth_id, dbi);
         var val = await getWord(dbi);
         var word = val[0].word;
         console.log("word %s player id %s", word, player_id);
 
-        //var existing = await dbi.getPlayerLastWord(player_id);
         const timestamp = Date.now() / 1000;
         var new_validity_timestamp = GLOBAL_TIME_START;
         while (new_validity_timestamp < timestamp) {
             new_validity_timestamp += WORD_VALIDITY;
         }
-        // if (existing == null || existing.expiration <= timestamp) {
-        //     existing = await dbi.addNewPlayerWord(player_id, word, timestamp + WORD_VALIDITY);
-        // }
         const existing = await getOrCreateGlobalWord(timestamp, new_validity_timestamp, word, dbi);
         const tries = await getPlayerTries(player_id, existing!.word_id, timestamp, dbi);
         stats.addWordleInitEvent(player_id, existing!.word_id)
-        res.json({
+        return {
             message: 'ok',
             guesses: await Promise.all(tries!.guesses.map(async function(g) { return validateGuess(g, existing!.word) })),
             timeToNext: Math.floor(existing!.validity - timestamp),
             finished: tries!.guesses.length == 6 || tries!.guesses.includes(existing!.word)
-        });
-    } catch (error) {
-        console.log(error);
-        next(error);
-        Sentry.captureException(error);
+        };
     }
 
-});
-
-wordle.post('/validate', async (req, res, next) => {
-    try {
-        const value = new BaseGuessRequest(req);
-        const player_id = await resolvePlayerId(value.auth_id, dbi)
+    @Post("validate")
+    public async validateGuess(@Query() auth_id:string, @Query() guess:string):Promise<GuessValidation> {
+        const player_id = await resolvePlayerId(auth_id, dbi)
         const timestamp = Date.now() / 1000;
         const wordEntry = await getGlobalWord(timestamp, dbi);
-
-        const guess = value.guess;
 
         const word = wordEntry!.word;
         
@@ -66,8 +57,7 @@ wordle.post('/validate', async (req, res, next) => {
         var tries = t!.guesses.length;
         if (t!.guesses.includes(guess) || tries >=6) {
             stats.addWordleGuessEvent(player_id, tries, guess == word)
-            res.json({isWord: false, guess: guess, answer: [], isGuessed: guess == word});
-            return;
+            return {isWord: false, guess: guess, answer: [], isGuessed: guess == word};
         }
         
 
@@ -87,28 +77,12 @@ wordle.post('/validate', async (req, res, next) => {
             guessResult.correctWord = word;
         }
         stats.addWordleGuessEvent(player_id, tries, guess == word)
-        res.json(guessResult);
-    } catch (error) {
-        console.log(error);
-        next(error);
-        Sentry.captureException(error);
+        return guessResult;
     }
-})
-
-
-
-
-async function getMyPositionInRank(player_id:number, rank:RankingEntry[], dbi:WordleDBI) {
-    for (const index in rank) {
-        const rankEntry = rank[index]
-        if (rankEntry.player_id === player_id) {
-            return {position: parseInt(index) + 1, score: rankEntry.score, player: (((await getProfile(player_id, dbi)))|| {nick: null}).nick}
-        }
-    }
-    return null;
 }
 
-async function validateGuess(guess:string, word:string) {
+
+async function validateGuess(guess:string, word:string):Promise<GuessValidation> {
     const guessed = (guess == word);
     const isWord = await isWordValid(guess, dbi);
    
@@ -143,9 +117,3 @@ async function validateGuess(guess:string, word:string) {
     }
     return {isWord: isWord, guess: guess, answer: result, isGuessed: guessed, correctWord:""};
 }
-
-wordle.post('/word', (req, res, next) => {
-    res.json({
-        word: 'SNAIL'
-    });
-})
