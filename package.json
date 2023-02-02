@@ -41,7 +41,8 @@
     "node-cron": "^3.0.0",
     "onesignal-node": "^3.3.0",
     "prom-client": "^14.1.0",
-    "swagger-ui-express": "^4.1.4"
+    "swagger-ui-express": "^4.1.4",
+    "tsoa": "5.0.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
