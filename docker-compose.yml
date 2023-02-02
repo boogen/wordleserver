@@ -50,7 +50,7 @@ services:
 
   model:
     image: python:3
-    command: "sh -c 'pip3 install pymongo argparse && python3 upload.py -s -d ${MONGO_DB} -c ../model/crosswrds_uniq -b ../model/new_spelling_bee -p ../model/possible_words.txt -w ../model/words.txt -dh mongo_wordle -m'"
+    command: "sh -c 'pip3 install pymongo argparse && python3 upload.py -s -d ${MONGO_DB} -c ../model/crosswrds_uniq -b ../model/new_spelling_bee -p ../model/possible_words.txt -w ../model/words.txt -dh mongo_wordle -f ../model/fallback_bee -m'"
     volumes:
       - ./:/wordle
     working_dir: /wordle/scripts
