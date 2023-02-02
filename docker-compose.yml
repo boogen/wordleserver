@@ -6,7 +6,7 @@ services:
     restart: always
     command: "sh -c 'npm install && npm install typescript -g && tsc && npm start'"
     ports:
-      - 5001:5000
+      - ${PORT}:5000
     working_dir: /wordle
     volumes:
       - ./:/wordle
@@ -50,7 +50,7 @@ services:
 
   model:
     image: python:3
-    command: "sh -c 'pip3 install pymongo argparse && python3 upload.py -s -d wordle -c ../model/crosswrds_uniq -b ../model/spelling_bee -p ../model/possible_words.txt -w ../model/words.txt -dh mongo_wordle'"
+    command: "sh -c 'pip3 install pymongo argparse && python3 upload.py -s -d ${MONGO_DB} -c ../model/crosswrds_uniq -b ../model/spelling_bee -p ../model/possible_words.txt -w ../model/words.txt -dh mongo_wordle -m'"
     volumes:
       - ./:/wordle
     working_dir: /wordle/scripts
