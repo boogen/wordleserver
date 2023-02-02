@@ -4,9 +4,9 @@ services:
   wordle:
     image: node:latest
     restart: always
-    command: "sh -c 'npm install && npm install typescript -g && tsc && npm start'"
+    command: "sh -c 'npm clean-install && npm install typescript -g && tsc && npm run dev'"
     ports:
-      - ${PORT}:5000
+      - ${PORT}:${PORT}
     working_dir: /wordle
     volumes:
       - ./:/wordle
