@@ -23,7 +23,7 @@ const controller = new PlayerController();
 
 player.post("/register", async (req, res, next) => {
     try {
-        res.json(controller.register())
+        res.json(await controller.register())
     }
     catch(error) {
         console.log(error);
@@ -35,7 +35,7 @@ player.post("/register", async (req, res, next) => {
 player.post('/login',async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
-        res.json(controller.login(value.auth_id))
+        res.json(await controller.login(value.auth_id))
     }
     catch(error) {
         console.log(error);
@@ -48,7 +48,7 @@ player.post('/login',async (req, res, next) => {
 player.post("/setNick", async (req, res, next) => {
     try {
         const value = new SetNickRequest(req);
-        res.json(controller.setNick(value.auth_id, value.nick))
+        res.json(await controller.setNick(value.auth_id, value.nick))
     }
     catch(error) {
         console.log(error);
@@ -59,8 +59,8 @@ player.post("/setNick", async (req, res, next) => {
 
 player.post("/getNick", async (req:express.Request, res:express.Response, next) => {
     try {
-                var value = new SetSocialIdRequest(req);
-        res.json(controller.getNick(value.auth_id))
+        var value = new SetSocialIdRequest(req);
+        res.json(await controller.getNick(value.auth_id))
     }
     catch(error) {
         console.log(error);
@@ -72,7 +72,7 @@ player.post("/getNick", async (req:express.Request, res:express.Response, next) 
 player.post("/setSocialId",  async (req:express.Request, res:express.Response, next) => {
     try {
         var value = new SetSocialIdRequest(req);
-        res.json(controller.setSocialId(value.auth_id, value.socialId))
+        res.json(await controller.setSocialId(value.auth_id, value.socialId))
     }
     catch(error) {
         console.log(error);
@@ -84,7 +84,7 @@ player.post("/setSocialId",  async (req:express.Request, res:express.Response, n
 player.post("/getProfile", async (req:express.Request, res:express.Response, next) => {
     try {
         const value = new ProfileRequest(req);
-        res.json(controller.getProfile(value.auth_id, value.player_id))
+        res.json(await controller.getProfile(value.auth_id, value.player_id))
     }
     catch(error) {
         console.log(error);
@@ -96,7 +96,7 @@ player.post("/getProfile", async (req:express.Request, res:express.Response, nex
 player.post("/getMyProfile", async (req:express.Request, res:express.Response, next) => {
     try {
         const value = new AuthIdRequest(req);
-        res.json(controller.getMyProfile(value.auth_id))
+        res.json(await controller.getMyProfile(value.auth_id))
     }
     catch(error) {
         console.log(error);

@@ -25,7 +25,7 @@ const controller = new SpellingBeeDuelController();
 spelling_bee_duel.post('/prematch', async (req:express.Request, res:express.Response, next:Function) => {
     try {
         const request = new AuthIdRequest(req);
-        res.json(controller.prematch(request.auth_id))
+        res.json(await controller.prematch(request.auth_id))
     }
     catch (error) {
         console.log(error);
@@ -35,7 +35,7 @@ spelling_bee_duel.post('/prematch', async (req:express.Request, res:express.Resp
 spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Response, next:Function) => {
     try {
         const request = new AuthIdRequest(req);
-        res.json(controller.start(request.auth_id))
+        res.json(await controller.start(request.auth_id))
     }
     catch (error) {
         console.log(error);
@@ -48,7 +48,7 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
     try {
         const request = new BaseGuessRequest(req);
         const guess = request.guess;
-        res.json(controller.guess(request.auth_id, guess))
+        res.json(await controller.guess(request.auth_id, guess))
     }
     catch(error) {
         console.log(error)
@@ -61,7 +61,7 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
 spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, next:NextFunction) => {
     try {
         const request = new AuthIdRequest(req);
-        res.json(controller.end(request.auth_id))
+        res.json(await controller.end(request.auth_id))
     } catch (error) {
         console.log(error)
         next(error)
@@ -72,7 +72,7 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
 spelling_bee_duel.post('/buy_letter',async (req, res, next) => {
     try {
         const request = new AuthIdRequest(req);
-        res.json(controller.buy_letter(request.auth_id))
+        res.json(await controller.buy_letter(request.auth_id))
     } catch (error) {
         console.log(error)
         next(error)

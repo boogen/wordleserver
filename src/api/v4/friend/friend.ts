@@ -16,7 +16,7 @@ const controller = new FriendController();
 friend.post('/code', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
-        res.json(controller.getCode(value.auth_id))
+        res.json(await controller.getCode(value.auth_id))
     }
     catch(error) {
         console.log(error);
@@ -28,7 +28,7 @@ friend.post('/code', async (req, res, next) => {
 friend.post('/add', async (req, res, next) => {
     try {
         const value = new AddFriendRequest(req);
-        res.json(controller.addFriend(value.auth_id, value.friend_code))
+        res.json(await controller.addFriend(value.auth_id, value.friend_code))
     }
     catch(error) {
         console.log(error);
@@ -41,7 +41,7 @@ friend.post('/add', async (req, res, next) => {
 friend.post('/list', async (req, res, next) => {
     try {
         const value =new AuthIdRequest(req);
-        res.json(controller.friendList(value.auth_id))
+        res.json(await controller.friendList(value.auth_id))
     }
     catch(error) {
         console.log(error);

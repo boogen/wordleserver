@@ -18,7 +18,7 @@ const controller = new WordleController();
 wordle.post('/getState', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
-        res.json(controller.getState(value.auth_id))
+        res.json(await controller.getState(value.auth_id))
     } catch (error) {
         console.log(error);
         next(error);
@@ -30,7 +30,7 @@ wordle.post('/getState', async (req, res, next) => {
 wordle.post('/validate', async (req, res, next) => {
     try {
         const value = new BaseGuessRequest(req);
-        res.json(controller.validateGuess(value.auth_id, value.guess))
+        res.json(await controller.validateGuess(value.auth_id, value.guess))
     } catch (error) {
         console.log(error);
         next(error);

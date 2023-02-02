@@ -9,7 +9,7 @@ const controller = new CrosswordController();
 
 crossword.post('/mock', async (req, res, next) => {
     try {
-        res.json(controller.mock())
+        res.json(await controller.mock())
     }
     catch(error) {
         console.log(error);
@@ -21,7 +21,7 @@ crossword.post('/mock', async (req, res, next) => {
 crossword.post('/guess', async (req, res, next) => {
     try {
         const value = new BaseGuessRequest(req);
-        res.json(controller.guess(value.auth_id, value.guess))
+        res.json(await controller.guess(value.auth_id, value.guess))
     }
     catch(error) {
         console.log(error);
@@ -34,7 +34,7 @@ crossword.post('/guess', async (req, res, next) => {
 crossword.post('/init', async (req, res, next) => {
     try {
         const value = new AuthIdRequest(req);
-        res.json(controller.init(value.auth_id));
+        res.json(await controller.init(value.auth_id));
     }
     catch(error) {
         console.log(error);
