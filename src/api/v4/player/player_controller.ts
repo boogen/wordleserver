@@ -98,6 +98,7 @@ export class PlayerController {
         const playerId = await dbi.getNextSequenceValue("player_id");
         await addPlayerToAuthMap(authId, playerId, dbi);
         await stats.addRegistrationEvent(authId, playerId);
+        console.log({message:'ok', auth_id: authId})
         return {message:'ok', auth_id: authId}
     }
 
