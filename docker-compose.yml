@@ -1,18 +1,61 @@
 version: "3.7"
 
 services:
-  wordle:
+  wordle_dev:
+    image: node:latest
+    restart: always
+    command: "sh -c 'npm clean-install && npm install typescript -g && tsc && npm run dev'"
+    ports:
+      - 5003:5000
+    working_dir: /wordle
+    profiles:
+      - dev
+    volumes:
+      - ./:/wordle
+    environment:
+      - MONGO_URI=mongodb://${MONGO_HOST}/wordle_dev
+    networks:
+      - proxy
+      - mongo
+      - stats
+    depends_on:
+      - mongo
+      - mariadb
+
+  wordle_prod:
+    image: node:latest
+    restart: always
+    command: "sh -c 'npm clean-install && npm install typescript -g && tsc && npm run dev'"
+    ports:
+      - 5000:5000
+    working_dir: /wordle
+    profiles:
+      - prod
+    volumes:
+      - ./:/wordle
+    environment:
+      - MONGO_URI=mongodb://${MONGO_HOST}/wordle
+    networks:
+      - proxy
+      - mongo
+      - stats
+    depends_on:
+      - mongo
+      - mariadb
+
+  wordle_standalone:
     image: node:latest
     restart: always
     command: "sh -c 'npm clean-install && npm install typescript -g && tsc && npm run dev'"
     ports:
       - ${PORT}:${PORT}
     working_dir: /wordle
+    profiles:
+      - standalone
     volumes:
       - ./:/wordle
     environment:
-      - MONGO_URI=mongodb://mongo_wordle/${MONGO_DB}
-      - STATS_DB_HOST=stats_db
+      - MONGO_URI=mongodb://${MONGO_HOST}/wordle
     networks:
       - proxy
       - mongo
@@ -26,6 +69,10 @@ services:
     image: mongo
     container_name: mongo_wordle
     restart: always
+    environment:
+      - MONGO_HOST=mongo_wordle
+    profiles:
+      - standalone
     volumes:
       - /var/lib/mongodb_wordle:/data/db
       - ./scripts/init.sh:/docker-entrypoint-initdb.d/init.sh
@@ -37,6 +84,8 @@ services:
     image: mariadb
     restart: always
     container_name: stats_db
+    profiles:
+      - standalone
     environment:
       - MARIADB_RANDOM_ROOT_PASSWORD=root_secret
       - MARIADB_DATABASE=${STATS_DB_NAME}
@@ -50,12 +99,11 @@ services:
 
   model:
     image: python:3
+    scale: 0
     command: "sh -c 'pip3 install pymongo argparse && python3 upload.py -s -d ${MONGO_DB} -c ../model/crosswrds_uniq -b ../model/new_spelling_bee -p ../model/possible_words.txt -w ../model/words.txt -dh mongo_wordle -f ../model/fallback_bee -m'"
     volumes:
       - ./:/wordle
     working_dir: /wordle/scripts
-    profiles:
-      - setup
     depends_on:
       - mongo
     networks:
