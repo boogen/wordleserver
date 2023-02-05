@@ -19,9 +19,7 @@ friend.post('/code', async (req, res, next) => {
         res.json(await controller.getCode(value.auth_id))
     }
     catch(error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 })
 
@@ -31,9 +29,7 @@ friend.post('/add', async (req, res, next) => {
         res.json(await controller.addFriend(value.auth_id, value.friend_code))
     }
     catch(error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 })
 
@@ -44,8 +40,6 @@ friend.post('/list', async (req, res, next) => {
         res.json(await controller.friendList(value.auth_id))
     }
     catch(error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 })

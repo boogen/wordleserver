@@ -58,9 +58,7 @@ ranking.post('/spelling_bee_duel/global', async (req:express.Request, res:expres
         var rank = await dbi.getSpellingBeeEloRank((await getDuelSeasonRules()).id!);
         res.json((await get_ranking(player_id, rank, dbi)));
     } catch (error) {
-        console.log(error)
-        next(error)
-        Sentry.captureException(error);
+        next(error);
     }
 
 })
@@ -74,9 +72,7 @@ ranking.post('/spelling_bee_duel/friends', async (req:express.Request, res:expre
         var rank = await dbi.getSpellingBeeEloRankWithFilter(friends, (await getDuelSeasonRules()).id!);
         res.json((await get_ranking(player_id, rank, dbi)));
     } catch (error) {
-        console.log(error)
-        next(error)
-        Sentry.captureException(error);
+        next(error);
     }
 
 })
@@ -96,9 +92,7 @@ ranking.post('/spelling_bee/global', async (req, res, next) => {
         console.log(ranking);
         res.json((await get_ranking(player_id, ranking, dbi)))
     } catch (error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 })
 
@@ -120,9 +114,7 @@ ranking.post('/spelling_bee/friends', async (req, res, next) => {
         res.json((await get_ranking(player_id, ranking, dbi)))
     }
     catch (error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 })
 
@@ -141,9 +133,7 @@ ranking.post('/wordle_daily_challenge/global', async (req, res, next) => {
         res.json((await get_ranking(player_id, ranking, dbi)))
     }
     catch (error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 })
 
@@ -164,8 +154,6 @@ ranking.post('/wordle_daily_challenge/friends', async (req, res, next) => {
         res.json((await get_ranking(player_id, ranking, dbi)))
     }
     catch (error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 })

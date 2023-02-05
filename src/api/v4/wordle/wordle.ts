@@ -1,5 +1,4 @@
 import express from 'express';
-import Sentry from '@sentry/node';
 import WordleDBI from '../DBI/DBI';
 import { RankingEntry } from "../DBI/ranks/RankingEntry";
 import AuthIdRequest from '../types/AuthIdRequest';
@@ -20,9 +19,7 @@ wordle.post('/getState', async (req, res, next) => {
         const value = new AuthIdRequest(req);
         res.json(await controller.getState(value.auth_id))
     } catch (error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 
 });
@@ -32,9 +29,7 @@ wordle.post('/validate', async (req, res, next) => {
         const value = new BaseGuessRequest(req);
         res.json(await controller.validateGuess(value.auth_id, value.guess))
     } catch (error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 })
 

@@ -14,9 +14,7 @@ challenge.post('/getState', async (req, res, next) => {
         const request = new AuthIdRequest(req);
         res.json(await controller.getState(request.auth_id));
     } catch (error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 
 });
@@ -26,9 +24,7 @@ challenge.post('/validate', async (req, res, next) => {
         const request = new BaseGuessRequest(req);
         res.json(await controller.validate(request.auth_id, request.guess));
     } catch (error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 })
 

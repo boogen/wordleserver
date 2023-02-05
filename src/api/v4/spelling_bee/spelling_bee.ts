@@ -16,9 +16,7 @@ spelling_bee.post('/getState', async (req, res, next) => {
         const request = new AuthIdRequest(req);
         res.json(await controller.getState(request.auth_id));
     } catch (error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 });
 
@@ -26,9 +24,7 @@ spelling_bee.post('/season_info',async (req, res, next) => {
     try {
         res.json(await controller.getSeasonRules());
     } catch (error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 })
 
@@ -37,9 +33,7 @@ spelling_bee.post('/guess', async (req, res, next) => {
         const request = new SpellingBeeGuessRequest(req);
         res.json(await controller.guess(request.auth_id, request.guess))
     } catch (error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 });
 
@@ -48,9 +42,7 @@ spelling_bee.post('/buy_letter',async (req, res, next) => {
         const request = new AuthIdRequest(req);
         res.json(await controller.buy_letter(request.auth_id));
     } catch (error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 })
 

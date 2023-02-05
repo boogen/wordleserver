@@ -26,9 +26,7 @@ player.post("/register", async (req, res, next) => {
         res.json(await controller.register())
     }
     catch(error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 });
 
@@ -38,9 +36,7 @@ player.post('/login',async (req, res, next) => {
         res.json(await controller.login(value.auth_id))
     }
     catch(error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 
 })
@@ -51,9 +47,7 @@ player.post("/setNick", async (req, res, next) => {
         res.json(await controller.setNick(value.auth_id, value.nick))
     }
     catch(error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 });
 
@@ -63,9 +57,7 @@ player.post("/getNick", async (req:express.Request, res:express.Response, next) 
         res.json(await controller.getNick(value.auth_id))
     }
     catch(error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 })
 
@@ -75,9 +67,7 @@ player.post("/setSocialId",  async (req:express.Request, res:express.Response, n
         res.json(await controller.setSocialId(value.auth_id, value.socialId))
     }
     catch(error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 })
 
@@ -87,9 +77,7 @@ player.post("/getProfile", async (req:express.Request, res:express.Response, nex
         res.json(await controller.getProfile(value.auth_id, value.player_id))
     }
     catch(error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 })
 
@@ -99,9 +87,7 @@ player.post("/getMyProfile", async (req:express.Request, res:express.Response, n
         res.json(await controller.getMyProfile(value.auth_id))
     }
     catch(error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 });
 ;

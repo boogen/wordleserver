@@ -1,5 +1,5 @@
 import express from 'express';
-
+import * as Sentry from '@sentry/node';
 
   export function notFound(req:express.Request, res:express.Response, next:express.NextFunction) {
   res.status(404);
@@ -16,5 +16,7 @@ import express from 'express';
     message: err.message,
     stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack
   });
+  console.log(err);
+  Sentry.captureException(err);
 }
 

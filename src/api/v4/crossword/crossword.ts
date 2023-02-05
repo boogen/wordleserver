@@ -12,9 +12,7 @@ crossword.post('/mock', async (req, res, next) => {
         res.json(await controller.mock())
     }
     catch(error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 });
 
@@ -24,9 +22,7 @@ crossword.post('/guess', async (req, res, next) => {
         res.json(await controller.guess(value.auth_id, value.guess))
     }
     catch(error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 });
 
@@ -37,9 +33,6 @@ crossword.post('/init', async (req, res, next) => {
         res.json(await controller.init(value.auth_id));
     }
     catch(error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
-    
 });

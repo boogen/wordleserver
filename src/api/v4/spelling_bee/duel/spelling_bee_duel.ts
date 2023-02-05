@@ -28,7 +28,7 @@ spelling_bee_duel.post('/prematch', async (req:express.Request, res:express.Resp
         res.json(await controller.prematch(request.auth_id))
     }
     catch (error) {
-        console.log(error);
+        next(error);
     }
 })
 
@@ -38,9 +38,7 @@ spelling_bee_duel.post('/start',  async (req:express.Request, res:express.Respon
         res.json(await controller.start(request.auth_id))
     }
     catch (error) {
-        console.log(error);
         next(error);
-        Sentry.captureException(error);
     }
 })
 
@@ -51,9 +49,7 @@ spelling_bee_duel.post('/guess', async (req, res, next) => {
         res.json(await controller.guess(request.auth_id, guess))
     }
     catch(error) {
-        console.log(error)
-        next(error)
-        Sentry.captureException(error)
+        next(error);
     }
 })
 
@@ -63,9 +59,7 @@ spelling_bee_duel.post('/end',async (req:express.Request, res:express.Response, 
         const request = new AuthIdRequest(req);
         res.json(await controller.end(request.auth_id))
     } catch (error) {
-        console.log(error)
-        next(error)
-        Sentry.captureException(error);
+        next(error);
     }
 })
 
@@ -74,9 +68,7 @@ spelling_bee_duel.post('/buy_letter',async (req, res, next) => {
         const request = new AuthIdRequest(req);
         res.json(await controller.buy_letter(request.auth_id))
     } catch (error) {
-        console.log(error)
-        next(error)
-        Sentry.captureException(error);
+        next(error);
     }
 })
 
