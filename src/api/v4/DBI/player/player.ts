@@ -44,9 +44,10 @@ export async function updateLastLoginTimestamp(timestamp:number, player_id:numbe
 }
 
 export async function resetPlayerLimits(player_id:number, dbi:WordleDBI):Promise<PlayerLimits|null> {
-    const new_limits = await dbi.limits_model().findOne({player_category:"free"});
-    return dbi.player_limits().findOneAndUpdate({player_id:player_id}, {$set:{limits:new_limits!.limits}},
-        {upsert:true})
+    return null;
+    // const new_limits = await dbi.limits_model().findOne({player_category:"free"});
+    // return dbi.player_limits().findOneAndUpdate({player_id:player_id}, {$set:{limits:new_limits!.limits}},
+    //     {upsert:true})
 }
 
 export async function getPlayerLimits(player_id:number, dbi:WordleDBI):Promise<PlayerLimits|null> {
