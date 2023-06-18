@@ -109,9 +109,17 @@ export default class WordleDBI {
         return getScoreFromRank(player_id, this.spelling_bee_elo_rank(rankTag), DEFAULT_ELO);
     }
 
-    async getOpponentsFromSpellingBeeEloRank(player_id:number, score:number, maxDiff:number, rankTag:string):Promise<number[]> {
-        const returnValue = this.spelling_bee_elo_rank(rankTag).find({score:{$gte: score - maxDiff, $lte:score + maxDiff}, player_id:{$ne:player_id}})
-        return (returnValue.then(r => r.map(entry => entry.player_id)))
+    async getOpponentsFromSpellingBeeEloRank(player_id:number, maxDiff:number, positionDiff:number, rankTag:string):Promise<number[]> {
+        const returnValue = await this.getSpellingBeeEloRank(rankTag);
+        const playerRankingEntry:RankingEntry|undefined = returnValue.find(re => re.player_id === player_id);
+        if (playerRankingEntry === undefined) {
+            return [];
+        }
+        var opponentsByPosition = returnValue.filter(re => Math.abs(playerRankingEntry.position - re.position) <= positionDiff);
+        var opponentsByElo = returnValue.filter(re => Math.abs(playerRankingEntry.score - re.score) <= maxDiff);
+        var result = opponentsByElo.length > opponentsByPosition.length ? opponentsByElo : opponentsByPosition;
+
+        return result.filter(re => re.player_id !== player_id).map(re => re.player_id);
     }
 
     async increaseBeeRank(player_id:number, bee_id:number, points_delta:number):Promise<RawRankingEntry> {

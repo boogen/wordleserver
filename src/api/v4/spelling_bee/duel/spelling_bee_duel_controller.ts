@@ -9,7 +9,7 @@ import { SpellingBeeDuellGuess } from "../../DBI/spelling_bee/duel/SpellingBeeDu
 import { addNewLetterToSpellingBeeDuel, addPlayerGuessInSpellingBeeDuel, addSpellingBeeDuelMatch, checkForExistingDuel, checkForUnfinishedDuel, getAllPlayerDuelsBeeIds, getBestResultPercentage, getDuelsForGivenBee, getLastSpellingBeeDuelOpponents, getRandomDuelBee, getSpellingBeeDuelMatch, markDuelAsFinished, startDuel } from "../../DBI/spelling_bee/duel/spelling_bee_duel";
 import { LetterState } from "../../DBI/spelling_bee/LetterState";
 import { getBeeById, getRandomBee } from "../../DBI/spelling_bee/model";
-import { BOT_THRESHOLD, CHANCE_FOR_BOT, DUEL_DURATION, ELO_COEFFICIENT, MATCH_ELO_DIFF } from "../../duel_settings";
+import { BOT_THRESHOLD, CHANCE_FOR_BOT, DUEL_DURATION, ELO_COEFFICIENT, MATCH_ELO_DIFF, MATCH_POSITION_DIFF } from "../../duel_settings";
 import { get_bot_id, get_nick } from "../../player/player_common";
 import { notifyAboutRankingChange } from "../../ranking";
 import { fromOtherSeasonRules, getDuelSeasonRules, LetterToBuy, SeasonRules } from "../../season_rules";
@@ -105,7 +105,7 @@ export class SpellingBeeDuelController {
                 opponent:await getSpellingBeeDuelPrematchPlayerInfo(existing_match.opponent_id, season_rules),
                 season_info:new SpellingBeeDuelSeasonInfo(season_rules.season_title, season_rules.getSecondsToEnd(), season_rules.rules, season_rules.points)}
         }
-        const opponentsCandidates:number[] = await dbi.getOpponentsFromSpellingBeeEloRank(player_id, (await dbi.getCurrentSpellingBeeElo(player_id, season_rules.id)), MATCH_ELO_DIFF, season_rules.id)
+        const opponentsCandidates:number[] = await dbi.getOpponentsFromSpellingBeeEloRank(player_id,  MATCH_ELO_DIFF, MATCH_POSITION_DIFF, season_rules.id)
         var opponent_id = get_bot_id()
         if (Math.random() >= CHANCE_FOR_BOT && opponentsCandidates.length !== 0) {
             var opponent_filter:Set<number> = new Set((await getLastSpellingBeeDuelOpponents(player_id, dbi)));
