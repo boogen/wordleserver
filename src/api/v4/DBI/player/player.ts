@@ -54,19 +54,19 @@ export async function getPlayerLimits(player_id:number, dbi:WordleDBI):Promise<P
 }
 
 export async function checkLimit(limitName:string, player_id:number, dbi:WordleDBI):Promise<boolean> {
-    var playerLimits = await getPlayerLimits(player_id, dbi)
+    // var playerLimits = await getPlayerLimits(player_id, dbi)
 
-    if (playerLimits === null) {
-        return false;
-    }
-    var limit = playerLimits.limits.find(limit => limit.name === limitName);
-    if (limit!.limitless) {
-        return true;
-    }
-    if (limit!.limit <= 0) {
-        return false;
-    }
-    limit!.limit -= 1;
-    dbi.player_limits().findOneAndUpdate({player_id:player_id}, {$set: playerLimits}, {upsert:false})
+    // if (playerLimits === null) {
+    //     return false;
+    // }
+    // var limit = playerLimits.limits.find(limit => limit.name === limitName);
+    // if (limit!.limitless) {
+    //     return true;
+    // }
+    // if (limit!.limit <= 0) {
+    //     return false;
+    // }
+    // limit!.limit -= 1;
+    // dbi.player_limits().findOneAndUpdate({player_id:player_id}, {$set: playerLimits}, {upsert:false})
     return true;
 }
