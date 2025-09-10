@@ -32,7 +32,7 @@ class NickSetEvent extends StatsEvent {
         return "nick_set_event";
     }
     getValues():any[] {
-        return [this.playerId, this.nick, this.timestamp];
+        return [this.playerId, this.nick,  new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
     }
 }
 
