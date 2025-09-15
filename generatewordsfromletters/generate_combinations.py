@@ -31,6 +31,43 @@ def read_dictionary(path='slownik', min_len=4, max_letters=7):
             words.append(word)
     return words
 
+def mask_from_tuple(tup):
+    m = 0
+    for ch in tup:
+        m |= (1 << INDEX[ch])
+    return m
+
+def iter_submasks(mask: int):
+    s = mask
+    while s:
+        yield s
+        s = (s - 1) & mask
+
+def generate_combinations():
+    all_word_masks = list(by_mask.keys())
+    results = []
+
+    for i, rack in enumerate(itertools.combinations(ALPHABET, 7), 1):
+        if i % 1000 == 0:
+            print(f"Processed {i:,} racks", end='\r')
+        rmask = mask_from_tuple(rack)
+        found = []
+
+        # visit ONLY submasks of rmask (<= 127 of them)
+        for s in iter_submasks(rmask):
+            lst = by_mask.get(s)
+            if lst:
+                found.extend(lst)
+
+        if not found:
+            continue
+
+        deduped = sorted(set(found), key=lambda x: (-len(x), x ))
+        results.append((rack, deduped))
+
+    results.sort(key=lambda x: len(x[1]), reverse=True)
+    return results
+
 words = read_dictionary()
 by_mask = defaultdict(list)
 
@@ -39,34 +76,6 @@ for w in words:
     if m == 0:
         continue
     by_mask[m].append(w)
-
-def mask_from_tuple(tup):
-    m = 0
-    for ch in tup:
-        m |= (1 << INDEX[ch])
-    return m
-
-def generate_combinations():
-    all_word_masks = list(by_mask.keys())
-    results = []
-
-    i = 0
-    for rack in itertools.combinations(ALPHABET, 7):
-        print(f"Processing combination {i}", end='\r')
-        rmask = mask_from_tuple(rack)
-        found = []
-
-        for wm in all_word_masks:
-            if (wm & rmask) == wm:
-                found.extend(by_mask[wm])
-
-        deduped = sorted(set(found), key=lambda x: (-len(x), x ))
-        results.append((rack, found))
-        i += 1
-
-    results.sort(key=lambda x: len(x[1]), reverse=True)
-    return results
-
 
 combinations = generate_combinations()
 with open('combinations.txt', 'w', encoding='utf-8') as result_file:
