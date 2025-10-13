@@ -29,8 +29,61 @@ except Exception:
     OpenAI = None
 
 BASIC_PROMPT_PL = (
-    "wymyśl opis w stylu krzyżówki z przymrużeniem oka \"{word}\". "
+    " \"{word}\". "
 )
+
+import json
+import time
+from typing import Dict, List
+
+def _build_batch_messages(words: List[str]) -> List[Dict[str, str]]:
+    # Zwięzłe opisy po 1 na słowo, zwracamy WYŁĄCZNIE JSON { "SŁOWO": "opis" }
+    system = (
+        "Jesteś twórcą krótkich haseł krzyżówkowych z przymrużeniem oka."
+        "Dla każdego słowa wymyśl opis w stylu krzyżówki z przymrużeniem oka"
+        "Zwróć WYŁĄCZNIE JSON obiekt mapujący słowo na opis."
+    )
+    user = (
+        "Słowa do opisania z (po jednym opisie na słowo):\n"
+        + "\n".join(f"- {w}" for w in words)
+        + "\n\nZwróć TYLKO JSON obiekt {\"SŁOWO\":\"opis\"} dla wszystkich słów."
+    )
+    return [
+        {"role": "system", "content": system},
+        {"role": "user", "content": user},
+    ]
+
+def _request_clues_batch(client, model: str, words: List[str], max_retries: int = 3, delay: float = 2.0) -> Dict[str, str]:
+    """
+    Jedno wywołanie API, JSON mode. Zwraca mapę {słowo: opis} tylko dla słów z 'words'.
+    """
+    messages = _build_batch_messages(words)
+    for attempt in range(max_retries):
+        try:
+            resp = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                response_format={"type": "json_object"},
+            )
+            content = resp.choices[0].message.content or "{}"
+            parsed = json.loads(content)
+
+            # Normalizacja: bierzemy tylko klucze odpowiadające wejściowym słowom (case-insensitive OK)
+            out = {}
+            lower_map = {w.lower(): w for w in words}
+            for k, v in parsed.items():
+                if not isinstance(k, str) or not isinstance(v, str):
+                    continue
+                key = k.lower()
+                if key in lower_map:
+                    out[lower_map[key]] = v.strip()
+            return out
+        except Exception:
+            if attempt == max_retries - 1:
+                raise
+            time.sleep(delay * (2 ** attempt))
+    return {}
+
 
 def get_client():
     load_dotenv()
@@ -64,25 +117,30 @@ def main():
     # Build quick lookup to avoid duplicates
     for cw in data.get("crosswords", []):
         # Create a dict (word -> clue) for already present clues
-        existing: Dict[str, str] = {c["word"].upper(): c["description_pl"] for c in cw.get("clues", []) if "word" in c and "description_pl" in c}
-        to_append = []
-        for w in cw.get("words", []):
-            word = w["word"].upper()
-            if word in existing:
-                continue
-            # Basic retry on transient errors
-            for attempt in range(3):
-                try:
-                    clue = generate_clue(client, word, args.model)
-                    print(f"Generated clue for {word}: {clue}")
-                    to_append.append({"word": word, "description_pl": clue})
-                    break
-                except Exception as e:
-                    if attempt == 2:
-                        raise
-                    time.sleep(2 * (attempt + 1))
-        if to_append:
-            cw.setdefault("clues", []).extend(to_append)
+        existing: Dict[str, str] = {
+            c["word"].upper(): c["description_pl"]
+            for c in cw.get("clues", [])
+            if "word" in c and "description_pl" in c
+        }
+
+        words = [w["word"].upper() for w in cw.get("words", [])]
+        missing_words = [w for w in words if w not in existing]
+
+        if missing_words:
+            # 🟢 jeden request na wszystkie brakujące słowa
+            batch_map = _request_clues_batch(client, args.model, missing_words)
+
+            to_append = []
+            for w in missing_words:
+                clue = batch_map.get(w)
+                if clue:
+                    print(f"Generated clue for {w}: {clue}")
+                    to_append.append({"word": w, "description_pl": clue})
+
+            if to_append:
+                cw.setdefault("clues", []).extend(to_append)
+
+
 
     # Write back
     with open(args.json_path, "w", encoding="utf-8") as out:
