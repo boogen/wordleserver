@@ -20,6 +20,8 @@ import argparse
 import time
 from dataclasses import dataclass
 from typing import List, Tuple, Dict, Optional
+from datetime import datetime
+import json
 
 EMPTY = "."
 
@@ -157,6 +159,14 @@ class Board:
         for r in range(self.H):
             lines.append("".join(self.grid[r]))
         return "\n".join(lines)
+
+    def render_letters_lower(self):
+        grid = [[None for _ in range(self.W)] for _ in range(self.H)]
+        for r in range(self.H):
+            for c in range(self.W):
+                if self.grid[r][c] != EMPTY:
+                    grid[r][c] = self.grid[r][c].lower()
+        return grid
 
 def enumerate_candidates(board: Board, word: str) -> List[Tuple[int, int, int]]:
     cands = []
@@ -301,6 +311,7 @@ def main():
     parser.add_argument("--width", type=int, default=15, help="Grid width (default: 15)")
     parser.add_argument("--height", type=int, default=15, help="Grid height (default: 15)")
     parser.add_argument("--time-per-line", type=float, default=2.0, help="Time limit in seconds per line (default: 2.0)")
+    parser.add_argument("--out", default="crosswords.json", help="Output JSON file")
     args = parser.parse_args()
 
     try:
@@ -310,22 +321,45 @@ def main():
         print(f"ERROR: failed to read file: {e}", file=sys.stderr)
         sys.exit(1)
 
+    all_crosswords = []
     for idx, line in enumerate(lines, 1):
         words = line.split()
         sol = generate_crossword(words, args.height, args.width, time_limit_s=args.time_per_line)
+        if sol is None:
+            print(f"[WARN] Could not place crossword for line {i}: {words}")
+            continue
         board = apply_solution_to_board(sol, args.height, args.width)
-        print(f"=== Crossword {idx} ===")
-        print(board.render())
-        print()
-        if sol.placements:
-            print("Placed words:")
-            for p in sol.placements:
-                orient = "ACROSS" if p.dir == HORIZONTAL else "DOWN"
-                print(f"  - {p.word:>12} @ ({p.r},{p.c}) {orient}")
-        else:
-            print("No words could be placed within constraints.")
-        print(f"Score: words={sol.count}, crossings={sol.crossings}, filled={sol.filled_cells}")
-        print()
+
+        words_json = [{
+            "word": p.word,
+            "row": p.r,
+            "col": p.c,
+            "direction": "H" if p.dir == HORIZONTAL else "V"
+        } for p in sol.placements]
+
+        crossword_entry = {
+            "id": idx,
+            "words": words_json,
+            "letter_grid": board.render_letters_lower(),
+            "clues": []  # to be enriched later
+        }
+        all_crosswords.append(crossword_entry)
+
+    output = {
+        "metadata": {
+            "generated_at": datetime.utcnow().isoformat() + "Z",
+            "width": args.width,
+            "height": args.height,
+            "source_file": args.file
+        },
+        "crosswords": all_crosswords
+    }
+
+    with open(args.out, "w", encoding="utf-8") as out_f:
+        json.dump(output, out_f, ensure_ascii=False, indent=2)
+
+    print(f"Wrote {len(all_crosswords)} crosswords to {args.out}")
+
 
 if __name__ == "__main__":
     main()
