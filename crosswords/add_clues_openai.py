@@ -7,7 +7,7 @@ Reads the JSON created by the generator, iterates through each crossword and eac
 requests a Polish clue from OpenAI, and writes the updated JSON back to disk.
 
 Usage:
-  python add_clues_openai.py crosswords.json --model gpt-4o-mini --rate-limit 30
+  python add_clues_openai.py crosswords.json --model gpt-5 --rate-limit 30
 
 Environment:
   - OPENAI_API_KEY must be set.
@@ -118,12 +118,12 @@ def main():
     for cw in data.get("crosswords", []):
         # Create a dict (word -> clue) for already present clues
         existing: Dict[str, str] = {
-            c["word"].upper(): c["description_pl"]
+            c["word"].lower(): c["description"]
             for c in cw.get("clues", [])
-            if "word" in c and "description_pl" in c
+            if "word" in c and "description" in c
         }
 
-        words = [w["word"].upper() for w in cw.get("words", [])]
+        words = [w["word"].lower() for w in cw.get("words", [])]
         missing_words = [w for w in words if w not in existing]
 
         if missing_words:
@@ -135,7 +135,7 @@ def main():
                 clue = batch_map.get(w)
                 if clue:
                     print(f"Generated clue for {w}: {clue}")
-                    to_append.append({"word": w, "description_pl": clue})
+                    to_append.append({"word": w, "description": clue})
 
             if to_append:
                 cw.setdefault("clues", []).extend(to_append)

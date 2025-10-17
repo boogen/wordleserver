@@ -1,16 +1,16 @@
-import express, {Request,Response,Application} from 'express';
+import express, { Request, Response, Application } from 'express';
 
 import morgan from 'morgan';
 import helmet from 'helmet';
 import cors from 'cors';
-import {metrics} from './metrics'
+import { metrics } from './metrics'
 import * as Sentry from "@sentry/node"
 
 require('dotenv').config();
 
-Sentry.init({dsn: process.env.sentry_dsn});
+Sentry.init({ dsn: process.env.SENTRY_DNS });
 
-import {notFound, errorHandler} from './middlewares';
+import { notFound, errorHandler } from './middlewares';
 import { apiV4 } from './api/v4';
 
 import WordleDBI from './api/v4/DBI/DBI';
@@ -22,13 +22,13 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req:Request, res:Response) => {
+app.get('/', (req: Request, res: Response) => {
   res.json({
     message: '🦄🌈✨👋🌎🌍🌏✨🌈🦄'
   });
 });
 
-app.get("/error", (req:Request, res:Response) => {
+app.get("/error", (req: Request, res: Response) => {
   try {
     throw "aaa";
   }
@@ -43,8 +43,8 @@ const dbi = new WordleDBI();
 
 app.use((req, res, next) => {
   var d = new Date();
-  d.setHours(0,0,0,0);
-  dbi.increase_request_counter(req.path, d.getTime()/1000);
+  d.setHours(0, 0, 0, 0);
+  dbi.increase_request_counter(req.path, d.getTime() / 1000);
   next()
 })
 
@@ -54,6 +54,6 @@ app.use('/', metrics)
 app.use(notFound);
 app.use(errorHandler);
 
-process.on("SIGUSR2", function() {
+process.on("SIGUSR2", function () {
   heapdump.writeSnapshot('/var/local/' + Date.now() + '.heapsnapshot');
 });

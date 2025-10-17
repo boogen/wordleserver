@@ -7,10 +7,10 @@ Crossword generator for lines of words.
 - By default grid is 15x15; change via --width/--height.
 
 Usage:
-    python crossword.py input.txt --width 15 --height 15
+    python3 crossword_generator.py --height 20 --width 10 --time-per-line 10 input.txt
 
 Notes:
-- Words are treated case-insensitively and normalized to uppercase.
+- Words are treated case-insensitively and normalized to lowercase.
 - The algorithm uses backtracking with MRV (minimum remaining valid placements),
   connectivity & adjacency constraints, and simple branch-and-bound scoring.
 """
@@ -281,7 +281,7 @@ def generate_crossword(words: List[str], height: int, width: int, time_limit_s: 
     # Normalize
     vocab = []
     for w in words:
-        w = "".join(ch for ch in w.upper() if ch.isalpha())
+        w = "".join(ch for ch in w.lower() if ch.isalpha())
         if len(w) >= 2:
             vocab.append(w)
     # Deduplicate; longer words first often help initial seeding
@@ -332,9 +332,11 @@ def main():
 
         words_json = [{
             "word": p.word,
-            "row": p.r,
-            "col": p.c,
-            "direction": "H" if p.dir == HORIZONTAL else "V"
+            "coordinates": {
+                "row": p.r,
+                "column": p.c,
+                "direction": "H" if p.dir == HORIZONTAL else "V"
+            }
         } for p in sol.placements]
 
         crossword_entry = {
