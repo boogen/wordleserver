@@ -58,6 +58,9 @@ class Board:
         self.crossings = 0  # letters placed on an already filled cell (match)
         # track how many words cover each cell for quick crossing count
         self.cover_count = [[0 for _ in range(W)] for _ in range(H)]
+        self.occ_h = [[False for _ in range(W)] for _ in range(H)]  # cell used by a horizontal word
+        self.occ_v = [[False for _ in range(W)] for _ in range(H)]  # cell used by a vertical word
+
 
     def in_bounds(self, r, c):
         return 0 <= r < self.H and 0 <= c < self.W
@@ -75,10 +78,10 @@ class Board:
     def _ahead(self, r, c, dir_, step=1):
         return (r, c + step) if dir_ == HORIZONTAL else (r + step, c)
 
-    def can_place(self, word: str, r: int, c: int, dir_: int, require_cross=True) -> bool:
+    def can_place(self, word: str, r: int, c: int, dir_: int, require_cross: bool = True) -> bool:
         n = len(word)
 
-        # Bounds
+        # Bounds (fast fail)
         if dir_ == HORIZONTAL:
             if c < 0 or c + n > self.W or r < 0 or r >= self.H:
                 return False
@@ -86,40 +89,61 @@ class Board:
             if r < 0 or r + n > self.H or c < 0 or c >= self.W:
                 return False
 
-        has_cross = False
-
-        # Check boundary cells (before and after the word)
+        # Boundary cells before/after the word must be empty or OOB
         br, bc = self._ahead(r, c, dir_, -1)
         ar, ac = self._ahead(r, c, dir_, n)
-        if self.in_bounds(br, bc) and self.cell(br, bc) != EMPTY:
+        if self.in_bounds(br, bc) and self.grid[br][bc] != EMPTY:
             return False
-        if self.in_bounds(ar, ac) and self.cell(ar, ac) != EMPTY:
+        if self.in_bounds(ar, ac) and self.grid[ar][ac] != EMPTY:
             return False
 
-        # Check each letter placement
+        any_new_cell = False      # at least one EMPTY cell we would fill
+        any_cross = False         # at least one true perpendicular crossing we would claim
+
         rr, cc = r, c
-        for i, ch in enumerate(word):
+        for ch in word:
             if not self.in_bounds(rr, cc):
                 return False
-            cell = self.cell(rr, cc)
-            if cell != EMPTY and cell != ch:
-                return False
-            # adjacency (perpendicular neighbors) must be empty unless this cell will be a crossing
-            # If this cell matches an existing letter, it's a crossing and side neighbors can be anything (they might be part of the other word)
-            crossing_here = (cell == ch)
-            if not crossing_here:
+
+            cell_ch = self.grid[rr][cc]
+
+            if cell_ch == EMPTY:
+                # fresh letter; forbid side-touching (perpendicular neighbors)
+                any_new_cell = True
                 for nr, nc in self._neighbors_perp(rr, cc, dir_):
-                    if self.in_bounds(nr, nc) and self.cell(nr, nc) != EMPTY:
-                        # If neighbor is filled and this cell isn't a crossing, illegal side-touch
+                    if self.in_bounds(nr, nc) and self.grid[nr][nc] != EMPTY:
                         return False
+
             else:
-                has_cross = True
+                # must match existing letter
+                if cell_ch != ch:
+                    return False
+
+                # disallow same-direction overlay
+                if (dir_ == HORIZONTAL and self.occ_h[rr][cc]) or \
+                (dir_ == VERTICAL   and self.occ_v[rr][cc]):
+                    return False
+
+                # allow only a true perpendicular crossing
+                if (dir_ == HORIZONTAL and self.occ_v[rr][cc]) or \
+                (dir_ == VERTICAL   and self.occ_h[rr][cc]):
+                    any_cross = True
+                else:
+                    # inconsistent state (letter without occ flags) -> be conservative
+                    return False
+
             rr, cc = self._ahead(rr, cc, dir_, 1)
 
-        # Connectivity: after first word placed, require at least one crossing
-        if require_cross and self.filled > 0 and not has_cross:
+        # Must change something: either write a new cell or add at least one perpendicular claim
+        if not any_new_cell and not any_cross:
             return False
+
+        # If a cross is required (e.g., not the first word), enforce it
+        if require_cross and not any_cross:
+            return False
+
         return True
+
 
     def place(self, word: str, r: int, c: int, dir_: int):
         """
@@ -133,26 +157,60 @@ class Board:
         for ch in word:
             prev_char = self.grid[rr][cc]
             prev_cover = self.cover_count[rr][cc]
+            prev_occ_h = self.occ_h[rr][cc]
+            prev_occ_v = self.occ_v[rr][cc]
             if prev_char == EMPTY:
                 # fresh fill
                 self.grid[rr][cc] = ch
                 self.filled += 1
                 filled_added += 1
+                if dir_ == HORIZONTAL:
+                    self.occ_h[rr][cc] = True
+                else:
+                    self.occ_v[rr][cc] = True
             else:
-                # crossing (must match ch)
-                crossings_added += 1
+                # must match ch (guaranteed by can_place)
+                # Now decide if this is a true perpendicular crossing.
+                if dir_ == HORIZONTAL:
+                    # Same-dir overlay should be impossible if can_place is correct
+                    if self.occ_h[rr][cc]:
+                        raise AssertionError("Same-direction overlay detected in place(); bug in can_place")
+                    # If the vertical occupancy is already there, we are adding the horizontal side -> a crossing
+                    if self.occ_v[rr][cc]:
+                        self.occ_h[rr][cc] = True
+                        crossings_added += 1
+                    else:
+                        # No vertical owner yet — this means we are “claiming” the cell for H
+                        # but since prev_char != EMPTY, this would be illegal; can_place should have blocked it.
+                        raise AssertionError("Illegal non-crossing reuse; bug in can_place")
+                else:  # VERTICAL
+                    if self.occ_v[rr][cc]:
+                        raise AssertionError("Same-direction overlay detected in place(); bug in can_place")
+                    if self.occ_h[rr][cc]:
+                        self.occ_v[rr][cc] = True
+                        crossings_added += 1
+                    else:
+                        raise AssertionError("Illegal non-crossing reuse; bug in can_place")
             self.cover_count[rr][cc] = prev_cover + 1
-            delta.append((rr, cc, prev_char, prev_cover))
+            delta.append((rr, cc, prev_char, prev_occ_h, prev_occ_v))
             rr, cc = self._ahead(rr, cc, dir_, 1)
         self.crossings += crossings_added
-        return delta, crossings_added, filled_added
+        return filled_added, crossings_added, delta
 
-    def undo(self, delta, crossings_added, filled_added):
-        for (r, c, prev_char, prev_cover) in delta:
-            self.grid[r][c] = prev_char
-            self.cover_count[r][c] = prev_cover
-        self.crossings -= crossings_added
+    def undo(self, word: str, r: int, c: int, dir_: int,
+            filled_added: int, crossings_added: int, delta):
+        # Validate delta early (helps catch bad call sites)
+        if not isinstance(delta, list) or (delta and not isinstance(delta[0], tuple)):
+            raise TypeError(f"undo(): bad delta type: {type(delta).__name__}; expected List[Tuple]")
+
+        for rr, cc, prev_char, prev_occ_h, prev_occ_v in reversed(delta):
+            self.grid[rr][cc] = prev_char
+            self.occ_h[rr][cc] = prev_occ_h
+            self.occ_v[rr][cc] = prev_occ_v
+
         self.filled -= filled_added
+        self.crossings -= crossings_added
+
 
     def render(self) -> str:
         lines = []
@@ -240,9 +298,11 @@ def dfs(board: Board,
         candidates: Dict[str, List[Tuple[int,int,int]]],
         best: Solution,
         deadline: Optional[float]):
+
     update_best_if_improved(board, placed, best)
 
-    if deadline and time.time() > deadline:
+    # Use the same clock you used to compute 'deadline' (prefer time.monotonic())
+    if deadline and time.monotonic() > deadline:
         return
 
     optimistic = len(placed) + optimistic_upper_bound(unplaced, candidates)
@@ -255,7 +315,7 @@ def dfs(board: Board,
 
     plist = candidates.get(target, [])
     if not plist:
-        # Try skipping this word (since we don't need to use all)
+        # skip target and continue
         next_unplaced = [w for w in unplaced if w != target]
         next_candidates = dict(candidates)
         next_candidates.pop(target, None)
@@ -263,19 +323,24 @@ def dfs(board: Board,
         return
 
     for (r, c, dir_) in order_placements(plist, board):
-        delta, c_add, f_add = board.place(target, r, c, dir_)
+        # match the return order: (filled_added, crossings_added, delta)
+        filled_added, crossings_added, delta = board.place(target, r, c, dir_)
+
         p = Placement(word=target, r=r, c=c, dir=dir_)
         next_placed = placed + [p]
         next_unplaced = [w for w in unplaced if w != target]
 
-        # Incrementally update candidates (recompute only for remaining words)
+        # recompute candidates only for remaining words
         next_candidates = dict(candidates)
         next_candidates.pop(target, None)
         for w in next_unplaced:
             next_candidates[w] = enumerate_candidates(board, w)
 
         dfs(board, next_placed, next_unplaced, next_candidates, best, deadline)
-        board.undo(delta, c_add, f_add)
+
+        # use 'target' here; and the same filled/cross deltas you just got
+        board.undo(target, r, c, dir_, filled_added, crossings_added, delta)
+
 
 def generate_crossword(words: List[str], height: int, width: int, time_limit_s: float = 2.0) -> Solution:
     # Normalize
