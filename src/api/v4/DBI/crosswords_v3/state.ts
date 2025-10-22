@@ -8,7 +8,7 @@ export class ClueState {
 }
 
 export class PlayerCrosswordV3State {
-    constructor(public player_id: number, public crossword_id: number, public grid: string[][], public guessed_words: string[], public tries: string[], public words: string[], public clues: ClueState[], public id?: ObjectId) { }
+    constructor(public player_id: number, public crossword_id: number, public grid: string[][], public player_grid: string[][], public words: string[], public clues: ClueState[], public width: number, public height: number, public id?: ObjectId) { }
 }
 
 export async function getCrosswordV3State(playerId: number, dbi: WordleDBI): Promise<PlayerCrosswordV3State | null> {
@@ -22,9 +22,9 @@ export async function getCrosswordV3State(playerId: number, dbi: WordleDBI): Pro
     }
 }
 
-export async function setCrosswordV3State(player_id: number, words: string[], guessed_words: string[], grid: string[][], crossword_id: number, tries: string[], clues: ClueState[], dbi: WordleDBI): Promise<FindOneResult<PlayerCrosswordV3State>> {
+export async function setCrosswordV3State(state: PlayerCrosswordV3State, dbi: WordleDBI): Promise<FindOneResult<PlayerCrosswordV3State>> {
     try {
-        return dbi.player_crossword_v3_state().findOneAndUpdate({ player_id: player_id }, { $set: new PlayerCrosswordV3State(player_id, crossword_id, grid, guessed_words, tries, words, clues) }, { upsert: true });
+        return dbi.player_crossword_v3_state().findOneAndUpdate({ player_id: state.player_id }, { $set: state }, { upsert: true });
     }
     catch (error) {
         console.log(error);

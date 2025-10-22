@@ -20,7 +20,7 @@ export class PossibleCrosswordV3 {
 }
 
 export class PlayerCrosswordState {
-    constructor(public player_id: number, public crossword_id: number, public grid: string[][], public guessed_words: string[], public tries: string[], public words: string[], public id?: ObjectId) { }
+    constructor(public player_id: number, public crossword_id: number, public grid: string[][], public words: string[], public id?: ObjectId) { }
 }
 
 export async function getCrossword(crossword_id: number, dbi: WordleDBI): Promise<FindOneResult<PossibleCrosswordV3>> {

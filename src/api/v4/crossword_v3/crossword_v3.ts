@@ -3,15 +3,16 @@ import * as Sentry from "@sentry/node"
 import BaseGuessRequest from '../types/BaseGuessRequest';
 import AuthIdRequest from '../types/AuthIdRequest';
 import { CrosswordController } from './crossword_controller';
+import CrosswordSaveRequest from '../types/CrosswordSaveRequest';
 
 export const crossword_v3 = express.Router();
 const controller = new CrosswordController();
 
 
-crossword_v3.post('/guess', async (req, res, next) => {
+crossword_v3.post('/save', async (req, res, next) => {
     try {
-        const value = new BaseGuessRequest(req);
-        res.json(await controller.guess(value.auth_id, value.guess))
+        const value = new CrosswordSaveRequest(req);
+        res.json(await controller.save(value.auth_id, value.grid))
     }
     catch (error) {
         next(error);
