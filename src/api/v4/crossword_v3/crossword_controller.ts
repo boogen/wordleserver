@@ -52,41 +52,32 @@ export class CrosswordController {
     }
 
     @Post("save")
-    public async save(@Query() auth_id: string, @Query() grid: string[][]) {
+    public async save(@Query() auth_id: string, @Query() row: number, column: number, letter: string) {
+        console.log(`row: ${row}, column: ${column}, letter: ${letter}`)
         const playerId = await resolvePlayerId(auth_id, dbi);
         var state = await getCrosswordV3State(playerId, dbi);
         if (state == null) {
             throw "state is null"
         }
-        grid = this.validateGrid(grid, state);
-        state.player_grid = grid;
+        if (row < 0 || row >= state.height) {
+            throw "row out of bounds"
+        }
+        if (column < 0 || column >= state.width) {
+            throw "column out of bounds"
+        }
+        if (state.grid[row][column] == null) {
+            throw "letter not on crossword"
+        }
+        if (letter.length > 1) {
+            throw "letter is not of length 1"
+        }
+        var letterList = new Set(state.words.join(""))
+        if (!letterList.has(letter) && letter !== "") {
+            throw `letter ${letter} not allowed`;
+        }
+        state.player_grid[row][column] = letter;
         await setCrosswordV3State(state, dbi)
         return { message: 'ok', state: this.convertInternalStateToReplyState(state)};
-    }
-
-    private validateGrid(grid: string[][], state: PlayerCrosswordV3State): string[][] {
-        if (grid.length != state.grid.length) {
-            return state.player_grid;
-        }
-
-        var letterList = new Set(state.words.join(""))
-        for (var i = 0; i < grid.length; i++) {
-            if (grid[i].length != state.grid[i].length) {
-                return state.player_grid;
-            }
-
-            for (var j = 0; j < grid[i].length; j++) {
-                if (state.grid[i][j] == null) {
-                    grid[i][j] = " ";
-                } 
-                else if (grid[i][j] != '-' && !letterList.has(grid[i][j])) {
-                    console.log(`wrong letter ${grid[i][j]} should be ${state.grid[i][j]}`);
-                    grid[i][j] = "-";
-                }
-            }
-        }
-
-        return grid;
     }
 
     private convertCrosswordToInternalState(player_id: number, crossword: PossibleCrosswordV3): PlayerCrosswordV3State {

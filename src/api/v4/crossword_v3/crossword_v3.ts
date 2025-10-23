@@ -12,7 +12,7 @@ const controller = new CrosswordController();
 crossword_v3.post('/save', async (req, res, next) => {
     try {
         const value = new CrosswordSaveRequest(req);
-        res.json(await controller.save(value.auth_id, value.grid))
+        res.json(await controller.save(value.auth_id, value.row, value.column, value.letter))
     }
     catch (error) {
         next(error);
