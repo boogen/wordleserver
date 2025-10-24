@@ -105,16 +105,20 @@ export class CrosswordController {
         }
     }
 
-    private isFinished(crosswordState: PlayerCrosswordState) {
+    private isFinished(crosswordState: PlayerCrosswordV3State) {
         if (crosswordState == null) {
             return false;
         }
         var grid = crosswordState.grid;
         for (var i = 0; i < grid.length; i++) {
             for (var j = 0; j < grid[i].length; j++) {
-                if (grid[i][j] == "-") {
+                if (grid[i][j] == null) {
+                    continue;
+                }
+                if (grid[i][j] != crosswordState.player_grid[i][j]) {
                     return false;
                 }
+                    
             }
         }
         return true;
