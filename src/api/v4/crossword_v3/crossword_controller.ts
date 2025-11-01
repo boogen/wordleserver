@@ -8,6 +8,7 @@ import WordleDBI from "../DBI/DBI";
 import { checkLimit, resolvePlayerId } from "../DBI/player/player";
 import { isWordValid } from "../DBI/wordle/model";
 import { ClueState, getCrosswordV3State, PlayerCrosswordV3State, setCrosswordV3State } from "../DBI/crosswords_v3/state";
+import { log } from "console";
 
 const WORD_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
@@ -47,8 +48,14 @@ export class CrosswordController {
         while (new_validity_timestamp < timestamp) {
             new_validity_timestamp += WORD_VALIDITY;
         }
+        log('New validity timestamp start:', new_validity_timestamp);
 
         const crossword = await getOrCreateRandomCrossword(dbi, timestamp, new_validity_timestamp);
+
+        if (state != null && state.crossword_id != crossword.crossword_id) {
+            // Different crossword - create new state
+            state = null;
+        }
 
         if (state == null) {
             console.log(crossword)
@@ -81,7 +88,7 @@ export class CrosswordController {
         if (letter.length > 1) {
             throw "letter is not of length 1"
         }
-        var letterList = new Set(state.words.join(""))
+        var letterList = new Set(state.words.join("").normalize('NFC'))
         if (!letterList.has(letter) && letter !== "") {
             throw `letter ${letter} not allowed`;
         }
@@ -104,7 +111,9 @@ export class CrosswordController {
     }
 
     private convertInternalStateToReplyState(state: PlayerCrosswordV3State): CrosswordState {
-        var letterList = new Set(state.words.join(""))
+        const letters = Array.from(state.words.join("").normalize('NFC'));
+        const letterList = new Set(letters);
+        log('Letter list:', letters);
         return {
             letters: Array.from(letterList),
             grid: state.player_grid.concat.apply([], state.player_grid),

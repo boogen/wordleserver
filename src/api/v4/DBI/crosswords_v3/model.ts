@@ -1,6 +1,7 @@
 import { FindOneResult } from "monk";
 import WordleDBI from "../DBI";
 import { ObjectId } from 'mongodb';
+import { log } from "console";
 
 
 export class CrosswordWord {
@@ -34,12 +35,12 @@ export async function getCrossword(crossword_id: number, dbi: WordleDBI): Promis
 export async function getOrCreateRandomCrossword(dbi: WordleDBI, timestamp: number, new_validity: number): Promise<PossibleCrosswordV3> {
     var new_crossword_id:number = await dbi.getNextSequenceValue("global_crossword")
     var new_crossword = (await dbi.possible_crosswords_v3().aggregate([{ $sample: { size: 1 } }]))[0]
-    console.log(new_crossword)
     var crossword = (await dbi.crossword_v3().findOneAndUpdate(
         {validity:{$gt: timestamp}},
         {$setOnInsert: {crossword_id:new_crossword.crossword_id, validity: new_validity, crossword_serial: new_crossword_id}},
         {upsert: true}
     ))
+    log('Selected crossword:', crossword!.crossword_id);
     return (await dbi.possible_crosswords_v3().findOne({crossword_id:crossword!.crossword_id}))!;
 }
 

@@ -88,4 +88,5 @@ combinations = generate_combinations()
 with open('combinations.txt', 'w', encoding='utf-8') as result_file:
     for rack, words in combinations:
         if len(words) >= 8:
-            result_file.write(' '.join(words) + '\n')
+            normalized_words = [unicodedata.normalize('NFC', word) for word in words]
+            result_file.write(' '.join(normalized_words) + '\n')
