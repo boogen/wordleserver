@@ -1,0 +1,7465 @@
+{
+  "metadata": {
+    "generated_at": "2025-11-01T21:21:09.460381Z",
+    "width": 10,
+    "height": 20,
+    "source_file": "input.txt"
+  },
+  "crosswords": [
+    {
+      "id": 1,
+      "words": [
+        {
+          "word": "boso",
+          "coordinates": {
+            "row": 10,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "port",
+          "coordinates": {
+            "row": 11,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "probostwo",
+          "coordinates": {
+            "row": 13,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "stos",
+          "coordinates": {
+            "row": 13,
+            "column": 6,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "strop",
+          "coordinates": {
+            "row": 10,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "towot",
+          "coordinates": {
+            "row": 7,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "trop",
+          "coordinates": {
+            "row": 8,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "stop",
+          "coordinates": {
+            "row": 16,
+            "column": 6,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "spot",
+          "coordinates": {
+            "row": 5,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "wprost",
+          "coordinates": {
+            "row": 12,
+            "column": 1,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "sport",
+          "coordinates": {
+            "row": 5,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "porost",
+          "coordinates": {
+            "row": 12,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "proso",
+          "coordinates": {
+            "row": 7,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "tost",
+          "coordinates": {
+            "row": 6,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "prosto",
+          "coordinates": {
+            "row": 0,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "ostro",
+          "coordinates": {
+            "row": 2,
+            "column": 3,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "sporo",
+          "coordinates": {
+            "row": 0,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "porto",
+          "coordinates": {
+            "row": 9,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "tors",
+          "coordinates": {
+            "row": 16,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "tort",
+          "coordinates": {
+            "row": 2,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "robot",
+          "coordinates": {
+            "row": 15,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "rotor",
+          "coordinates": {
+            "row": 4,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "potop",
+          "coordinates": {
+            "row": 3,
+            "column": 1,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "sopor",
+          "coordinates": {
+            "row": 0,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "topos",
+          "coordinates": {
+            "row": 19,
+            "column": 3,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "post",
+          "coordinates": {
+            "row": 16,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "opos",
+          "coordinates": {
+            "row": 8,
+            "column": 0,
+            "direction": "V"
+          }
+        }
+      ],
+      "letter_grid": [
+        [
+          null,
+          null,
+          null,
+          "s",
+          null,
+          "s",
+          "o",
+          "p",
+          "o",
+          "r"
+        ],
+        [
+          null,
+          null,
+          null,
+          "p",
+          null,
+          null,
+          null,
+          "r",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "o",
+          "s",
+          "t",
+          "r",
+          "o",
+          null,
+          "t"
+        ],
+        [
+          null,
+          "p",
+          null,
+          "r",
+          null,
+          null,
+          null,
+          "s",
+          null,
+          "o"
+        ],
+        [
+          "r",
+          "o",
+          "t",
+          "o",
+          "r",
+          null,
+          null,
+          "t",
+          null,
+          "r"
+        ],
+        [
+          null,
+          "t",
+          null,
+          null,
+          null,
+          "s",
+          "p",
+          "o",
+          "r",
+          "t"
+        ],
+        [
+          null,
+          "o",
+          null,
+          "t",
+          null,
+          "p",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          "p",
+          "r",
+          "o",
+          "s",
+          "o",
+          null,
+          "t",
+          null,
+          null
+        ],
+        [
+          "o",
+          null,
+          null,
+          "s",
+          null,
+          "t",
+          "r",
+          "o",
+          "p",
+          null
+        ],
+        [
+          "p",
+          "o",
+          "r",
+          "t",
+          "o",
+          null,
+          null,
+          "w",
+          null,
+          null
+        ],
+        [
+          "o",
+          null,
+          null,
+          null,
+          null,
+          "b",
+          null,
+          "o",
+          null,
+          "s"
+        ],
+        [
+          "s",
+          null,
+          null,
+          null,
+          "p",
+          "o",
+          "r",
+          "t",
+          null,
+          "t"
+        ],
+        [
+          null,
+          "w",
+          null,
+          "p",
+          null,
+          "s",
+          null,
+          null,
+          null,
+          "r"
+        ],
+        [
+          null,
+          "p",
+          "r",
+          "o",
+          "b",
+          "o",
+          "s",
+          "t",
+          "w",
+          "o"
+        ],
+        [
+          null,
+          "r",
+          null,
+          "r",
+          null,
+          null,
+          "t",
+          null,
+          null,
+          "p"
+        ],
+        [
+          "r",
+          "o",
+          "b",
+          "o",
+          "t",
+          null,
+          "o",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          "s",
+          null,
+          "s",
+          null,
+          null,
+          "s",
+          "t",
+          "o",
+          "p"
+        ],
+        [
+          null,
+          "t",
+          null,
+          "t",
+          null,
+          null,
+          null,
+          "o",
+          null,
+          "o"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "r",
+          null,
+          "s"
+        ],
+        [
+          null,
+          null,
+          null,
+          "t",
+          "o",
+          "p",
+          "o",
+          "s",
+          null,
+          "t"
+        ]
+      ],
+      "clues": [
+        {
+          "word": "boso",
+          "description": "Bez butów, ale z charakterem"
+        },
+        {
+          "word": "port",
+          "description": "Parking dla barek"
+        },
+        {
+          "word": "probostwo",
+          "description": "Dom z widokiem na wiernych"
+        },
+        {
+          "word": "stos",
+          "description": "Sterta, która rośnie w oczach"
+        },
+        {
+          "word": "strop",
+          "description": "Punkt widzenia żyrandola"
+        },
+        {
+          "word": "towot",
+          "description": "Smar, co wchodzi w zawiasy"
+        },
+        {
+          "word": "trop",
+          "description": "Prowadzi do zwierzyny albo do zbrodni"
+        },
+        {
+          "word": "stop",
+          "description": "Metalowa mieszanka albo komenda"
+        },
+        {
+          "word": "spot",
+          "description": "Przerwa na zakupy w trakcie filmu"
+        },
+        {
+          "word": "wprost",
+          "description": "Bez owijania w bawełnę"
+        },
+        {
+          "word": "sport",
+          "description": "Walka o puchar lub o linię"
+        },
+        {
+          "word": "porost",
+          "description": "Roślinny mariaż glonu z grzybem"
+        },
+        {
+          "word": "proso",
+          "description": "Ulubione danie kanarka"
+        },
+        {
+          "word": "tost",
+          "description": "Chleb po solarium"
+        },
+        {
+          "word": "prosto",
+          "description": "Przeciwieństwo kręcenia"
+        },
+        {
+          "word": "ostro",
+          "description": "Jak brzytwa albo papryczka chili"
+        },
+        {
+          "word": "sporo",
+          "description": "Więcej niż trochę, mniej niż w bród"
+        },
+        {
+          "word": "porto",
+          "description": "Mocne wino z widokiem na Douro"
+        },
+        {
+          "word": "tors",
+          "description": "Posąg bez głowy i kończyn"
+        },
+        {
+          "word": "tort",
+          "description": "Kaloryczny król imprezy"
+        },
+        {
+          "word": "robot",
+          "description": "Mechaniczny pracownik bez ZUS-u"
+        },
+        {
+          "word": "rotor",
+          "description": "Kręci się w pralce lub śmigłowcu"
+        },
+        {
+          "word": "potop",
+          "description": "Sienkiewiczowska wersja powodzi"
+        },
+        {
+          "word": "sopor",
+          "description": "Głęboki sen, niekoniecznie w Sopocie"
+        },
+        {
+          "word": "topos",
+          "description": "Motyw wędrowny w kulturze"
+        },
+        {
+          "word": "post",
+          "description": "Wpis w internecie lub dieta odświętna"
+        },
+        {
+          "word": "opos",
+          "description": "Aktor wśród torbaczy"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "words": [
+        {
+          "word": "alfa",
+          "coordinates": {
+            "row": 10,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "familia",
+          "coordinates": {
+            "row": 11,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "mile",
+          "coordinates": {
+            "row": 11,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "film",
+          "coordinates": {
+            "row": 11,
+            "column": 1,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "fajf",
+          "coordinates": {
+            "row": 10,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "emalia",
+          "coordinates": {
+            "row": 6,
+            "column": 2,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "filia",
+          "coordinates": {
+            "row": 9,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "flama",
+          "coordinates": {
+            "row": 5,
+            "column": 4,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "lamela",
+          "coordinates": {
+            "row": 6,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "faja",
+          "coordinates": {
+            "row": 3,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "fala",
+          "coordinates": {
+            "row": 4,
+            "column": 6,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "aleja",
+          "coordinates": {
+            "row": 0,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "mafia",
+          "coordinates": {
+            "row": 0,
+            "column": 3,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "lilia",
+          "coordinates": {
+            "row": 13,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "lala",
+          "coordinates": {
+            "row": 6,
+            "column": 8,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "lila",
+          "coordinates": {
+            "row": 8,
+            "column": 6,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "fama",
+          "coordinates": {
+            "row": 0,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "mama",
+          "coordinates": {
+            "row": 3,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "limfa",
+          "coordinates": {
+            "row": 7,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "mila",
+          "coordinates": {
+            "row": 6,
+            "column": 6,
+            "direction": "V"
+          }
+        }
+      ],
+      "letter_grid": [
+        [
+          null,
+          null,
+          null,
+          "m",
+          "a",
+          "f",
+          "i",
+          "a",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null,
+          "l",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "m",
+          null,
+          "e",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "m",
+          "a",
+          "m",
+          "a",
+          null,
+          "j",
+          null,
+          "f"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "f",
+          "a",
+          "l",
+          "a"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "f",
+          null,
+          null,
+          null,
+          null,
+          "j"
+        ],
+        [
+          null,
+          null,
+          "e",
+          null,
+          "l",
+          "a",
+          "m",
+          "e",
+          "l",
+          "a"
+        ],
+        [
+          "l",
+          "i",
+          "m",
+          "f",
+          "a",
+          null,
+          "i",
+          null,
+          "a",
+          null
+        ],
+        [
+          null,
+          null,
+          "a",
+          null,
+          "m",
+          null,
+          "l",
+          "i",
+          "l",
+          "a"
+        ],
+        [
+          "f",
+          "i",
+          "l",
+          "i",
+          "a",
+          null,
+          "a",
+          null,
+          "a",
+          null
+        ],
+        [
+          null,
+          null,
+          "i",
+          null,
+          null,
+          "a",
+          null,
+          "f",
+          null,
+          null
+        ],
+        [
+          null,
+          "f",
+          "a",
+          "m",
+          "i",
+          "l",
+          "i",
+          "a",
+          null,
+          null
+        ],
+        [
+          null,
+          "i",
+          null,
+          "i",
+          null,
+          "f",
+          null,
+          "j",
+          null,
+          null
+        ],
+        [
+          null,
+          "l",
+          "i",
+          "l",
+          "i",
+          "a",
+          null,
+          "f",
+          null,
+          null
+        ],
+        [
+          null,
+          "m",
+          null,
+          "e",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      "clues": [
+        {
+          "word": "alfa",
+          "description": "Początek stada"
+        },
+        {
+          "word": "familia",
+          "description": "Swoi z serialu"
+        },
+        {
+          "word": "mile",
+          "description": "Długie, ale przyjemne"
+        },
+        {
+          "word": "film",
+          "description": "Taśma, która wciąga"
+        },
+        {
+          "word": "fajf",
+          "description": "Herbaciany zryw o piątej"
+        },
+        {
+          "word": "emalia",
+          "description": "Garnkowa pasta do zębów"
+        },
+        {
+          "word": "filia",
+          "description": "Oddział, ale nie wojskowy"
+        },
+        {
+          "word": "flama",
+          "description": "Dawna sympatia z ogniem"
+        },
+        {
+          "word": "lamela",
+          "description": "Płytka znajoma grzybiarza"
+        },
+        {
+          "word": "faja",
+          "description": "Komin do palenia w ustach"
+        },
+        {
+          "word": "fala",
+          "description": "Fryzura prosto z morza"
+        },
+        {
+          "word": "aleja",
+          "description": "Ale ja nie ulica"
+        },
+        {
+          "word": "mafia",
+          "description": "Rodzina, z którą lepiej nie zadzierać"
+        },
+        {
+          "word": "lilia",
+          "description": "Czysta jak... w doniczce"
+        },
+        {
+          "word": "lala",
+          "description": "Dziewczynka z fabryki"
+        },
+        {
+          "word": "lila",
+          "description": "Fioletowy, ale nie fiołek"
+        },
+        {
+          "word": "fama",
+          "description": "Plotka z miasta"
+        },
+        {
+          "word": "mama",
+          "description": "Pierwsze słowo do krzyżówki"
+        },
+        {
+          "word": "limfa",
+          "description": "Chłonka, nie chłopka"
+        },
+        {
+          "word": "mila",
+          "description": "Angielski dystans do morza"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "words": [
+        {
+          "word": "alfa",
+          "coordinates": {
+            "row": 10,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "wiza",
+          "coordinates": {
+            "row": 13,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "lufa",
+          "coordinates": {
+            "row": 11,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "faul",
+          "coordinates": {
+            "row": 11,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "awal",
+          "coordinates": {
+            "row": 12,
+            "column": 2,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "azalia",
+          "coordinates": {
+            "row": 10,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "filia",
+          "coordinates": {
+            "row": 7,
+            "column": 8,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "fliza",
+          "coordinates": {
+            "row": 6,
+            "column": 2,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "waza",
+          "coordinates": {
+            "row": 9,
+            "column": 0,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "faza",
+          "coordinates": {
+            "row": 6,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "waliza",
+          "coordinates": {
+            "row": 15,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "lawa",
+          "coordinates": {
+            "row": 5,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "fala",
+          "coordinates": {
+            "row": 9,
+            "column": 6,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "lala",
+          "coordinates": {
+            "row": 5,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "liza",
+          "coordinates": {
+            "row": 3,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "lila",
+          "coordinates": {
+            "row": 3,
+            "column": 3,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "lilia",
+          "coordinates": {
+            "row": 8,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "wilia",
+          "coordinates": {
+            "row": 15,
+            "column": 0,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "willa",
+          "coordinates": {
+            "row": 1,
+            "column": 8,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "aula",
+          "coordinates": {
+            "row": 15,
+            "column": 5,
+            "direction": "V"
+          }
+        }
+      ],
+      "letter_grid": [
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "w",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "i",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "l",
+          "i",
+          "l",
+          "a",
+          null,
+          "l",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "i",
+          null,
+          null,
+          null,
+          null,
+          "l",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "z",
+          null,
+          "l",
+          "a",
+          "l",
+          "a",
+          null
+        ],
+        [
+          null,
+          null,
+          "f",
+          "a",
+          "z",
+          "a",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "l",
+          null,
+          null,
+          "w",
+          null,
+          null,
+          "f",
+          null
+        ],
+        [
+          null,
+          "l",
+          "i",
+          "l",
+          "i",
+          "a",
+          null,
+          null,
+          "i",
+          null
+        ],
+        [
+          "w",
+          null,
+          "z",
+          null,
+          null,
+          null,
+          "f",
+          "a",
+          "l",
+          "a"
+        ],
+        [
+          "a",
+          "z",
+          "a",
+          "l",
+          "i",
+          "a",
+          null,
+          null,
+          "i",
+          null
+        ],
+        [
+          "z",
+          null,
+          null,
+          null,
+          null,
+          "l",
+          "u",
+          "f",
+          "a",
+          null
+        ],
+        [
+          "a",
+          null,
+          "a",
+          null,
+          null,
+          "f",
+          null,
+          "a",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "w",
+          "i",
+          "z",
+          "a",
+          null,
+          "u",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "a",
+          null,
+          null,
+          null,
+          null,
+          "l",
+          null,
+          null
+        ],
+        [
+          "w",
+          "a",
+          "l",
+          "i",
+          "z",
+          "a",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "i",
+          null,
+          null,
+          null,
+          null,
+          "u",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "l",
+          null,
+          null,
+          null,
+          null,
+          "l",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "i",
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "a",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      "clues": [
+        {
+          "word": "alfa",
+          "description": "Pierwsza w stadzie i w alfabecie"
+        },
+        {
+          "word": "wiza",
+          "description": "Pieczątka w paszporcie albo w toalecie"
+        },
+        {
+          "word": "lufa",
+          "description": "Zimna, gdy nie strzela"
+        },
+        {
+          "word": "faul",
+          "description": "Kopniak nie do bramki"
+        },
+        {
+          "word": "awal",
+          "description": "Gwarancja na wekslu, nie na twarzy"
+        },
+        {
+          "word": "azalia",
+          "description": "Krzew z Azją w środku"
+        },
+        {
+          "word": "filia",
+          "description": "Firmowa córka"
+        },
+        {
+          "word": "fliza",
+          "description": "Płytka krewna terakoty"
+        },
+        {
+          "word": "waza",
+          "description": "Królewska zastawa"
+        },
+        {
+          "word": "faza",
+          "description": "Etap rozwoju lub odlotu"
+        },
+        {
+          "word": "waliza",
+          "description": "Podróżna szafa"
+        },
+        {
+          "word": "lawa",
+          "description": "Kamień w stanie ciekłym"
+        },
+        {
+          "word": "fala",
+          "description": "Uczesanie na wodzie"
+        },
+        {
+          "word": "lala",
+          "description": "Zabawka, co nie płacze z własnej woli"
+        },
+        {
+          "word": "liza",
+          "description": "Daje buzi językiem"
+        },
+        {
+          "word": "lila",
+          "description": "Fiołek bez zapachu"
+        },
+        {
+          "word": "lilia",
+          "description": "Symbol czystości z cebulki"
+        },
+        {
+          "word": "wilia",
+          "description": "Wieczór, w którym karp przemawia"
+        },
+        {
+          "word": "willa",
+          "description": "Posiadłość, nie imię żeńskie"
+        },
+        {
+          "word": "aula",
+          "description": "Uczelniana sala, co brzmi jak okrzyk"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "words": [
+        {
+          "word": "duda",
+          "coordinates": {
+            "row": 10,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "hasz",
+          "coordinates": {
+            "row": 9,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "zasada",
+          "coordinates": {
+            "row": 6,
+            "column": 4,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "juhas",
+          "coordinates": {
+            "row": 8,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "sadza",
+          "coordinates": {
+            "row": 11,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "susz",
+          "coordinates": {
+            "row": 11,
+            "column": 0,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "jazda",
+          "coordinates": {
+            "row": 12,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "szus",
+          "coordinates": {
+            "row": 6,
+            "column": 3,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "uzda",
+          "coordinates": {
+            "row": 9,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "zajazd",
+          "coordinates": {
+            "row": 11,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "zjazd",
+          "coordinates": {
+            "row": 15,
+            "column": 3,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "susza",
+          "coordinates": {
+            "row": 7,
+            "column": 1,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "dusza",
+          "coordinates": {
+            "row": 15,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "szuja",
+          "coordinates": {
+            "row": 13,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "zajad",
+          "coordinates": {
+            "row": 14,
+            "column": 5,
+            "direction": "V"
+          }
+        }
+      ],
+      "letter_grid": [
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "s",
+          "z",
+          "u",
+          "s",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          "s",
+          null,
+          null,
+          "a",
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "j",
+          "u",
+          "h",
+          "a",
+          "s",
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          "s",
+          null,
+          null,
+          "a",
+          null,
+          null,
+          "h",
+          null,
+          "u"
+        ],
+        [
+          null,
+          "z",
+          null,
+          null,
+          "d",
+          "u",
+          "d",
+          "a",
+          null,
+          "z"
+        ],
+        [
+          "s",
+          "a",
+          "d",
+          "z",
+          "a",
+          null,
+          null,
+          "s",
+          null,
+          "d"
+        ],
+        [
+          "u",
+          null,
+          null,
+          "a",
+          null,
+          "j",
+          "a",
+          "z",
+          "d",
+          "a"
+        ],
+        [
+          "s",
+          "z",
+          "u",
+          "j",
+          "a",
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "z",
+          null,
+          null,
+          "a",
+          null,
+          "z",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "z",
+          "j",
+          "a",
+          "z",
+          "d",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "d",
+          null,
+          "j",
+          null,
+          "u",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null,
+          "s",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "d",
+          null,
+          "z",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null,
+          null
+        ]
+      ],
+      "clues": [
+        {
+          "word": "duda",
+          "description": "Andrzej z instrumentem"
+        },
+        {
+          "word": "hasz",
+          "description": "Upalony kaszel"
+        },
+        {
+          "word": "zasada",
+          "description": "Twarda, choć bywa złota"
+        },
+        {
+          "word": "juhas",
+          "description": "Pasterz na haju"
+        },
+        {
+          "word": "sadza",
+          "description": "Osad z sadu w kominie"
+        },
+        {
+          "word": "susz",
+          "description": "Owocowe siano"
+        },
+        {
+          "word": "jazda",
+          "description": "Bywa konna lub bez trzymanki"
+        },
+        {
+          "word": "szus",
+          "description": "Zjazd na jednej kresce"
+        },
+        {
+          "word": "uzda",
+          "description": "Kiełzna konia lub apetyt"
+        },
+        {
+          "word": "zajazd",
+          "description": "Gospoda, nie w kąciku ust"
+        },
+        {
+          "word": "zjazd",
+          "description": "Spotkanie absolwentów na stoku"
+        },
+        {
+          "word": "susza",
+          "description": "Okres bez deszczu i bez kasy"
+        },
+        {
+          "word": "dusza",
+          "description": "Opuszcza ciało na końcu lub na ramieniu"
+        },
+        {
+          "word": "szuja",
+          "description": "Szu... ja tego nie zrobiłem!"
+        },
+        {
+          "word": "zajad",
+          "description": "Bolesne pęknięcie, a nie gospoda"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "words": [
+        {
+          "word": "akta",
+          "coordinates": {
+            "row": 10,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "pupa",
+          "coordinates": {
+            "row": 7,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "patat",
+          "coordinates": {
+            "row": 9,
+            "column": 4,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "kapuś",
+          "coordinates": {
+            "row": 7,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kupa",
+          "coordinates": {
+            "row": 4,
+            "column": 6,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "papa",
+          "coordinates": {
+            "row": 12,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "atut",
+          "coordinates": {
+            "row": 12,
+            "column": 2,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "kapka",
+          "coordinates": {
+            "row": 4,
+            "column": 3,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "fakt",
+          "coordinates": {
+            "row": 2,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "kupka",
+          "coordinates": {
+            "row": 0,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "papka",
+          "coordinates": {
+            "row": 2,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kapa",
+          "coordinates": {
+            "row": 3,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "patka",
+          "coordinates": {
+            "row": 15,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "tafta",
+          "coordinates": {
+            "row": 10,
+            "column": 6,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "tutka",
+          "coordinates": {
+            "row": 13,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "tatuś",
+          "coordinates": {
+            "row": 12,
+            "column": 8,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "tata",
+          "coordinates": {
+            "row": 2,
+            "column": 1,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "paka",
+          "coordinates": {
+            "row": 15,
+            "column": 0,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "ptak",
+          "coordinates": {
+            "row": 0,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "pakt",
+          "coordinates": {
+            "row": 5,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "takt",
+          "coordinates": {
+            "row": 1,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "atak",
+          "coordinates": {
+            "row": 15,
+            "column": 4,
+            "direction": "V"
+          }
+        }
+      ],
+      "letter_grid": [
+        [
+          null,
+          null,
+          null,
+          null,
+          "p",
+          "t",
+          "a",
+          "k",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "u",
+          null,
+          "t"
+        ],
+        [
+          null,
+          "t",
+          null,
+          "f",
+          null,
+          "p",
+          "a",
+          "p",
+          "k",
+          "a"
+        ],
+        [
+          "k",
+          "a",
+          "p",
+          "a",
+          null,
+          null,
+          null,
+          "k",
+          null,
+          "k"
+        ],
+        [
+          null,
+          "t",
+          null,
+          "k",
+          "a",
+          "p",
+          "k",
+          "a",
+          null,
+          "t"
+        ],
+        [
+          "p",
+          "a",
+          "k",
+          "t",
+          null,
+          null,
+          "u",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "p",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "k",
+          "a",
+          "p",
+          "u",
+          "ś"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "u",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "p",
+          null,
+          null,
+          "p",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "a",
+          "k",
+          "t",
+          "a",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "t",
+          null,
+          "a",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          "p",
+          "a",
+          "p",
+          "a",
+          null,
+          "f",
+          null,
+          "t",
+          null
+        ],
+        [
+          null,
+          null,
+          "t",
+          null,
+          "t",
+          "u",
+          "t",
+          "k",
+          "a",
+          null
+        ],
+        [
+          null,
+          null,
+          "u",
+          null,
+          null,
+          null,
+          "a",
+          null,
+          "t",
+          null
+        ],
+        [
+          "p",
+          "a",
+          "t",
+          "k",
+          "a",
+          null,
+          null,
+          null,
+          "u",
+          null
+        ],
+        [
+          "a",
+          null,
+          null,
+          null,
+          "t",
+          null,
+          null,
+          null,
+          "ś",
+          null
+        ],
+        [
+          "k",
+          null,
+          null,
+          null,
+          "a",
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "a",
+          null,
+          null,
+          null,
+          "k",
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      "clues": [
+        {
+          "word": "akta",
+          "description": "Urzędowy akt zbiorowy."
+        },
+        {
+          "word": "pupa",
+          "description": "Tam, gdzie plecy tracą swą szlachetną nazwę."
+        },
+        {
+          "word": "patat",
+          "description": "Bieg konia tam i z powrotem."
+        },
+        {
+          "word": "kapuś",
+          "description": "Główka, która sypie."
+        },
+        {
+          "word": "kupa",
+          "description": "Bywa, że śmiechu."
+        },
+        {
+          "word": "papa",
+          "description": "Pożegnanie z ojcem."
+        },
+        {
+          "word": "atut",
+          "description": "A tu... mocna karta!"
+        },
+        {
+          "word": "kapka",
+          "description": "Symboliczna ilość deszczu."
+        },
+        {
+          "word": "fakt",
+          "description": "Coś, z czym się nie dyskutuje."
+        },
+        {
+          "word": "kupka",
+          "description": "Mniejsza siostra kupy."
+        },
+        {
+          "word": "papka",
+          "description": "Danie dla niemowlaka lub dla mas."
+        },
+        {
+          "word": "kapa",
+          "description": "Przykrywa pościelową niedbałość."
+        },
+        {
+          "word": "patka",
+          "description": "Klapka, nie gaduła."
+        },
+        {
+          "word": "tafta",
+          "description": "Szeleszcząca elegancja."
+        },
+        {
+          "word": "tutka",
+          "description": "Papierowa siostra wafelka."
+        },
+        {
+          "word": "tatuś",
+          "description": "Zdrobniale o ojcu, czasem z portfelem w tle."
+        },
+        {
+          "word": "tata",
+          "description": "Głowa rodziny, często z pilotem w ręku."
+        },
+        {
+          "word": "paka",
+          "description": "Coś, co listonosz ledwo dźwiga."
+        },
+        {
+          "word": "ptak",
+          "description": "Lotnik bez licencji."
+        },
+        {
+          "word": "pakt",
+          "description": "Uroczysta umowa, bywa, że z diabłem."
+        },
+        {
+          "word": "takt",
+          "description": "Potrzebny w tańcu i w dyplomacji."
+        },
+        {
+          "word": "atak",
+          "description": "Nagła dolegliwość serca lub wroga."
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "words": [
+        {
+          "word": "alga",
+          "coordinates": {
+            "row": 10,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "pizza",
+          "coordinates": {
+            "row": 6,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "lala",
+          "coordinates": {
+            "row": 10,
+            "column": 6,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "giga",
+          "coordinates": {
+            "row": 7,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "gilza",
+          "coordinates": {
+            "row": 13,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "papla",
+          "coordinates": {
+            "row": 3,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "azalia",
+          "coordinates": {
+            "row": 10,
+            "column": 8,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "gaza",
+          "coordinates": {
+            "row": 13,
+            "column": 2,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "liga",
+          "coordinates": {
+            "row": 15,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "lilia",
+          "coordinates": {
+            "row": 15,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "zgaga",
+          "coordinates": {
+            "row": 4,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "lipa",
+          "coordinates": {
+            "row": 17,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "lila",
+          "coordinates": {
+            "row": 11,
+            "column": 4,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "liza",
+          "coordinates": {
+            "row": 15,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "papa",
+          "coordinates": {
+            "row": 19,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "agapa",
+          "coordinates": {
+            "row": 0,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "plaga",
+          "coordinates": {
+            "row": 14,
+            "column": 0,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "laga",
+          "coordinates": {
+            "row": 0,
+            "column": 6,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "gapa",
+          "coordinates": {
+            "row": 15,
+            "column": 7,
+            "direction": "V"
+          }
+        }
+      ],
+      "letter_grid": [
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "l",
+          "a",
+          "g",
+          "a"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "g"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "a"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "p",
+          null,
+          "p"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "z",
+          "g",
+          "a",
+          "g",
+          "a"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "p",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "p",
+          null,
+          "l",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "g",
+          "i",
+          "g",
+          "a",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "z",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "z",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "a",
+          "l",
+          "g",
+          "a",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "l",
+          null,
+          "a",
+          null,
+          "z",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "i",
+          null,
+          "l",
+          null,
+          "a",
+          null
+        ],
+        [
+          null,
+          null,
+          "g",
+          "i",
+          "l",
+          "z",
+          "a",
+          null,
+          "l",
+          null
+        ],
+        [
+          "p",
+          null,
+          "a",
+          null,
+          "a",
+          null,
+          null,
+          null,
+          "i",
+          null
+        ],
+        [
+          "l",
+          "i",
+          "z",
+          "a",
+          null,
+          "l",
+          "i",
+          "g",
+          "a",
+          null
+        ],
+        [
+          "a",
+          null,
+          "a",
+          null,
+          null,
+          "i",
+          null,
+          "a",
+          null,
+          null
+        ],
+        [
+          "g",
+          null,
+          null,
+          null,
+          null,
+          "l",
+          "i",
+          "p",
+          "a",
+          null
+        ],
+        [
+          "a",
+          null,
+          null,
+          null,
+          null,
+          "i",
+          null,
+          "a",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "p",
+          "a",
+          "p",
+          "a",
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      "clues": [
+        {
+          "word": "alga",
+          "description": "Zielona koleżanka gałęzi"
+        },
+        {
+          "word": "pizza",
+          "description": "Krzywa wieża smaku"
+        },
+        {
+          "word": "lala",
+          "description": "Zabawka do usypiania"
+        },
+        {
+          "word": "giga",
+          "description": "Wielki śmiech w informatyce"
+        },
+        {
+          "word": "gilza",
+          "description": "Wystrzałowa pozostałość"
+        },
+        {
+          "word": "papla",
+          "description": "Słowotok w ludzkiej skórze"
+        },
+        {
+          "word": "azalia",
+          "description": "Krzew, który zalewa kwieciem"
+        },
+        {
+          "word": "gaza",
+          "description": "Lekki opatrunek ze strefy"
+        },
+        {
+          "word": "liga",
+          "description": "Sojusz kopaczy"
+        },
+        {
+          "word": "lilia",
+          "description": "Królowa stawu w herbie króla"
+        },
+        {
+          "word": "zgaga",
+          "description": "Ognisty powrót obiadu"
+        },
+        {
+          "word": "lipa",
+          "description": "Drzewna ściema"
+        },
+        {
+          "word": "lila",
+          "description": "Fioletowa kołysanka"
+        },
+        {
+          "word": "liza",
+          "description": "Monę ... pędzlem malowano"
+        },
+        {
+          "word": "papa",
+          "description": "Dachowe pożegnanie"
+        },
+        {
+          "word": "agapa",
+          "description": "Wspólny posiłek bez gapienia się"
+        },
+        {
+          "word": "plaga",
+          "description": "Egipska specjalność"
+        },
+        {
+          "word": "laga",
+          "description": "Kij do podpierania argumentów"
+        },
+        {
+          "word": "gapa",
+          "description": "Ptak... roztargnienia"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "words": [
+        {
+          "word": "atol",
+          "coordinates": {
+            "row": 10,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "cało",
+          "coordinates": {
+            "row": 12,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "matoł",
+          "coordinates": {
+            "row": 10,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "matma",
+          "coordinates": {
+            "row": 11,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "tamto",
+          "coordinates": {
+            "row": 6,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "mało",
+          "coordinates": {
+            "row": 7,
+            "column": 6,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "małolat",
+          "coordinates": {
+            "row": 15,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "omal",
+          "coordinates": {
+            "row": 15,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "omam",
+          "coordinates": {
+            "row": 7,
+            "column": 4,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "atom",
+          "coordinates": {
+            "row": 8,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "maca",
+          "coordinates": {
+            "row": 12,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "lama",
+          "coordinates": {
+            "row": 5,
+            "column": 1,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "łata",
+          "coordinates": {
+            "row": 6,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "lato",
+          "coordinates": {
+            "row": 17,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "lala",
+          "coordinates": {
+            "row": 3,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "taca",
+          "coordinates": {
+            "row": 4,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "tama",
+          "coordinates": {
+            "row": 1,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "mama",
+          "coordinates": {
+            "row": 15,
+            "column": 2,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "mata",
+          "coordinates": {
+            "row": 3,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "tata",
+          "coordinates": {
+            "row": 2,
+            "column": 8,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "tato",
+          "coordinates": {
+            "row": 1,
+            "column": 3,
+            "direction": "H"
+          }
+        }
+      ],
+      "letter_grid": [
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "t",
+          "a",
+          "t",
+          "o",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null,
+          null,
+          "t",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "l",
+          null,
+          "m",
+          "a",
+          "t",
+          "a",
+          null
+        ],
+        [
+          null,
+          null,
+          "t",
+          "a",
+          "c",
+          "a",
+          null,
+          null,
+          "t",
+          null
+        ],
+        [
+          null,
+          "l",
+          null,
+          "l",
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null
+        ],
+        [
+          "ł",
+          "a",
+          "t",
+          "a",
+          null,
+          null,
+          null,
+          "t",
+          null,
+          null
+        ],
+        [
+          null,
+          "m",
+          null,
+          null,
+          "o",
+          null,
+          "m",
+          "a",
+          "ł",
+          "o"
+        ],
+        [
+          null,
+          "a",
+          "t",
+          "o",
+          "m",
+          null,
+          null,
+          "m",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null,
+          null,
+          "t",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "m",
+          "a",
+          "t",
+          "o",
+          "ł",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "m",
+          null,
+          "t",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "c",
+          "a",
+          "ł",
+          "o",
+          null,
+          "m",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "t",
+          null,
+          "l",
+          null,
+          "a",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "m",
+          null,
+          null,
+          null,
+          "c",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "m",
+          "a",
+          "ł",
+          "o",
+          "l",
+          "a",
+          "t",
+          null
+        ],
+        [
+          null,
+          null,
+          "a",
+          null,
+          null,
+          "m",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "m",
+          null,
+          "l",
+          "a",
+          "t",
+          "o",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "a",
+          null,
+          null,
+          "l",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      "clues": [
+        {
+          "word": "atol",
+          "description": "Wodny obwarzanek"
+        },
+        {
+          "word": "cało",
+          "description": "Jednoczęściowy po wypadku"
+        },
+        {
+          "word": "matoł",
+          "description": "Daje mata logice"
+        },
+        {
+          "word": "matma",
+          "description": "Dodaje problemów, odejmuje chęci"
+        },
+        {
+          "word": "tamto",
+          "description": "To, ale nie to"
+        },
+        {
+          "word": "mało",
+          "description": "Niedosyt w czterech literach"
+        },
+        {
+          "word": "małolat",
+          "description": "Lata małe, ego duże"
+        },
+        {
+          "word": "omal",
+          "description": "Prawie, co robi wielką różnicę"
+        },
+        {
+          "word": "omam",
+          "description": "Złudzenie optyczne bez optyka"
+        },
+        {
+          "word": "atom",
+          "description": "Budulec z wybuchowym potencjałem"
+        },
+        {
+          "word": "maca",
+          "description": "Przaśny chleb, nie do macania"
+        },
+        {
+          "word": "lama",
+          "description": "Andysjski opluwacz"
+        },
+        {
+          "word": "łata",
+          "description": "Nadziana na dziurę"
+        },
+        {
+          "word": "lato",
+          "description": "Okres, gdy dni są długie, a spodnie krótkie"
+        },
+        {
+          "word": "lala",
+          "description": "Plastikowa piękność bez własnego zdania"
+        },
+        {
+          "word": "taca",
+          "description": "Płaski tragarz napojów"
+        },
+        {
+          "word": "tama",
+          "description": "Zatrzymuje rzekę w biegu"
+        },
+        {
+          "word": "mama",
+          "description": "Pierwsze słowo i ostatnia instancja"
+        },
+        {
+          "word": "mata",
+          "description": "Na niej niejeden judoka poległ"
+        },
+        {
+          "word": "tata",
+          "description": "Głowa rodziny, gdy mama pozwoli"
+        },
+        {
+          "word": "tato",
+          "description": "Męski odpowiednik okrzyku 'mamo!'"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "words": [
+        {
+          "word": "nić",
+          "coordinates": {
+            "row": 9,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "sokolnik",
+          "coordinates": {
+            "row": 9,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "silić",
+          "coordinates": {
+            "row": 11,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "okolić",
+          "coordinates": {
+            "row": 8,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "silikon",
+          "coordinates": {
+            "row": 11,
+            "column": 1,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "skosić",
+          "coordinates": {
+            "row": 15,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "sokolik",
+          "coordinates": {
+            "row": 3,
+            "column": 2,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "silnik",
+          "coordinates": {
+            "row": 14,
+            "column": 4,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "sino",
+          "coordinates": {
+            "row": 12,
+            "column": 6,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "link",
+          "coordinates": {
+            "row": 7,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "solić",
+          "coordinates": {
+            "row": 11,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "konno",
+          "coordinates": {
+            "row": 5,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kosić",
+          "coordinates": {
+            "row": 3,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kisić",
+          "coordinates": {
+            "row": 18,
+            "column": 3,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "konik",
+          "coordinates": {
+            "row": 3,
+            "column": 0,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "nisko",
+          "coordinates": {
+            "row": 1,
+            "column": 6,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "silos",
+          "coordinates": {
+            "row": 2,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kino",
+          "coordinates": {
+            "row": 4,
+            "column": 6,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "lisi",
+          "coordinates": {
+            "row": 0,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "skon",
+          "coordinates": {
+            "row": 2,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "okno",
+          "coordinates": {
+            "row": 0,
+            "column": 1,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "klik",
+          "coordinates": {
+            "row": 13,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "klin",
+          "coordinates": {
+            "row": 16,
+            "column": 6,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "koić",
+          "coordinates": {
+            "row": 1,
+            "column": 1,
+            "direction": "H"
+          }
+        }
+      ],
+      "letter_grid": [
+        [
+          null,
+          "o",
+          null,
+          "l",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          "k",
+          "o",
+          "i",
+          "ć",
+          null,
+          "n",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          "n",
+          null,
+          "s",
+          null,
+          "s",
+          "i",
+          "l",
+          "o",
+          "s"
+        ],
+        [
+          "k",
+          "o",
+          "s",
+          "i",
+          "ć",
+          null,
+          "s",
+          null,
+          null,
+          "k"
+        ],
+        [
+          "o",
+          null,
+          "o",
+          null,
+          null,
+          null,
+          "k",
+          "i",
+          "n",
+          "o"
+        ],
+        [
+          "n",
+          null,
+          "k",
+          "o",
+          "n",
+          "n",
+          "o",
+          null,
+          null,
+          "n"
+        ],
+        [
+          "i",
+          null,
+          "o",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "k",
+          null,
+          "l",
+          "i",
+          "n",
+          "k",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "i",
+          null,
+          null,
+          null,
+          null,
+          "o",
+          null,
+          null
+        ],
+        [
+          "s",
+          "o",
+          "k",
+          "o",
+          "l",
+          "n",
+          "i",
+          "k",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "i",
+          null,
+          "o",
+          null,
+          null
+        ],
+        [
+          null,
+          "s",
+          "i",
+          "l",
+          "i",
+          "ć",
+          null,
+          "l",
+          null,
+          "s"
+        ],
+        [
+          null,
+          "i",
+          null,
+          null,
+          null,
+          null,
+          "s",
+          "i",
+          "n",
+          "o"
+        ],
+        [
+          "k",
+          "l",
+          "i",
+          "k",
+          null,
+          null,
+          null,
+          "ć",
+          null,
+          "l"
+        ],
+        [
+          null,
+          "i",
+          null,
+          null,
+          "s",
+          null,
+          null,
+          null,
+          null,
+          "i"
+        ],
+        [
+          "s",
+          "k",
+          "o",
+          "s",
+          "i",
+          "ć",
+          null,
+          null,
+          null,
+          "ć"
+        ],
+        [
+          null,
+          "o",
+          null,
+          null,
+          "l",
+          null,
+          "k",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          "n",
+          null,
+          null,
+          "n",
+          null,
+          "l",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "k",
+          "i",
+          "s",
+          "i",
+          "ć",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "k",
+          null,
+          "n",
+          null,
+          null,
+          null
+        ]
+      ],
+      "clues": [
+        {
+          "word": "nić",
+          "description": "Wątek bez fabuły"
+        },
+        {
+          "word": "sokolnik",
+          "description": "Ptasiarz na wysokich lotach"
+        },
+        {
+          "word": "silić",
+          "description": "Wysiłek wbrew woli"
+        },
+        {
+          "word": "okolić",
+          "description": "Wziąć w kółko"
+        },
+        {
+          "word": "silikon",
+          "description": "Dolina krzemowa w dekolcie"
+        },
+        {
+          "word": "skosić",
+          "description": "Pozbawić trawę fryzury"
+        },
+        {
+          "word": "sokolik",
+          "description": "Drapieżnik kieszonkowy"
+        },
+        {
+          "word": "silnik",
+          "description": "Warczące serce maszyny"
+        },
+        {
+          "word": "sino",
+          "description": "Niebiesko pod okiem"
+        },
+        {
+          "word": "link",
+          "description": "Klikalny sznurek w sieci"
+        },
+        {
+          "word": "solić",
+          "description": "Sypać rany"
+        },
+        {
+          "word": "konno",
+          "description": "Z perspektywy siodła"
+        },
+        {
+          "word": "kosić",
+          "description": "Golić trawnik"
+        },
+        {
+          "word": "kisić",
+          "description": "Zmieniać ogórka w zagrychę"
+        },
+        {
+          "word": "konik",
+          "description": "Cwałuje po szachownicy"
+        },
+        {
+          "word": "nisko",
+          "description": "Poziom dla krasnoludków"
+        },
+        {
+          "word": "silos",
+          "description": "Wieżowiec dla ziarna"
+        },
+        {
+          "word": "kino",
+          "description": "Ciemnia z ruchomymi obrazkami"
+        },
+        {
+          "word": "lisi",
+          "description": "Chytry z ogonem"
+        },
+        {
+          "word": "skon",
+          "description": "Życie na mecie"
+        },
+        {
+          "word": "okno",
+          "description": "Szklane oko domu"
+        },
+        {
+          "word": "klik",
+          "description": "Dźwięk decyzji w internecie"
+        },
+        {
+          "word": "klin",
+          "description": "Rozpiera od środka"
+        },
+        {
+          "word": "koić",
+          "description": "Głaskać słowem"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "words": [
+        {
+          "word": "koks",
+          "coordinates": {
+            "row": 10,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "mormon",
+          "coordinates": {
+            "row": 6,
+            "column": 6,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "rokoko",
+          "coordinates": {
+            "row": 7,
+            "column": 3,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kosmos",
+          "coordinates": {
+            "row": 3,
+            "column": 4,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "mors",
+          "coordinates": {
+            "row": 5,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "krosno",
+          "coordinates": {
+            "row": 3,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "korso",
+          "coordinates": {
+            "row": 2,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "konno",
+          "coordinates": {
+            "row": 1,
+            "column": 2,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "mokro",
+          "coordinates": {
+            "row": 5,
+            "column": 1,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "skoro",
+          "coordinates": {
+            "row": 10,
+            "column": 8,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "skrom",
+          "coordinates": {
+            "row": 14,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "moro",
+          "coordinates": {
+            "row": 9,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "smok",
+          "coordinates": {
+            "row": 14,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "srom",
+          "coordinates": {
+            "row": 15,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kokon",
+          "coordinates": {
+            "row": 17,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kokos",
+          "coordinates": {
+            "row": 11,
+            "column": 2,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "krok",
+          "coordinates": {
+            "row": 12,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "mrok",
+          "coordinates": {
+            "row": 9,
+            "column": 0,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "okno",
+          "coordinates": {
+            "row": 16,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "skok",
+          "coordinates": {
+            "row": 19,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "skon",
+          "coordinates": {
+            "row": 1,
+            "column": 6,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "kros",
+          "coordinates": {
+            "row": 2,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "skos",
+          "coordinates": {
+            "row": 1,
+            "column": 0,
+            "direction": "V"
+          }
+        }
+      ],
+      "letter_grid": [
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "s",
+          null,
+          "k",
+          null,
+          null,
+          null,
+          "s",
+          null,
+          null,
+          null
+        ],
+        [
+          "k",
+          "r",
+          "o",
+          "s",
+          null,
+          null,
+          "k",
+          null,
+          null,
+          "k"
+        ],
+        [
+          "o",
+          null,
+          "n",
+          null,
+          "k",
+          "r",
+          "o",
+          "s",
+          "n",
+          "o"
+        ],
+        [
+          "s",
+          null,
+          "n",
+          null,
+          "o",
+          null,
+          "n",
+          null,
+          null,
+          "r"
+        ],
+        [
+          null,
+          "m",
+          "o",
+          "r",
+          "s",
+          null,
+          null,
+          null,
+          null,
+          "s"
+        ],
+        [
+          null,
+          "o",
+          null,
+          null,
+          "m",
+          null,
+          "m",
+          null,
+          null,
+          "o"
+        ],
+        [
+          null,
+          "k",
+          null,
+          "r",
+          "o",
+          "k",
+          "o",
+          "k",
+          "o",
+          null
+        ],
+        [
+          null,
+          "r",
+          null,
+          null,
+          "s",
+          null,
+          "r",
+          null,
+          null,
+          null
+        ],
+        [
+          "m",
+          "o",
+          "r",
+          "o",
+          null,
+          null,
+          "m",
+          null,
+          null,
+          null
+        ],
+        [
+          "r",
+          null,
+          null,
+          null,
+          null,
+          "k",
+          "o",
+          "k",
+          "s",
+          null
+        ],
+        [
+          "o",
+          null,
+          "k",
+          null,
+          null,
+          null,
+          "n",
+          null,
+          "k",
+          null
+        ],
+        [
+          "k",
+          "r",
+          "o",
+          "k",
+          null,
+          null,
+          null,
+          null,
+          "o",
+          null
+        ],
+        [
+          null,
+          null,
+          "k",
+          null,
+          null,
+          null,
+          null,
+          null,
+          "r",
+          null
+        ],
+        [
+          null,
+          null,
+          "o",
+          null,
+          null,
+          "s",
+          "k",
+          "r",
+          "o",
+          "m"
+        ],
+        [
+          null,
+          null,
+          "s",
+          "r",
+          "o",
+          "m",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "o",
+          null,
+          "o",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "k",
+          "o",
+          "k",
+          "o",
+          "n"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "n",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "s",
+          "k",
+          "o",
+          "k",
+          null
+        ]
+      ],
+      "clues": [
+        {
+          "word": "koks",
+          "description": "Paliwo dla pakerów"
+        },
+        {
+          "word": "mormon",
+          "description": "Morowy facet z Utah"
+        },
+        {
+          "word": "rokoko",
+          "description": "Koko-luksusowy styl"
+        },
+        {
+          "word": "kosmos",
+          "description": "Gwiezdny most dla kosa"
+        },
+        {
+          "word": "mors",
+          "description": "Kąpielowy twardziel"
+        },
+        {
+          "word": "krosno",
+          "description": "Miasto, w którym przeplatają się wątki"
+        },
+        {
+          "word": "korso",
+          "description": "Spacerowy wybieg w centrum miasta"
+        },
+        {
+          "word": "konno",
+          "description": "Podróż z końską dawką emocji"
+        },
+        {
+          "word": "mokro",
+          "description": "Efekt uboczny płaczu i deszczu"
+        },
+        {
+          "word": "skoro",
+          "description": "Spójnik, co się spieszy"
+        },
+        {
+          "word": "skrom",
+          "description": "Odejście bez fanfar"
+        },
+        {
+          "word": "moro",
+          "description": "Morowy wzór na mundurze"
+        },
+        {
+          "word": "smok",
+          "description": "Ognisty buziak gada"
+        },
+        {
+          "word": "srom",
+          "description": "Anatomiczny wstyd"
+        },
+        {
+          "word": "kokon",
+          "description": "Jedwabny śpiwór gąsienicy"
+        },
+        {
+          "word": "kokos",
+          "description": "Twardy orzech do zgryzienia, ale na plaży"
+        },
+        {
+          "word": "krok",
+          "description": "Pierwszy do tańca"
+        },
+        {
+          "word": "mrok",
+          "description": "Nastaje, gdy krok staje się niewidoczny"
+        },
+        {
+          "word": "okno",
+          "description": "Telewizor z widokiem na żywo"
+        },
+        {
+          "word": "skok",
+          "description": "Krok na dopingu"
+        },
+        {
+          "word": "skon",
+          "description": "Życiowy finisz"
+        },
+        {
+          "word": "kros",
+          "description": "Bieg z przełajami, ale bez 'na'"
+        },
+        {
+          "word": "skos",
+          "description": "Kierunek dla tych, co nie idą prosto"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "words": [
+        {
+          "word": "arat",
+          "coordinates": {
+            "row": 10,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "hurt",
+          "coordinates": {
+            "row": 13,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "tata",
+          "coordinates": {
+            "row": 10,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "tiara",
+          "coordinates": {
+            "row": 6,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "hurra",
+          "coordinates": {
+            "row": 12,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "hura",
+          "coordinates": {
+            "row": 8,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "utrata",
+          "coordinates": {
+            "row": 6,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "atut",
+          "coordinates": {
+            "row": 12,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "aria",
+          "coordinates": {
+            "row": 6,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "trał",
+          "coordinates": {
+            "row": 12,
+            "column": 8,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "huta",
+          "coordinates": {
+            "row": 8,
+            "column": 0,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "ruta",
+          "coordinates": {
+            "row": 15,
+            "column": 3,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "rura",
+          "coordinates": {
+            "row": 3,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "hart",
+          "coordinates": {
+            "row": 9,
+            "column": 6,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "łata",
+          "coordinates": {
+            "row": 14,
+            "column": 6,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "tara",
+          "coordinates": {
+            "row": 17,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "aura",
+          "coordinates": {
+            "row": 4,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "raut",
+          "coordinates": {
+            "row": 6,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "rata",
+          "coordinates": {
+            "row": 16,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "tura",
+          "coordinates": {
+            "row": 14,
+            "column": 0,
+            "direction": "V"
+          }
+        }
+      ],
+      "letter_grid": [
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "r",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "a",
+          "u",
+          "r",
+          "a",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "r",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "u",
+          "t",
+          "r",
+          "a",
+          "t",
+          "a",
+          null,
+          "r"
+        ],
+        [
+          null,
+          null,
+          null,
+          "i",
+          null,
+          null,
+          null,
+          "r",
+          null,
+          "a"
+        ],
+        [
+          "h",
+          "u",
+          "r",
+          "a",
+          null,
+          null,
+          null,
+          "i",
+          null,
+          "u"
+        ],
+        [
+          "u",
+          null,
+          null,
+          "r",
+          null,
+          null,
+          "h",
+          "a",
+          "r",
+          "t"
+        ],
+        [
+          "t",
+          null,
+          "t",
+          "a",
+          "t",
+          "a",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "a",
+          null,
+          null,
+          null,
+          null,
+          "r",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "h",
+          null,
+          "a",
+          "t",
+          "u",
+          "t",
+          null
+        ],
+        [
+          null,
+          null,
+          "h",
+          "u",
+          "r",
+          "t",
+          null,
+          null,
+          "r",
+          null
+        ],
+        [
+          "t",
+          null,
+          null,
+          "r",
+          null,
+          null,
+          "ł",
+          null,
+          "a",
+          null
+        ],
+        [
+          "u",
+          null,
+          null,
+          "r",
+          "u",
+          "t",
+          "a",
+          null,
+          "ł",
+          null
+        ],
+        [
+          "r",
+          "a",
+          "t",
+          "a",
+          null,
+          null,
+          "t",
+          null,
+          null,
+          null
+        ],
+        [
+          "a",
+          null,
+          null,
+          null,
+          null,
+          "t",
+          "a",
+          "r",
+          "a",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      "clues": [
+        {
+          "word": "arat",
+          "description": "Górska papuga"
+        },
+        {
+          "word": "hurt",
+          "description": "Bolesna sprzedaż"
+        },
+        {
+          "word": "tata",
+          "description": "Czytany w obie strony rodzic"
+        },
+        {
+          "word": "tiara",
+          "description": "Ozdoba głowy kierowcy ciężarówki?"
+        },
+        {
+          "word": "hurra",
+          "description": "Wesoły okrzyk z podwojeniem"
+        },
+        {
+          "word": "hura",
+          "description": "Skromniejsza siostra 'hurra'"
+        },
+        {
+          "word": "utrata",
+          "description": "Strata z utratą 'S'"
+        },
+        {
+          "word": "atut",
+          "description": "Mocna karta faraona"
+        },
+        {
+          "word": "aria",
+          "description": "Śpiewana reklama proszku do prania"
+        },
+        {
+          "word": "trał",
+          "description": "Ciągnie się za kutrem, byle jak najdłużej trwał"
+        },
+        {
+          "word": "huta",
+          "description": "Zakład, w którym praca się huśta"
+        },
+        {
+          "word": "ruta",
+          "description": "Ziele, które wyznacza drogę"
+        },
+        {
+          "word": "rura",
+          "description": "Zmiękła, gdy zabrakło wody"
+        },
+        {
+          "word": "hart",
+          "description": "Duch nie z Hogwartu"
+        },
+        {
+          "word": "łata",
+          "description": "Dawniej w Rydze, dziś na dziurze"
+        },
+        {
+          "word": "tara",
+          "description": "Waga, której nikt nie chce"
+        },
+        {
+          "word": "aura",
+          "description": "Nimb wokół głowy lub dawny model z FSO"
+        },
+        {
+          "word": "raut",
+          "description": "Przyjęcie, po którym goście są 'out'"
+        },
+        {
+          "word": "rata",
+          "description": "Miesięczny gryzoń domowego budżetu"
+        },
+        {
+          "word": "tura",
+          "description": "Bycza kolejka"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "words": [
+        {
+          "word": "rój",
+          "coordinates": {
+            "row": 10,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "strata",
+          "coordinates": {
+            "row": 8,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "arras",
+          "coordinates": {
+            "row": 13,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "tara",
+          "coordinates": {
+            "row": 11,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "strój",
+          "coordinates": {
+            "row": 8,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "stras",
+          "coordinates": {
+            "row": 8,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "taras",
+          "coordinates": {
+            "row": 12,
+            "column": 8,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "start",
+          "coordinates": {
+            "row": 4,
+            "column": 6,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "trója",
+          "coordinates": {
+            "row": 6,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "trasa",
+          "coordinates": {
+            "row": 15,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "rajtar",
+          "coordinates": {
+            "row": 6,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "rasa",
+          "coordinates": {
+            "row": 15,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "rata",
+          "coordinates": {
+            "row": 4,
+            "column": 2,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "arat",
+          "coordinates": {
+            "row": 9,
+            "column": 0,
+            "direction": "H"
+          }
+        }
+      ],
+      "letter_grid": [
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "r",
+          null,
+          null,
+          null,
+          "s",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "a",
+          null,
+          null,
+          null,
+          "t",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "t",
+          "r",
+          "ó",
+          "j",
+          "a",
+          null,
+          null,
+          "r"
+        ],
+        [
+          null,
+          null,
+          "a",
+          null,
+          null,
+          null,
+          "r",
+          null,
+          null,
+          "a"
+        ],
+        [
+          null,
+          null,
+          null,
+          "s",
+          null,
+          "s",
+          "t",
+          "r",
+          "ó",
+          "j"
+        ],
+        [
+          "a",
+          "r",
+          "a",
+          "t",
+          null,
+          "t",
+          null,
+          null,
+          null,
+          "t"
+        ],
+        [
+          null,
+          null,
+          null,
+          "r",
+          null,
+          "r",
+          "ó",
+          "j",
+          null,
+          "a"
+        ],
+        [
+          null,
+          null,
+          "t",
+          "a",
+          "r",
+          "a",
+          null,
+          null,
+          null,
+          "r"
+        ],
+        [
+          null,
+          null,
+          null,
+          "s",
+          null,
+          "t",
+          null,
+          null,
+          "t",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "a",
+          "r",
+          "r",
+          "a",
+          "s"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "r",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "t",
+          "r",
+          "a",
+          "s",
+          "a",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null,
+          null,
+          "s",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "s",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      "clues": [
+        {
+          "word": "rój",
+          "description": "żądliwe zgrupowanie"
+        },
+        {
+          "word": "strata",
+          "description": "ubytek z taty"
+        },
+        {
+          "word": "arras",
+          "description": "tkany na opak"
+        },
+        {
+          "word": "tara",
+          "description": "puste ma swoją wagę"
+        },
+        {
+          "word": "strój",
+          "description": "oprawa dla ciała"
+        },
+        {
+          "word": "stras",
+          "description": "kryształowy oszust"
+        },
+        {
+          "word": "taras",
+          "description": "podłoga pod chmurką"
+        },
+        {
+          "word": "start",
+          "description": "wystrzałowy początek"
+        },
+        {
+          "word": "trója",
+          "description": "dostateczny powód do zmartwienia"
+        },
+        {
+          "word": "trasa",
+          "description": "szlak koncertowy lub drogowy"
+        },
+        {
+          "word": "rajtar",
+          "description": "jeździec z raju"
+        },
+        {
+          "word": "rasa",
+          "description": "kategoria dla psa i kota"
+        },
+        {
+          "word": "rata",
+          "description": "cykliczny ból portfela"
+        },
+        {
+          "word": "arat",
+          "description": "gadatliwy ptak, nie rolnik"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "words": [
+        {
+          "word": "arak",
+          "coordinates": {
+            "row": 9,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "kukuryku",
+          "coordinates": {
+            "row": 10,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "brawura",
+          "coordinates": {
+            "row": 6,
+            "column": 8,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "krwawy",
+          "coordinates": {
+            "row": 10,
+            "column": 1,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "rubryka",
+          "coordinates": {
+            "row": 5,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "kurara",
+          "coordinates": {
+            "row": 5,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kubryk",
+          "coordinates": {
+            "row": 2,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "kabura",
+          "coordinates": {
+            "row": 3,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "babka",
+          "coordinates": {
+            "row": 13,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "wybryk",
+          "coordinates": {
+            "row": 15,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kawka",
+          "coordinates": {
+            "row": 15,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "bury",
+          "coordinates": {
+            "row": 8,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "rybka",
+          "coordinates": {
+            "row": 19,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "barak",
+          "coordinates": {
+            "row": 0,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "rybak",
+          "coordinates": {
+            "row": 0,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "bark",
+          "coordinates": {
+            "row": 0,
+            "column": 2,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "arka",
+          "coordinates": {
+            "row": 16,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "aura",
+          "coordinates": {
+            "row": 16,
+            "column": 8,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "wyka",
+          "coordinates": {
+            "row": 15,
+            "column": 0,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "karuk",
+          "coordinates": {
+            "row": 13,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "kurak",
+          "coordinates": {
+            "row": 12,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "brak",
+          "coordinates": {
+            "row": 8,
+            "column": 6,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "ubaw",
+          "coordinates": {
+            "row": 1,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kwark",
+          "coordinates": {
+            "row": 18,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kara",
+          "coordinates": {
+            "row": 12,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "kawa",
+          "coordinates": {
+            "row": 0,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "karb",
+          "coordinates": {
+            "row": 5,
+            "column": 1,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "kark",
+          "coordinates": {
+            "row": 17,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kura",
+          "coordinates": {
+            "row": 0,
+            "column": 0,
+            "direction": "V"
+          }
+        }
+      ],
+      "letter_grid": [
+        [
+          "k",
+          null,
+          "b",
+          null,
+          null,
+          "r",
+          "y",
+          "b",
+          "a",
+          "k"
+        ],
+        [
+          "u",
+          "b",
+          "a",
+          "w",
+          null,
+          null,
+          null,
+          "a",
+          null,
+          "a"
+        ],
+        [
+          "r",
+          null,
+          "r",
+          null,
+          null,
+          "k",
+          null,
+          "r",
+          null,
+          "w"
+        ],
+        [
+          "a",
+          null,
+          "k",
+          "a",
+          "b",
+          "u",
+          "r",
+          "a",
+          null,
+          "a"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "b",
+          null,
+          "k",
+          null,
+          null
+        ],
+        [
+          null,
+          "k",
+          "u",
+          "r",
+          "a",
+          "r",
+          "a",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          "a",
+          null,
+          "u",
+          null,
+          "y",
+          null,
+          null,
+          "b",
+          null
+        ],
+        [
+          null,
+          "r",
+          null,
+          "b",
+          null,
+          "k",
+          null,
+          null,
+          "r",
+          null
+        ],
+        [
+          null,
+          "b",
+          "u",
+          "r",
+          "y",
+          null,
+          "b",
+          "r",
+          "a",
+          "k"
+        ],
+        [
+          null,
+          null,
+          null,
+          "y",
+          null,
+          "a",
+          null,
+          null,
+          "w",
+          null
+        ],
+        [
+          null,
+          "k",
+          "u",
+          "k",
+          "u",
+          "r",
+          "y",
+          "k",
+          "u",
+          null
+        ],
+        [
+          null,
+          "r",
+          null,
+          "a",
+          null,
+          "a",
+          null,
+          null,
+          "r",
+          null
+        ],
+        [
+          null,
+          "w",
+          null,
+          null,
+          null,
+          "k",
+          "u",
+          "r",
+          "a",
+          "k"
+        ],
+        [
+          "b",
+          "a",
+          "b",
+          "k",
+          "a",
+          null,
+          null,
+          null,
+          null,
+          "a"
+        ],
+        [
+          null,
+          "w",
+          null,
+          "a",
+          null,
+          null,
+          null,
+          null,
+          null,
+          "r"
+        ],
+        [
+          "w",
+          "y",
+          "b",
+          "r",
+          "y",
+          "k",
+          null,
+          null,
+          null,
+          "a"
+        ],
+        [
+          "y",
+          null,
+          null,
+          "u",
+          null,
+          "a",
+          "r",
+          "k",
+          "a",
+          null
+        ],
+        [
+          "k",
+          "a",
+          "r",
+          "k",
+          null,
+          "w",
+          null,
+          null,
+          "u",
+          null
+        ],
+        [
+          "a",
+          null,
+          null,
+          null,
+          null,
+          "k",
+          "w",
+          "a",
+          "r",
+          "k"
+        ],
+        [
+          null,
+          "r",
+          "y",
+          "b",
+          "k",
+          "a",
+          null,
+          null,
+          "a",
+          null
+        ]
+      ],
+      "clues": [
+        {
+          "word": "arak",
+          "description": "wódka z rakiem"
+        },
+        {
+          "word": "kukuryku",
+          "description": "budzik z grzebieniem"
+        },
+        {
+          "word": "brawura",
+          "description": "odwaga z rurą"
+        },
+        {
+          "word": "krwawy",
+          "description": "taki stek lubi wampir"
+        },
+        {
+          "word": "rubryka",
+          "description": "puste miejsce po Rubiku"
+        },
+        {
+          "word": "kurara",
+          "description": "strzałka, co paraliżuje"
+        },
+        {
+          "word": "kubryk",
+          "description": "marynarska sypialnia dla Rubika"
+        },
+        {
+          "word": "kabura",
+          "description": "dom dla rewolweru"
+        },
+        {
+          "word": "babka",
+          "description": "słodka krewna"
+        },
+        {
+          "word": "wybryk",
+          "description": "niesforny czyn z brykiem"
+        },
+        {
+          "word": "kawka",
+          "description": "czarny ptak o poranku"
+        },
+        {
+          "word": "bury",
+          "description": "kolor psa lub ponuraka"
+        },
+        {
+          "word": "rybka",
+          "description": "pływa w wódce"
+        },
+        {
+          "word": "barak",
+          "description": "dom, w którym czegoś brak"
+        },
+        {
+          "word": "rybak",
+          "description": "ten, co ma haka na ryby"
+        },
+        {
+          "word": "bark",
+          "description": "część ciała, co pływa"
+        },
+        {
+          "word": "arka",
+          "description": "pływający zwierzyniec"
+        },
+        {
+          "word": "aura",
+          "description": "otacza złotem"
+        },
+        {
+          "word": "wyka",
+          "description": "pasza, którą wykarmi"
+        },
+        {
+          "word": "karuk",
+          "description": "kara dla kruka"
+        },
+        {
+          "word": "kurak",
+          "description": "ptak z rakiem"
+        },
+        {
+          "word": "brak",
+          "description": "to, co dzieli barak od baru"
+        },
+        {
+          "word": "ubaw",
+          "description": "zabawa po pachy"
+        },
+        {
+          "word": "kwark",
+          "description": "serowy składnik materii"
+        },
+        {
+          "word": "kara",
+          "description": "płacisz za nią lub siedzisz"
+        },
+        {
+          "word": "kawa",
+          "description": "czarna dama o poranku"
+        },
+        {
+          "word": "karb",
+          "description": "nacięcie na karku"
+        },
+        {
+          "word": "kark",
+          "description": "nosi głowę, czasem byka"
+        },
+        {
+          "word": "kura",
+          "description": "znosi jaja, nie zniewagi"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "words": [
+        {
+          "word": "cedr",
+          "coordinates": {
+            "row": 10,
+            "column": 3,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "zaraza",
+          "coordinates": {
+            "row": 8,
+            "column": 6,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "zdrada",
+          "coordinates": {
+            "row": 13,
+            "column": 3,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "cera",
+          "coordinates": {
+            "row": 10,
+            "column": 8,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "radar",
+          "coordinates": {
+            "row": 13,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "czereda",
+          "coordinates": {
+            "row": 15,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "zadra",
+          "coordinates": {
+            "row": 15,
+            "column": 1,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "rezeda",
+          "coordinates": {
+            "row": 8,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "zecer",
+          "coordinates": {
+            "row": 4,
+            "column": 4,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "zrzęda",
+          "coordinates": {
+            "row": 4,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "czara",
+          "coordinates": {
+            "row": 12,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "rzecz",
+          "coordinates": {
+            "row": 6,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "dacza",
+          "coordinates": {
+            "row": 3,
+            "column": 2,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "zaraz",
+          "coordinates": {
+            "row": 0,
+            "column": 6,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "czad",
+          "coordinates": {
+            "row": 6,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "czar",
+          "coordinates": {
+            "row": 2,
+            "column": 3,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "radca",
+          "coordinates": {
+            "row": 17,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "reda",
+          "coordinates": {
+            "row": 14,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "raca",
+          "coordinates": {
+            "row": 18,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "rada",
+          "coordinates": {
+            "row": 2,
+            "column": 8,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "rdza",
+          "coordinates": {
+            "row": 16,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "zraz",
+          "coordinates": {
+            "row": 19,
+            "column": 5,
+            "direction": "H"
+          }
+        }
+      ],
+      "letter_grid": [
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "z",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "c",
+          "z",
+          "a",
+          "r",
+          null,
+          "r",
+          null
+        ],
+        [
+          null,
+          null,
+          "d",
+          null,
+          null,
+          null,
+          "a",
+          null,
+          "a",
+          null
+        ],
+        [
+          null,
+          null,
+          "a",
+          null,
+          "z",
+          "r",
+          "z",
+          "ę",
+          "d",
+          "a"
+        ],
+        [
+          null,
+          null,
+          "c",
+          null,
+          "e",
+          null,
+          null,
+          null,
+          "a",
+          null
+        ],
+        [
+          null,
+          "r",
+          "z",
+          "e",
+          "c",
+          "z",
+          null,
+          null,
+          null,
+          "c"
+        ],
+        [
+          null,
+          null,
+          "a",
+          null,
+          "e",
+          null,
+          null,
+          null,
+          null,
+          "z"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "r",
+          "e",
+          "z",
+          "e",
+          "d",
+          "a"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null,
+          null,
+          "d"
+        ],
+        [
+          null,
+          null,
+          null,
+          "c",
+          "e",
+          "d",
+          "r",
+          null,
+          "c",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null,
+          "e",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "c",
+          null,
+          null,
+          "z",
+          null,
+          "r",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "z",
+          "d",
+          "r",
+          "a",
+          "d",
+          "a",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          "a",
+          null,
+          "a",
+          null,
+          null,
+          null,
+          "r"
+        ],
+        [
+          "c",
+          "z",
+          "e",
+          "r",
+          "e",
+          "d",
+          "a",
+          null,
+          null,
+          "e"
+        ],
+        [
+          null,
+          "a",
+          null,
+          "a",
+          null,
+          "a",
+          null,
+          "r",
+          null,
+          "d"
+        ],
+        [
+          null,
+          "d",
+          null,
+          null,
+          null,
+          "r",
+          "a",
+          "d",
+          "c",
+          "a"
+        ],
+        [
+          null,
+          "r",
+          "a",
+          "c",
+          "a",
+          null,
+          null,
+          "z",
+          null,
+          null
+        ],
+        [
+          null,
+          "a",
+          null,
+          null,
+          null,
+          "z",
+          "r",
+          "a",
+          "z",
+          null
+        ]
+      ],
+      "clues": [
+        {
+          "word": "cedr",
+          "description": "Iglak z płyty"
+        },
+        {
+          "word": "zaraza",
+          "description": "Razi wszystkich bez wyjątku"
+        },
+        {
+          "word": "zdrada",
+          "description": "Gdy rada zawodzi"
+        },
+        {
+          "word": "cera",
+          "description": "Twarzowa sprawa"
+        },
+        {
+          "word": "radar",
+          "description": "Daje radę i mandat"
+        },
+        {
+          "word": "czereda",
+          "description": "Tłum z redą"
+        },
+        {
+          "word": "zadra",
+          "description": "Tkwi w palcu lub w sercu"
+        },
+        {
+          "word": "rezeda",
+          "description": "Zapach z edą"
+        },
+        {
+          "word": "zecer",
+          "description": "Gość z erą w drukarni"
+        },
+        {
+          "word": "zrzęda",
+          "description": "Rzędem marudzi"
+        },
+        {
+          "word": "czara",
+          "description": "Puchar pełen czarów"
+        },
+        {
+          "word": "rzecz",
+          "description": "Przedmiot rozmowy"
+        },
+        {
+          "word": "dacza",
+          "description": "Letnisko z czą"
+        },
+        {
+          "word": "zaraz",
+          "description": "Polska chwila, która trwa wieki"
+        },
+        {
+          "word": "czad",
+          "description": "W Afryce lub w kominie"
+        },
+        {
+          "word": "czar",
+          "description": "Ma go magik i amant"
+        },
+        {
+          "word": "radca",
+          "description": "Prawnik, który zawsze da radę"
+        },
+        {
+          "word": "reda",
+          "description": "Morska poczekalnia"
+        },
+        {
+          "word": "raca",
+          "description": "Wystrzałowa na ca"
+        },
+        {
+          "word": "rada",
+          "description": "Udzielana chętnie, przyjmowana niechętnie"
+        },
+        {
+          "word": "rdza",
+          "description": "Ruda, co zżera żelazo"
+        },
+        {
+          "word": "zraz",
+          "description": "Mięsny zwitek na raz"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "words": [
+        {
+          "word": "aula",
+          "coordinates": {
+            "row": 10,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kloc",
+          "coordinates": {
+            "row": 9,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "kolka",
+          "coordinates": {
+            "row": 6,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "lalka",
+          "coordinates": {
+            "row": 6,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "cacko",
+          "coordinates": {
+            "row": 12,
+            "column": 5,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kakao",
+          "coordinates": {
+            "row": 12,
+            "column": 8,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "koka",
+          "coordinates": {
+            "row": 14,
+            "column": 6,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "luka",
+          "coordinates": {
+            "row": 6,
+            "column": 2,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "lokal",
+          "coordinates": {
+            "row": 2,
+            "column": 4,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "lala",
+          "coordinates": {
+            "row": 2,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "lulka",
+          "coordinates": {
+            "row": 4,
+            "column": 1,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kloaka",
+          "coordinates": {
+            "row": 14,
+            "column": 6,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "kulka",
+          "coordinates": {
+            "row": 17,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "klaka",
+          "coordinates": {
+            "row": 14,
+            "column": 2,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "kalka",
+          "coordinates": {
+            "row": 15,
+            "column": 4,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "koala",
+          "coordinates": {
+            "row": 8,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "kula",
+          "coordinates": {
+            "row": 18,
+            "column": 6,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "laka",
+          "coordinates": {
+            "row": 19,
+            "column": 3,
+            "direction": "H"
+          }
+        }
+      ],
+      "letter_grid": [
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "l",
+          "a",
+          "l",
+          "a",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "o",
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          "l",
+          "u",
+          "l",
+          "k",
+          "a",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "l",
+          "a",
+          "l",
+          "k",
+          "a",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "u",
+          null,
+          null,
+          "o",
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "k",
+          "o",
+          "a",
+          "l",
+          "a",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "a",
+          null,
+          null,
+          "k",
+          null,
+          "k",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "a",
+          "u",
+          "l",
+          "a",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "o",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "c",
+          "a",
+          "c",
+          "k",
+          "o"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null
+        ],
+        [
+          null,
+          null,
+          "k",
+          null,
+          null,
+          null,
+          "k",
+          "o",
+          "k",
+          "a"
+        ],
+        [
+          null,
+          null,
+          "l",
+          null,
+          "k",
+          null,
+          "l",
+          null,
+          "a",
+          null
+        ],
+        [
+          null,
+          null,
+          "a",
+          null,
+          "a",
+          null,
+          "o",
+          null,
+          "o",
+          null
+        ],
+        [
+          null,
+          null,
+          "k",
+          "u",
+          "l",
+          "k",
+          "a",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          "a",
+          null,
+          "k",
+          null,
+          "k",
+          "u",
+          "l",
+          "a"
+        ],
+        [
+          null,
+          null,
+          null,
+          "l",
+          "a",
+          "k",
+          "a",
+          null,
+          null,
+          null
+        ]
+      ],
+      "clues": [
+        {
+          "word": "aula",
+          "description": "Akademicki salon z wysokim 'A'"
+        },
+        {
+          "word": "kloc",
+          "description": "Pozostawia ślad w lesie i w toalecie"
+        },
+        {
+          "word": "kolka",
+          "description": "Mały ból w kółko"
+        },
+        {
+          "word": "lalka",
+          "description": "Zabawka, co nuci 'la la'"
+        },
+        {
+          "word": "cacko",
+          "description": "Błyskotka dla pieszczocha"
+        },
+        {
+          "word": "kakao",
+          "description": "Napój, który lubi się powtarzać"
+        },
+        {
+          "word": "koka",
+          "description": "Gazowany napój... z polotem"
+        },
+        {
+          "word": "luka",
+          "description": "Pustka w uzębieniu lub w prawie"
+        },
+        {
+          "word": "lokal",
+          "description": "Gospoda bez loków"
+        },
+        {
+          "word": "lala",
+          "description": "Piękność z plastiku lub z sąsiedztwa"
+        },
+        {
+          "word": "lulka",
+          "description": "Fajka, co usypia"
+        },
+        {
+          "word": "kloaka",
+          "description": "Wyjście awaryjne u ptaka"
+        },
+        {
+          "word": "kulka",
+          "description": "Amunicja na mole"
+        },
+        {
+          "word": "klaka",
+          "description": "Grupa, co klaska za kasę"
+        },
+        {
+          "word": "kalka",
+          "description": "Przeźroczysta ściąga rysownika"
+        },
+        {
+          "word": "koala",
+          "description": "Niedźwiadek, co ma fazę na eukaliptus"
+        },
+        {
+          "word": "kula",
+          "description": "Może być u nogi albo w lufie"
+        },
+        {
+          "word": "laka",
+          "description": "Połysk na paznokciu z pieczęcią"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "words": [
+        {
+          "word": "aura",
+          "coordinates": {
+            "row": 10,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "cudo",
+          "coordinates": {
+            "row": 9,
+            "column": 5,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "duda",
+          "coordinates": {
+            "row": 7,
+            "column": 7,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "doradca",
+          "coordinates": {
+            "row": 7,
+            "column": 3,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "rura",
+          "coordinates": {
+            "row": 4,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "radca",
+          "coordinates": {
+            "row": 5,
+            "column": 3,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "ruada",
+          "coordinates": {
+            "row": 3,
+            "column": 6,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "dorada",
+          "coordinates": {
+            "row": 12,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "uroda",
+          "coordinates": {
+            "row": 5,
+            "column": 2,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "coda",
+          "coordinates": {
+            "row": 9,
+            "column": 9,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "radar",
+          "coordinates": {
+            "row": 12,
+            "column": 6,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "ruda",
+          "coordinates": {
+            "row": 14,
+            "column": 4,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "odra",
+          "coordinates": {
+            "row": 9,
+            "column": 0,
+            "direction": "H"
+          }
+        },
+        {
+          "word": "orda",
+          "coordinates": {
+            "row": 7,
+            "column": 1,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "rada",
+          "coordinates": {
+            "row": 14,
+            "column": 4,
+            "direction": "V"
+          }
+        },
+        {
+          "word": "udar",
+          "coordinates": {
+            "row": 4,
+            "column": 6,
+            "direction": "H"
+          }
+        }
+      ],
+      "letter_grid": [
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "r",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "u",
+          "d",
+          "a",
+          "r"
+        ],
+        [
+          null,
+          null,
+          "u",
+          "r",
+          "o",
+          "d",
+          "a",
+          null,
+          null,
+          "u"
+        ],
+        [
+          null,
+          null,
+          null,
+          "a",
+          null,
+          null,
+          "d",
+          null,
+          null,
+          "r"
+        ],
+        [
+          null,
+          "o",
+          null,
+          "d",
+          "o",
+          "r",
+          "a",
+          "d",
+          "c",
+          "a"
+        ],
+        [
+          null,
+          "r",
+          null,
+          "c",
+          null,
+          null,
+          null,
+          "u",
+          null,
+          null
+        ],
+        [
+          "o",
+          "d",
+          "r",
+          "a",
+          null,
+          "c",
+          null,
+          "d",
+          null,
+          "c"
+        ],
+        [
+          null,
+          "a",
+          null,
+          null,
+          "a",
+          "u",
+          "r",
+          "a",
+          null,
+          "o"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "d",
+          null,
+          null,
+          null,
+          "d"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "d",
+          "o",
+          "r",
+          "a",
+          "d",
+          "a"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "r",
+          "u",
+          "d",
+          "a",
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null,
+          "a",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "d",
+          null,
+          "r",
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          "a",
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      "clues": [
+        {
+          "word": "aura",
+          "description": "Atmosfera wokół, ale bez tlenu"
+        },
+        {
+          "word": "cudo",
+          "description": "Cud z dziurką"
+        },
+        {
+          "word": "duda",
+          "description": "Instrument prezydencki"
+        },
+        {
+          "word": "doradca",
+          "description": "Daje rady, ale nie zawsze radę"
+        },
+        {
+          "word": "rura",
+          "description": "Pusta w środku, a ciśnienie trzyma"
+        },
+        {
+          "word": "radca",
+          "description": "Prawnik, co radzi od rzeczy"
+        },
+        {
+          "word": "ruada",
+          "description": "Głośna gromada, która wpada"
+        },
+        {
+          "word": "dorada",
+          "description": "Ryba, która doradza"
+        },
+        {
+          "word": "uroda",
+          "description": "Kapitał, który z wiekiem traci na wartości"
+        },
+        {
+          "word": "coda",
+          "description": "Muzyczny ogon"
+        },
+        {
+          "word": "radar",
+          "description": "Oko, co patrzy wstecz"
+        },
+        {
+          "word": "ruda",
+          "description": "Może być na głowie albo pod ziemią"
+        },
+        {
+          "word": "odra",
+          "description": "Płynie przez Wrocław lub po ciele"
+        },
+        {
+          "word": "orda",
+          "description": "Dzika gromada, niekoniecznie złota"
+        },
+        {
+          "word": "rada",
+          "description": "Można ją dać lub w niej zasiadać"
+        },
+        {
+          "word": "udar",
+          "description": "Postrzał w głowę bez użycia broni"
+        }
+      ]
+    }
+  ]
+}
