@@ -1,14 +1,21 @@
 # find all sets of 7 letters and generate all possible words from them
 import itertools
 from collections import defaultdict
+import unicodedata
 
 ALPHABET = ['a','ą','b','c','ć','d','e','ę','f','g','h','i','j','k','l','ł','m','n','ń','o','ó','p','r','s','ś','t','u','w','y','z','ż','ź']
+ALPHABET = [unicodedata.normalize('NFC', ch) for ch in ALPHABET]
+
 INDEX = {letter: i for i, letter in enumerate(ALPHABET)}
+
+def norm(s: str) -> str:
+    # Lowercase and compose characters so 'a' + COMBINING OGONEK → 'ą'
+    return unicodedata.normalize('NFC', s.lower())
 
 def word_mask(word: str) -> int:
     """Generate a bitmask for the given word."""
     mask = 0
-    for letter in word:
+    for letter in norm(word):
         if letter in INDEX:  # Ensure the letter is in the defined alphabet
             mask |= (1 << INDEX[letter])
     return mask
