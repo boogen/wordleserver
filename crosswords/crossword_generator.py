@@ -346,7 +346,6 @@ def generate_crossword(words: List[str], height: int, width: int, time_limit_s: 
     # Normalize
     vocab = []
     for w in words:
-        w = "".join(ch for ch in w.lower() if ch.isalpha())
         if len(w) >= 2:
             vocab.append(w)
     # Deduplicate; longer words first often help initial seeding
@@ -388,6 +387,7 @@ def main():
 
     all_crosswords = []
     for idx, line in enumerate(lines, 1):
+        print(f"[INFO] Generating crossword for line {idx}: {line}")
         words = line.split()
         sol = generate_crossword(words, args.height, args.width, time_limit_s=args.time_per_line)
         if sol is None:

@@ -19,6 +19,10 @@ export class PossibleCrosswordV3 {
     constructor(public crossword_id: number, public word_list: CrosswordWord[], public letter_grid: string[][], public clues: Clue[], public id?: ObjectId) { }
 }
 
+export class GlobalCrossword {
+    constructor(public crossword_id:number, validity:number, crossword_serial:number, public id?: ObjectId) { }
+}
+
 export class PlayerCrosswordState {
     constructor(public player_id: number, public crossword_id: number, public grid: string[][], public words: string[], public id?: ObjectId) { }
 }
@@ -27,8 +31,16 @@ export async function getCrossword(crossword_id: number, dbi: WordleDBI): Promis
     return dbi.possible_crosswords_v3().findOne({ crossword_id: crossword_id });
 }
 
-export async function getRandomCrossword(dbi: WordleDBI): Promise<PossibleCrosswordV3> {
-    return (await dbi.possible_crosswords_v3().aggregate([{ $sample: { size: 1 } }]))[0];
+export async function getOrCreateRandomCrossword(dbi: WordleDBI, timestamp: number, new_validity: number): Promise<PossibleCrosswordV3> {
+    var new_crossword_id:number = await dbi.getNextSequenceValue("global_crossword")
+    var new_crossword = (await dbi.possible_crosswords_v3().aggregate([{ $sample: { size: 1 } }]))[0]
+    console.log(new_crossword)
+    var crossword = (await dbi.crossword_v3().findOneAndUpdate(
+        {validity:{$gt: timestamp}},
+        {$setOnInsert: {crossword_id:new_crossword.crossword_id, validity: new_validity, crossword_serial: new_crossword_id}},
+        {upsert: true}
+    ))
+    return (await dbi.possible_crosswords_v3().findOne({crossword_id:crossword!.crossword_id}))!;
 }
 
 export async function getFirstCrossword(dbi: WordleDBI): Promise<PossibleCrosswordV3 | null> {

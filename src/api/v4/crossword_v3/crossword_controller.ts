@@ -1,13 +1,16 @@
 import { query } from "express";
 import { Post, Query, Route } from "tsoa";
 import { Stats } from "../../../WordleStatsDBI";
-import { Clue, CrosswordWord, getCrossword, getFirstCrossword, getRandomCrossword, GridCoordinates } from "../DBI/crosswords_v3/model";
+import { Clue, CrosswordWord, getCrossword, getFirstCrossword, getOrCreateRandomCrossword, GridCoordinates } from "../DBI/crosswords_v3/model";
 import { PlayerCrosswordState } from "../DBI/crosswords_v3/model";
 import { PossibleCrosswordV3 } from "../DBI/crosswords_v3/model";
 import WordleDBI from "../DBI/DBI";
 import { checkLimit, resolvePlayerId } from "../DBI/player/player";
 import { isWordValid } from "../DBI/wordle/model";
 import { ClueState, getCrosswordV3State, PlayerCrosswordV3State, setCrosswordV3State } from "../DBI/crosswords_v3/state";
+
+const WORD_VALIDITY = 86400;
+const GLOBAL_TIME_START = 1647774000;
 
 interface CrosswordInitReply {
     message: string;
@@ -39,8 +42,15 @@ export class CrosswordController {
         const playerId = await resolvePlayerId(auth_id, dbi);
         var state = await getCrosswordV3State(playerId, dbi);
 
+        const timestamp = Date.now() / 1000;
+        var new_validity_timestamp = GLOBAL_TIME_START;
+        while (new_validity_timestamp < timestamp) {
+            new_validity_timestamp += WORD_VALIDITY;
+        }
+
+        const crossword = await getOrCreateRandomCrossword(dbi, timestamp, new_validity_timestamp);
+
         if (state == null) {
-            const crossword = await getRandomCrossword(dbi);
             console.log(crossword)
             state = this.convertCrosswordToInternalState(playerId, crossword);
         }

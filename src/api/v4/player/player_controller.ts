@@ -103,6 +103,7 @@ export class PlayerController {
 
     @Post("login")
     public async login(@Query() auth_id:string):Promise<LoginReply> {
+        console.log("Logging in auth_id: " + auth_id)
         const player_id:number = (await resolvePlayerId(auth_id, dbi));
         var last_login_timestamp = (await getLastLoginTimestamp(player_id, dbi));
         var last_midnight = new Date();

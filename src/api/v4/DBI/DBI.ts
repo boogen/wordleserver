@@ -23,7 +23,7 @@ import { getRank, getRankWithFilter, getScoreFromRank, updateRank } from './rank
 import { PlayerLastLogin } from './player/PlayerLastLogin';
 import { PlayerLimits } from './player/PlayerLimits';
 import { PlayerLimitsModel } from './player/PlayerLimitsModel';
-import { PossibleCrosswordV3 } from './crosswords_v3/model';
+import { PossibleCrosswordV3 , GlobalCrossword} from './crosswords_v3/model';
 import { PlayerCrosswordV3State } from './crosswords_v3/state';
 
 const _db: IMonkManager = monk(process.env.MONGO_URI!);
@@ -42,6 +42,7 @@ export default class WordleDBI {
     global_word(): ICollection<GlobalWord> { return _db.get("global_word") }
     possible_crosswords(): ICollection<PossibleCrossword> { return _db.get("possible_crosswords_v2") }
     possible_crosswords_v3(): ICollection<PossibleCrosswordV3> { return _db.get("possible_crosswords_v3") }
+    crossword_v3(): ICollection<GlobalCrossword> { return _db.get("crossword_v3") }
     player_crossword_state(): ICollection<PlayerCrosswordState> { return _db.get("player_crossword_state") }
     player_crossword_v3_state(): ICollection<PlayerCrosswordV3State> { return _db.get("player_crossword_v3_state") }
     global_bee(): ICollection<GlobalBee> { return _db.get("global_bee_v2") }
