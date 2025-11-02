@@ -2,6 +2,7 @@
 import itertools
 from collections import defaultdict
 import unicodedata
+from wordfreq import zipf_frequency
 
 ALPHABET = ['a','ą','b','c','ć','d','e','ę','f','g','h','i','j','k','l','ł','m','n','ń','o','ó','p','r','s','ś','t','u','w','y','z','ż','ź']
 ALPHABET = [unicodedata.normalize('NFC', ch) for ch in ALPHABET]
@@ -29,6 +30,8 @@ def read_dictionary(path='slownik', min_len=4, max_letters=7):
                 continue
             word, score = raw.split('=')
             word = word.strip()
+            if zipf_frequency(word, 'pl') < 1.5:
+                continue
             try:
                 score = int(score.strip())
             except ValueError:

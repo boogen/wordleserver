@@ -358,7 +358,7 @@ def generate_crossword(words: List[str], height: int, width: int, time_limit_s: 
 
     # Initial candidates for all words (seed logic inside enumerate)
     candidates = {w: enumerate_candidates(board, w) for w in vocab}
-    deadline = time.time() + time_limit_s if time_limit_s else None
+    deadline = time.monotonic() + time_limit_s if time_limit_s else None
     dfs(board, placed=[], unplaced=vocab, candidates=candidates, best=best, deadline=deadline)
     return best
 
