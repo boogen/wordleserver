@@ -436,7 +436,100 @@
           "a"
         ]
       ],
-      "clues": []
+      "clues": [
+        {
+          "word": "stokrotka",
+          "description": "Ma sto razy krótko do lata."
+        },
+        {
+          "word": "starosta",
+          "description": "Jego kadencja trwa dłużej niż niejedna ość w gardle."
+        },
+        {
+          "word": "prorok",
+          "description": "Zawodowo uprawia efekt 'a nie mówiłem?'"
+        },
+        {
+          "word": "aktor",
+          "description": "Zawodowy kłamca oklaskiwany na stojąco."
+        },
+        {
+          "word": "kropka",
+          "description": "Stawia ją nad \"i\" zazdrosna żona."
+        },
+        {
+          "word": "opaska",
+          "description": "Mały pas na wielkie problemy."
+        },
+        {
+          "word": "passat",
+          "description": "Ulubiony wehikuł szwagra z dieslem pod maską."
+        },
+        {
+          "word": "prostota",
+          "description": "Cechuje ją linia prosta i myślenie bez zakrętów."
+        },
+        {
+          "word": "aktorka",
+          "description": "Królowa dramatu, nie tylko na deskach teatru."
+        },
+        {
+          "word": "pokora",
+          "description": "Cnota, którą najtrudniej się chwalić."
+        },
+        {
+          "word": "prosta",
+          "description": "Najkrótsza droga między dwoma kuflami."
+        },
+        {
+          "word": "stopka",
+          "description": "Mały kieliszek na szybkie \"stop\" i dalszą jazdę."
+        },
+        {
+          "word": "atrapa",
+          "description": "Taniej wychodzi niż oryginał, ale radości nie daje."
+        },
+        {
+          "word": "pastor",
+          "description": "Jego kazania bywają bardzo protestanckie."
+        },
+        {
+          "word": "tarot",
+          "description": "Instrukcja obsługi życia w obrazkach."
+        },
+        {
+          "word": "starka",
+          "description": "Wódka, co im starsza, tym lepsza, w przeciwieństwie do kaca po niej."
+        },
+        {
+          "word": "kappa",
+          "description": "Grecka litera w sportowym dresie."
+        },
+        {
+          "word": "korka",
+          "description": "Zatyka butelkę lub całe miasto."
+        },
+        {
+          "word": "karta",
+          "description": "Czasem kredytowa, czasem atutowa, zawsze jakoś obciąża."
+        },
+        {
+          "word": "kasta",
+          "description": "W Indiach oficjalnie zniesiona, w korporacji ma się świetnie."
+        },
+        {
+          "word": "kotka",
+          "description": "Ma pazurki i dziewięć żyć na koncie bankowym właściciela."
+        },
+        {
+          "word": "papka",
+          "description": "Pierwszy posiłek w życiu i ostatnia rzecz, jakiej chcesz słuchać w mediach."
+        },
+        {
+          "word": "paska",
+          "description": "Element garderoby, który zacieśnia więzi z talią."
+        }
+      ]
     },
     {
       "id": 2,
@@ -868,7 +961,100 @@
           null
         ]
       ],
-      "clues": []
+      "clues": [
+        {
+          "word": "stokrotka",
+          "description": "kwiat, który ma setkę czegoś krótkiego w nazwie"
+        },
+        {
+          "word": "stolarka",
+          "description": "sztuka, w której deski nabierają ogłady"
+        },
+        {
+          "word": "korka",
+          "description": "pani, z którą omijasz egzaminacyjny korek"
+        },
+        {
+          "word": "aktor",
+          "description": "Jego praca to jedna wielka ściema"
+        },
+        {
+          "word": "katol",
+          "description": "W niedzielę na mszy, a w krzyżówce sąsiad kata"
+        },
+        {
+          "word": "lokator",
+          "description": "Płaci za możliwość narzekania na czynsz"
+        },
+        {
+          "word": "starosta",
+          "description": "urzędnik, który nie jest starym stulatkiem"
+        },
+        {
+          "word": "kokos",
+          "description": "Owoc, na którym można zbić majątek"
+        },
+        {
+          "word": "aktorka",
+          "description": "zawodowo wchodzi w cudze buty"
+        },
+        {
+          "word": "troska",
+          "description": "matczyna specjalność, serwowana na zimno i na gorąco"
+        },
+        {
+          "word": "kostka",
+          "description": "Może być do gry, do zupy albo... do skręcenia"
+        },
+        {
+          "word": "latarka",
+          "description": "urządzenie, które pracuje tylko po ciemku"
+        },
+        {
+          "word": "klatka",
+          "description": "Więzienie dla kanarka lub schody dla sąsiada"
+        },
+        {
+          "word": "astra",
+          "description": "jej imienniczka często stoi w korkach"
+        },
+        {
+          "word": "kolka",
+          "description": "Dziecięcy sposób na nieprzespaną noc rodziców"
+        },
+        {
+          "word": "lotka",
+          "description": "kuzynka piłki, ale z wbudowanym statecznikiem"
+        },
+        {
+          "word": "kotka",
+          "description": "mruczący kłębek z ostrym wyposażeniem"
+        },
+        {
+          "word": "kalka",
+          "description": "Papier, który lubi powtarzać po innych"
+        },
+        {
+          "word": "kasta",
+          "description": "społeczna szufladka bez klamki od wewnątrz"
+        },
+        {
+          "word": "klasa",
+          "description": "Można ją mieć lub do niej chodzić"
+        },
+        {
+          "word": "lokat",
+          "description": "ich oprocentowanie spędza sen z powiek oszczędzającym"
+        },
+        {
+          "word": "sroka",
+          "description": "Ptasi jubiler, co lubi błyskotki"
+        },
+        {
+          "word": "trasa",
+          "description": "Droga z punktu A do B, często przez punkt K jak korek"
+        }
+      ]
     },
     {
       "id": 3,
@@ -1292,7 +1478,96 @@
           "a"
         ]
       ],
-      "clues": []
+      "clues": [
+        {
+          "word": "stokrotka",
+          "description": "kwiat, który potrafi liczyć do stu... krotek"
+        },
+        {
+          "word": "starosta",
+          "description": "głowa powiatu, czasem po przejściach"
+        },
+        {
+          "word": "rosomak",
+          "description": "Pancerny zwierz na ośmiu kołach"
+        },
+        {
+          "word": "komora",
+          "description": "Serce ma cztery, rewolwer sześć"
+        },
+        {
+          "word": "masakra",
+          "description": "Krwawa rzeź albo efekt pracy stażysty"
+        },
+        {
+          "word": "maskotka",
+          "description": "jedyny członek drużyny, którego można wyprać w pralce"
+        },
+        {
+          "word": "amatorka",
+          "description": "pani, której dzieła są... bezcenne, bo nie na sprzedaż"
+        },
+        {
+          "word": "aktorka",
+          "description": "Zawodowo robi sceny i zbiera za to oklaski"
+        },
+        {
+          "word": "kokos",
+          "description": "Można na nim zbić majątek albo... głowę"
+        },
+        {
+          "word": "aktor",
+          "description": "zawodowy kłamca o wielu twarzach"
+        },
+        {
+          "word": "tarot",
+          "description": "Karty, które zawsze mają rację, zwłaszcza po fakcie"
+        },
+        {
+          "word": "amator",
+          "description": "fachowiec po godzinach"
+        },
+        {
+          "word": "tamto",
+          "description": "słowo zastępcze na wszystko, co wyleciało z głowy"
+        },
+        {
+          "word": "kartka",
+          "description": "wyrwana z kontekstu zeszytu"
+        },
+        {
+          "word": "strata",
+          "description": "gdy wychodzisz na zero, ale to zero jest poniżej zera"
+        },
+        {
+          "word": "kostka",
+          "description": "rzucona decyduje o losie, a źle postawiona o wizycie u ortopedy"
+        },
+        {
+          "word": "kratka",
+          "description": "W niej rozwiązanie krzyżówki albo... więzień"
+        },
+        {
+          "word": "astra",
+          "description": "można ją postawić w wazonie albo w garażu"
+        },
+        {
+          "word": "komar",
+          "description": "Latający poborca krwi z irytującym brzęczykiem"
+        },
+        {
+          "word": "armata",
+          "description": "jej wystrzał to historyczny argument siły"
+        },
+        {
+          "word": "karma",
+          "description": "Wraca do ciebie albo do psiej miski"
+        },
+        {
+          "word": "krata",
+          "description": "metalowa przeszkoda dla złodzieja i ozdoba spódnicy"
+        }
+      ]
     },
     {
       "id": 4,
@@ -1732,7 +2007,104 @@
           null
         ]
       ],
-      "clues": []
+      "clues": [
+        {
+          "word": "kampania",
+          "description": "Wojenny serial, ale bez abonamentu"
+        },
+        {
+          "word": "malinka",
+          "description": "Pamiątka po namiętnym wieczorze, którą tuszuje się korektorem"
+        },
+        {
+          "word": "klika",
+          "description": "Dźwięk, który robi mysz, gdy zatwierdza transakcję"
+        },
+        {
+          "word": "klinika",
+          "description": "Szpital w wersji demo"
+        },
+        {
+          "word": "lipka",
+          "description": "Małe drzewko, które może okazać się wielką ściemą"
+        },
+        {
+          "word": "mimika",
+          "description": "Bezgłośny komentarz do słów teściowej"
+        },
+        {
+          "word": "milka",
+          "description": "Najsłynniejsza fioletowa krowa w show-biznesie"
+        },
+        {
+          "word": "malina",
+          "description": "Można w nią kogoś wpuścić dla żartu"
+        },
+        {
+          "word": "klamka",
+          "description": "Zapadła, gdy decyzja została podjęta"
+        },
+        {
+          "word": "lampka",
+          "description": "Rozjaśnia mrok przy łóżku lub w głowie"
+        },
+        {
+          "word": "kanapa",
+          "description": "Mebel, w którym giną skarpetki i resztki godności"
+        },
+        {
+          "word": "kanapka",
+          "description": "Wynalazek hazardzisty, który nie chciał odchodzić od stołu"
+        },
+        {
+          "word": "lampa",
+          "description": "Ma klosz na głowie i nie jest elegantką z lat dwudziestych"
+        },
+        {
+          "word": "pianka",
+          "description": "Może być do golenia lub do jedzenia, ale lepiej nie mylić"
+        },
+        {
+          "word": "plamka",
+          "description": "Mały, niechciany autograf po ketchupie na białej koszuli"
+        },
+        {
+          "word": "kanalia",
+          "description": "Typ spod ciemnej gwiazdy, który często ląduje w rynsztoku"
+        },
+        {
+          "word": "kalina",
+          "description": "Krzew, który ma korale, ale nie nosi ich na szyi"
+        },
+        {
+          "word": "maniak",
+          "description": "Może być komputerowy, filmowy albo po prostu groźny"
+        },
+        {
+          "word": "niania",
+          "description": "Osoba, która wie, gdzie dziecko ma łaskotki, a rodzice pieniądze"
+        },
+        {
+          "word": "panama",
+          "description": "Można ją nosić na głowie lub czytać o niej w gazetach"
+        },
+        {
+          "word": "kalka",
+          "description": "Przedpotopowy 'kopiuj-wklej'"
+        },
+        {
+          "word": "kappa",
+          "description": "Japoński stwór, który traci moc, gdy się ukłoni"
+        },
+        {
+          "word": "kpina",
+          "description": "Żart, po którym atmosfera gęstnieje"
+        },
+        {
+          "word": "palma",
+          "description": "Odbija, gdy komuś uderzy do głowy woda sodowa"
+        }
+      ]
     },
     {
       "id": 5,
@@ -2156,7 +2528,96 @@
           "r"
         ]
       ],
-      "clues": []
+      "clues": [
+        {
+          "word": "amatorka",
+          "description": "Pani, która robi to dla przyjemności, nie dla faktury"
+        },
+        {
+          "word": "kormoran",
+          "description": "Elegancki jegomość w czerni, wiecznie głodny na Mazurach"
+        },
+        {
+          "word": "aktorka",
+          "description": "Pani, która wchodzi w rolę i w cudze buty"
+        },
+        {
+          "word": "tarot",
+          "description": "Talia, która przepowie ci przyszłość, ale nie poda numerów w lotto"
+        },
+        {
+          "word": "komnata",
+          "description": "Wersja premium pokoju, często z duchem w pakiecie"
+        },
+        {
+          "word": "koronka",
+          "description": "Ażurowa robota cierpliwej babci lub zręcznego dentysty"
+        },
+        {
+          "word": "narrator",
+          "description": "Profesjonalny podglądacz myśli i komentator zdarzeń"
+        },
+        {
+          "word": "notatka",
+          "description": "Zapisana, by nie zapomnieć, a potem zgubiona razem z pamięcią"
+        },
+        {
+          "word": "narkoman",
+          "description": "Dla niego 'działka' to niekoniecznie kawałek ziemi pod miastem"
+        },
+        {
+          "word": "kartka",
+          "description": "Można ją wyrwać z zeszytu lub z kontekstu"
+        },
+        {
+          "word": "tamto",
+          "description": "Słowny odpowiednik wyciągniętej ręki z palcem wskazującym"
+        },
+        {
+          "word": "amator",
+          "description": "Jego zapał często przewyższa posiadane kwalifikacje"
+        },
+        {
+          "word": "mantra",
+          "description": "Słowna pętla, która ma uspokoić ciebie, a denerwuje otoczenie"
+        },
+        {
+          "word": "armata",
+          "description": "Wytacza się ją, gdy kończą się argumenty słowne"
+        },
+        {
+          "word": "kromka",
+          "description": "Ta część chleba, która zawsze testuje prawo grawitacji masłem"
+        },
+        {
+          "word": "karana",
+          "description": "Pani, która poznała kodeks od podszewki"
+        },
+        {
+          "word": "komora",
+          "description": "W sercu pompuje, w rewolwerze ładuje"
+        },
+        {
+          "word": "tkanka",
+          "description": "Materiał, z którego szyje się ubrania lub organizmy"
+        },
+        {
+          "word": "aktor",
+          "description": "Facet, któremu płacą za to, że nie jest sobą"
+        },
+        {
+          "word": "manna",
+          "description": "Biblijny catering prosto z chmurki"
+        },
+        {
+          "word": "ranka",
+          "description": "Pamiątka po bliskim spotkaniu z żyletką lub krawężnikiem"
+        },
+        {
+          "word": "tarka",
+          "description": "Przez jej zęby przechodzi ser, a przez jej blachę brudne pranie"
+        }
+      ]
     },
     {
       "id": 6,
@@ -2588,7 +3049,100 @@
           null
         ]
       ],
-      "clues": []
+      "clues": [
+        {
+          "word": "plotkara",
+          "description": "Żywe medium społecznościowe, działa bez prądu i internetu"
+        },
+        {
+          "word": "aktorka",
+          "description": "W pracy regularnie umiera i zmartwychwstaje."
+        },
+        {
+          "word": "troll",
+          "description": "Pod mostem w baśni, w sieci pod postem."
+        },
+        {
+          "word": "laptop",
+          "description": "Przenośne centrum dowodzenia wszechświatem i oglądania kotów"
+        },
+        {
+          "word": "kropla",
+          "description": "Drąży skałę, ale z kranu doprowadza do szału"
+        },
+        {
+          "word": "pralka",
+          "description": "Domowy bęben, który kręci brudne interesy"
+        },
+        {
+          "word": "lokator",
+          "description": "Osoba, która płaci za możliwość narzekania na właściciela"
+        },
+        {
+          "word": "kratka",
+          "description": "Mała siostra kraty, bywa w konfesjonale lub w ścieku"
+        },
+        {
+          "word": "krata",
+          "description": "Symbol rozstania z wolnością lub spotkania z dobrym piwem."
+        },
+        {
+          "word": "prorok",
+          "description": "Mówił, jak będzie, ale nikt nie słuchał, bo nie było go w telewizji."
+        },
+        {
+          "word": "latarka",
+          "description": "Urządzenie, które działa idealnie, dopóki nie jest naprawdę potrzebne"
+        },
+        {
+          "word": "klatka",
+          "description": "Schodowa - miejsce niezręcznych spotkań z sąsiadami"
+        },
+        {
+          "word": "atrapa",
+          "description": "Coś, co udaje, że jest czymś innym, jak większość uśmiechów w poniedziałek"
+        },
+        {
+          "word": "plotka",
+          "description": "Informacja, która nabiera prędkości i szczegółów z każdym kolejnym uchem"
+        },
+        {
+          "word": "kartka",
+          "description": "Czysta daje nadzieję, zapisana - dowód winy."
+        },
+        {
+          "word": "kapral",
+          "description": "Pośrednik między młotem sierżanta a kowadłem szeregowca"
+        },
+        {
+          "word": "pokora",
+          "description": "Uczucie, które nachodzi człowieka tuż po tym, jak się spektakularnie pomylił"
+        },
+        {
+          "word": "aktor",
+          "description": "Człowiek, który może być królem jednego wieczoru, a bezrobotnym następnego"
+        },
+        {
+          "word": "karta",
+          "description": "Kredytowa - plastikowy przyjaciel, który wbija nóż w plecy pod koniec miesiąca"
+        },
+        {
+          "word": "lokat",
+          "description": "Sposób banku na to, byś nie wydał wszystkiego od razu na głupoty."
+        },
+        {
+          "word": "papka",
+          "description": "Efekt pracy blendera lub zbyt długiej dyskusji politycznej."
+        },
+        {
+          "word": "tarka",
+          "description": "Kuchenny instrument tortur dla warzyw i opuszków palców"
+        },
+        {
+          "word": "tarot",
+          "description": "Talia kart, która wie o tobie więcej niż twoja historia przeglądarki"
+        }
+      ]
     },
     {
       "id": 7,
@@ -3020,7 +3574,100 @@
           "a"
         ]
       ],
-      "clues": []
+      "clues": [
+        {
+          "word": "kamionka",
+          "description": "Garnek o kamiennym sercu"
+        },
+        {
+          "word": "komornik",
+          "description": "Urzędowy specjalista od eksmisji... z portfela"
+        },
+        {
+          "word": "kormoran",
+          "description": "ptak, co sam sobie ryby suszy na gałęzi"
+        },
+        {
+          "word": "armia",
+          "description": "Zorganizowana grupa turystyczna w mundurach"
+        },
+        {
+          "word": "kanonik",
+          "description": "w kościelnej hierarchii ma swój własny rozdział"
+        },
+        {
+          "word": "ironia",
+          "description": "gdy chwalisz pogodę w trakcie oberwania chmury"
+        },
+        {
+          "word": "narkoman",
+          "description": "Ciągle szuka działki, ale nie budowlanej"
+        },
+        {
+          "word": "kronika",
+          "description": "Historyczny blog pisany gęsim piórem"
+        },
+        {
+          "word": "maniak",
+          "description": "Hobbysta, który zapomniał o hamulcach"
+        },
+        {
+          "word": "miarka",
+          "description": "Niezbędna, by wiedzieć, czy już się przelała"
+        },
+        {
+          "word": "kokaina",
+          "description": "proszek do wciągania... w kłopoty"
+        },
+        {
+          "word": "komika",
+          "description": "jej pointa często zwala z nóg"
+        },
+        {
+          "word": "komora",
+          "description": "W sercu są cztery, a w rewolwerze sześć"
+        },
+        {
+          "word": "koniak",
+          "description": "trunek, który im starszy, tym bardziej uderza do głowy i do kieszeni"
+        },
+        {
+          "word": "ranna",
+          "description": "Pani po spotkaniu z pechem lub ostrym narzędziem"
+        },
+        {
+          "word": "manna",
+          "description": "Niebiański catering dla Izraelitów"
+        },
+        {
+          "word": "marka",
+          "description": "była walutą, zanim Niemcy polubili euro"
+        },
+        {
+          "word": "korka",
+          "description": "jej sąsiadem z północy jest Kim"
+        },
+        {
+          "word": "karma",
+          "description": "sucha dla psa, filozoficzna dla człowieka"
+        },
+        {
+          "word": "kirka",
+          "description": "Narzędzie górnika do flirtu ze skałą"
+        },
+        {
+          "word": "kania",
+          "description": "lata wysoko na niebie albo ląduje w jajecznicy"
+        },
+        {
+          "word": "norma",
+          "description": "jej przekroczenie kończy się mandatem lub premią"
+        },
+        {
+          "word": "komar",
+          "description": "Latająca strzykawka z irytującym brzęczeniem"
+        }
+      ]
     },
     {
       "id": 8,
@@ -3460,7 +4107,104 @@
           "a"
         ]
       ],
-      "clues": []
+      "clues": [
+        {
+          "word": "amatorka",
+          "description": "Artystka przed pierwszym przelewem"
+        },
+        {
+          "word": "troll",
+          "description": "Specjalista od siania fermentu w sieci, nie w kiszonkach"
+        },
+        {
+          "word": "aktorka",
+          "description": "Zawodowo udaje kogoś innego, a prywatnie bywa, że siebie"
+        },
+        {
+          "word": "amator",
+          "description": "Profesjonalista w stanie spoczynku... albo przed debiutem"
+        },
+        {
+          "word": "komora",
+          "description": "W sercu są cztery, a w pistolecie tylko jedna"
+        },
+        {
+          "word": "komar",
+          "description": "Jedyny natręt, którego klaskaniem witasz z zapałem"
+        },
+        {
+          "word": "aktor",
+          "description": "Płacą mu za kłamanie z uczuciem"
+        },
+        {
+          "word": "lokator",
+          "description": "Osoba, która płaci za możliwość narzekania na krzywe ściany"
+        },
+        {
+          "word": "malarka",
+          "description": "Kobieta, która plami zawodowo i z dumą"
+        },
+        {
+          "word": "tarot",
+          "description": "Karty, które mówią więcej niż niejeden psycholog, a wizyta tańsza"
+        },
+        {
+          "word": "latarka",
+          "description": "Pogromca potworów spod łóżka"
+        },
+        {
+          "word": "kartka",
+          "description": "Zeszyt po diecie odchudzającej"
+        },
+        {
+          "word": "klamka",
+          "description": "Zapadła, gdy było już za późno na zmianę decyzji"
+        },
+        {
+          "word": "armata",
+          "description": "Głośny argument w dyskusji między narodami"
+        },
+        {
+          "word": "tamto",
+          "description": "Słowo-wytrych, gdy nie pamiętasz, jak 'to' się nazywało"
+        },
+        {
+          "word": "katol",
+          "description": "Człowiek, który w piątek je rybę z przekonania, a nie z diety"
+        },
+        {
+          "word": "matma",
+          "description": "Przedmiot, w którym X jest zawsze niewiadomą, a problemy się mnożą"
+        },
+        {
+          "word": "klamra",
+          "description": "Spina włosy, papier albo całą opowieść"
+        },
+        {
+          "word": "klatka",
+          "description": "Piersiowa chroni serce, a schodowa słyszy wszystkie plotki"
+        },
+        {
+          "word": "kratka",
+          "description": "Za nią kończą się żarty, a zaczyna wyrok"
+        },
+        {
+          "word": "kalka",
+          "description": "Językowa, gdy mówisz jak postać z zagranicznego serialu"
+        },
+        {
+          "word": "lokat",
+          "description": "Inwestycje, które rosną wolniej niż kolejka do lekarza"
+        },
+        {
+          "word": "lokata",
+          "description": "Sposób na zamrożenie gotówki i nadziei na szybki zysk"
+        },
+        {
+          "word": "tarka",
+          "description": "Kuchenny instrument muzyczny o ostrym brzmieniu"
+        }
+      ]
     },
     {
       "id": 9,
@@ -3876,7 +4620,92 @@
           "r"
         ]
       ],
-      "clues": []
+      "clues": [
+        {
+          "word": "kuratorka",
+          "description": "Zawodowo wiesza obrazy i psy na artystach"
+        },
+        {
+          "word": "stokrotka",
+          "description": "Kocha, lubi, szanuje... ale na końcu zawsze zostawia z niczym"
+        },
+        {
+          "word": "struktura",
+          "description": "Szkielet budynku lub dobrej wymówki"
+        },
+        {
+          "word": "kokos",
+          "description": "Interes do zbicia na bezludnej wyspie"
+        },
+        {
+          "word": "starosta",
+          "description": "Samorządowiec, który wie, że wszystkie dziurawe drogi prowadzą do jego biurka"
+        },
+        {
+          "word": "aktorka",
+          "description": "Osoba, która potrafi zagrać scenę w sklepie i na scenie"
+        },
+        {
+          "word": "stout",
+          "description": "Ciemna strona mocy w kuflu"
+        },
+        {
+          "word": "autorka",
+          "description": "Pani, która przelewa myśli na papier, a potem czeka na przelew z wydawnictwa"
+        },
+        {
+          "word": "kostka",
+          "description": "Brukowa – wróg szpilek, rosołowa – przyjaciel leniwego kucharza"
+        },
+        {
+          "word": "tortura",
+          "description": "Spotkanie rodzinne, na którym ciocia pyta o ślub i dzieci"
+        },
+        {
+          "word": "kurtka",
+          "description": "Pogodowy kameleon: za gruba na słońce, za cienka na wiatr"
+        },
+        {
+          "word": "troska",
+          "description": "Uczucie, które matka ma o ciebie, a ty o stan baterii w telefonie"
+        },
+        {
+          "word": "kurator",
+          "description": "Facet, który decyduje, co jest sztuką, a co tylko zaciekim na ścianie"
+        },
+        {
+          "word": "kartka",
+          "description": "Biała, która przeraża pisarza bardziej niż horror"
+        },
+        {
+          "word": "krakus",
+          "description": "Mieszkaniec miasta, w którym smog konkuruje z Wawelem o miano symbolu"
+        },
+        {
+          "word": "statua",
+          "description": "Gołąb na jej głowie to ostateczny dowód uznania krytyków"
+        },
+        {
+          "word": "aktor",
+          "description": "Osoba, która pamięta swoje kwestie, ale zapomina kupić mleko"
+        },
+        {
+          "word": "sutka",
+          "description": "Mały detal, który potrafi narobić wielkiego szumu w mediach"
+        },
+        {
+          "word": "tarot",
+          "description": "Zestaw obrazków, po których obejrzeniu jesteś uboższy o stówę, ale bogatszy o nadzieję"
+        },
+        {
+          "word": "karta",
+          "description": "Atutowa bije króla, a dań... bije w biodra"
+        },
+        {
+          "word": "korka",
+          "description": "Specjalistka od łatania dziur w edukacji i w budżecie rodziców"
+        }
+      ]
     },
     {
       "id": 10,
@@ -4300,7 +5129,96 @@
           null
         ]
       ],
-      "clues": []
+      "clues": [
+        {
+          "word": "kopalnia",
+          "description": "Interes, w którym dokopujesz się do sedna"
+        },
+        {
+          "word": "pokonana",
+          "description": "Leży na deskach, choć nie jest z drewna"
+        },
+        {
+          "word": "klinika",
+          "description": "Miejsce, gdzie zbijają gorączkę i majątki"
+        },
+        {
+          "word": "ikonka",
+          "description": "Mały święty obrazek na pulpicie grzesznika"
+        },
+        {
+          "word": "kanapka",
+          "description": "dwie kromki chleba w separacji z powodu sera"
+        },
+        {
+          "word": "lalka",
+          "description": "Plastikowa celebrytka z pustką w głowie"
+        },
+        {
+          "word": "papka",
+          "description": "pierwszy stały posiłek w życiu i ostatni dowód w sprawie blendera"
+        },
+        {
+          "word": "polka",
+          "description": "Rodaczka, która kręci na parkiecie"
+        },
+        {
+          "word": "polak",
+          "description": "mały, ale za to z ułańską fantazją"
+        },
+        {
+          "word": "kanonik",
+          "description": "Duchowny, który trzyma się reguł"
+        },
+        {
+          "word": "kolonia",
+          "description": "skupisko bakterii na szalce lub dzieci na stołówce"
+        },
+        {
+          "word": "kanalia",
+          "description": "ściek charakteru"
+        },
+        {
+          "word": "kopniak",
+          "description": "sposób na przyspieszenie kariery piłki"
+        },
+        {
+          "word": "niania",
+          "description": "osoba, która wie, gdzie diabeł mówi dobranoc i jak go uśpić"
+        },
+        {
+          "word": "panika",
+          "description": "gwałtowna wyprzedaż rozsądku"
+        },
+        {
+          "word": "kalina",
+          "description": "Krzew, co czerwieni się jesienią ze wstydu"
+        },
+        {
+          "word": "konina",
+          "description": "Mięso, które galopem trafiło na talerz"
+        },
+        {
+          "word": "kalka",
+          "description": "językowa pożyczka bez pytania"
+        },
+        {
+          "word": "ikona",
+          "description": "Święta na desce, gwiazda na ekranie"
+        },
+        {
+          "word": "kpina",
+          "description": "drwina podana na ostro"
+        },
+        {
+          "word": "klapa",
+          "description": "Część marynarki, którą można postawić na baczność"
+        },
+        {
+          "word": "koala",
+          "description": "Miś, który przytula się do drzewa, bo boi się pracy"
+        }
+      ]
     }
   ]
 }
