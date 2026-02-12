@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import { GridCoordinates } from "./model";
 
 export class ClueState {
-    constructor(public description: string, public coordinates: GridCoordinates, public length: number) { }
+    constructor(public description: string, public coordinates: GridCoordinates, public length: number, public letters: string[]) { }
 }
 
 export class PlayerCrosswordV3State {

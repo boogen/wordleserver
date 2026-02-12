@@ -1,5 +1,5 @@
 import { query } from "express";
-import { Post, Query, Route } from "tsoa";
+import { Post, BodyProp, Route } from "tsoa";
 import { Stats } from "../../../WordleStatsDBI";
 import { getCrosswordState, setCrosswordState } from "../DBI/crosswords/crossword";
 import { getCrossword, getFirstCrossword, getRandomCrossword } from "../DBI/crosswords/model";
@@ -8,6 +8,7 @@ import { PossibleCrossword } from "../DBI/crosswords/PossibleCrossword";
 import WordleDBI from "../DBI/DBI";
 import { checkLimit, resolvePlayerId } from "../DBI/player/player";
 import { isWordValid } from "../DBI/wordle/model";
+import { inject, injectable } from "inversify";
 
 interface CrosswordInitReply {
     message: string;
@@ -28,15 +29,19 @@ interface CrosswordState {
     completed: boolean;
 }
 
-const dbi = new WordleDBI();
-const stats: Stats = new Stats();
-
+@injectable()
 @Route("api/v4/crossword")
 export class CrosswordController {
+    constructor(
+        @inject(WordleDBI) private dbi: WordleDBI,
+        @inject(Stats) private stats: Stats
+    ) {
+
+    }
     @Post("init")
-    public async init(@Query() auth_id: string): Promise<CrosswordInitReply> {
-        const playerId = await resolvePlayerId(auth_id, dbi);
-        var crosswordState = await getCrosswordState(playerId, dbi);
+    public async init(@BodyProp() auth_id: string): Promise<CrosswordInitReply> {
+        const playerId = await resolvePlayerId(auth_id, this.dbi);
+        var crosswordState = await getCrosswordState(playerId, this.dbi);
         var grid = []
         var word_list = []
         var tries: string[] = []
@@ -44,7 +49,7 @@ export class CrosswordController {
         var guessed_words: string[] = []
 
         if (crosswordState == null || this.isFinished(crosswordState)) {
-            const crossword = await getRandomCrossword(dbi);
+            const crossword = await getRandomCrossword(this.dbi);
             console.log(crossword)
             console.log(crossword.letter_grid)
             grid = this.convertGrid(crossword.letter_grid)
@@ -61,16 +66,16 @@ export class CrosswordController {
             guessed_words = crosswordState.guessed_words
         }
 
-        const crossword = await getCrossword(crossword_id, dbi)
-        const newState = await setCrosswordState(playerId, word_list, guessed_words, grid, crossword_id, tries, dbi)
+        const crossword = await getCrossword(crossword_id, this.dbi)
+        const newState = await setCrosswordState(playerId, word_list, guessed_words, grid, crossword_id, tries, this.dbi)
         const state = (await this.stateToReply(grid, word_list, crossword!, this.isFinished(newState!)))
-        await stats.addCrosswordInitEvent(playerId, crossword_id);
+        await this.stats.addCrosswordInitEvent(playerId, crossword_id);
         return { message: 'ok', state: state };
     }
 
     @Post("mock")
     public async mock(): Promise<CrosswordInitReply> {
-        const crossword = await getFirstCrossword(dbi);
+        const crossword = await getFirstCrossword(this.dbi);
         var letterList = new Set(crossword!.word_list.map(c => c.word).join(""))
         console.log(crossword!.letter_grid)
         var grid: string[][] = []
@@ -99,16 +104,16 @@ export class CrosswordController {
     }
 
     @Post("guess")
-    public async guess(@Query() auth_id: string, @Query() guess: string): Promise<CrosswordGuessReply> {
-        const playerId = await resolvePlayerId(auth_id, dbi);
+    public async guess(@BodyProp() auth_id: string, @BodyProp() guess: string): Promise<CrosswordGuessReply> {
+        const playerId = await resolvePlayerId(auth_id, this.dbi);
         const players_word = guess.toLowerCase();
-        const isWord = await isWordValid(players_word, dbi);
-        var crosswordState = await getCrosswordState(playerId, dbi);
+        const isWord = await isWordValid(players_word, this.dbi);
+        var crosswordState = await getCrosswordState(playerId, this.dbi);
         var grid = crosswordState!.grid;
         var guessed_words = new Set(crosswordState!.guessed_words)
-        const crossword = await getCrossword(crosswordState!.crossword_id, dbi)
+        const crossword = await getCrossword(crosswordState!.crossword_id, this.dbi)
         if (!isWord) {
-            await stats.addCrosswordGuessEvent(playerId, crosswordState!.guessed_words.length, crosswordState!.tries.length + crosswordState!.guessed_words.length, this.isFinished(crosswordState!), false)
+            await this.stats.addCrosswordGuessEvent(playerId, crosswordState!.guessed_words.length, crosswordState!.tries.length + crosswordState!.guessed_words.length, this.isFinished(crosswordState!), false)
             return { isWord: false, guessed_word: false, state: (await this.stateToReply(grid, crosswordState!.words, crossword!, this.isFinished(crosswordState!))) }
         }
 
@@ -161,8 +166,8 @@ export class CrosswordController {
             convertedOriginalGrid[indexToFill.x][indexToFill.y] = original_grid[indexToFill.x][indexToFill.y]
         }
         console.log(convertedOriginalGrid);
-        const newState = await setCrosswordState(playerId, crosswordState!.words, guessed_words_array, convertedOriginalGrid, crosswordState!.crossword_id, Array.from(tries), dbi)
-        await stats.addCrosswordGuessEvent(playerId, guessed_words_array.length, tries.size + guessed_words_array.length, this.isFinished(newState!), true)
+        const newState = await setCrosswordState(playerId, crosswordState!.words, guessed_words_array, convertedOriginalGrid, crosswordState!.crossword_id, Array.from(tries), this.dbi)
+        await this.stats.addCrosswordGuessEvent(playerId, guessed_words_array.length, tries.size + guessed_words_array.length, this.isFinished(newState!), true)
         return { isWord: true, guessed_word: guessed_word, state: (await this.stateToReply(convertedOriginalGrid, crosswordState!.words, crossword!, this.isFinished(newState!))) }
     }
 

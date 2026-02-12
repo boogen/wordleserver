@@ -1,4 +1,4 @@
-import { Path, Post, Query, Route } from "tsoa";
+import { Path, Post, BodyProp, Route } from "tsoa";
 import WordleDBI from "../../DBI/DBI";
 import { checkLimit, resolvePlayerId } from "../../DBI/player/player";
 import { getWord, isWordValid } from "../../DBI/wordle/model";
@@ -17,7 +17,7 @@ const dbi = new WordleDBI();
 @Route("api/v4/classic")
 export class WordleChallengeController {
     @Post("getState")
-    public async getState(@Query() auth_id:string):Promise<WordleChallengeStateReply> {
+    public async getState(@BodyProp() auth_id:string):Promise<WordleChallengeStateReply> {
         const player_id = await resolvePlayerId(auth_id, dbi);
         var limitMet = await checkLimit('wordle_challenge_limit', player_id, dbi)
         if(!limitMet) {
@@ -41,7 +41,7 @@ export class WordleChallengeController {
     }
 
     @Post("validate")
-    public async validate(@Query() auth_id:string, @Query() guess:string):Promise<GuessValidation> {
+    public async validate(@BodyProp() auth_id:string, @BodyProp() guess:string):Promise<GuessValidation> {
         const player_id = await resolvePlayerId(auth_id, dbi)
         const timestamp = Date.now() / 1000;
         const wordEntry = await getPlayerLastWord(player_id, dbi);

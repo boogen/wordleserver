@@ -7,6 +7,15 @@ First run adds model and setups databases
 ## NEXT RUNS
 `docker compose up`
 
+
+
+# TSOA
+
+## To generate TSOA code 
+* creates/modifies `src/routes.ts`
+* run: `npm run tsoa:gen`
+
+
 # Express API Starter
 
 Includes API Server utilities:

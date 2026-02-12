@@ -11,7 +11,7 @@ require('dotenv').config();
 Sentry.init({ dsn: process.env.SENTRY_DNS });
 
 import { notFound, errorHandler } from './middlewares';
-import { apiV4 } from './api/v4';
+import { RegisterRoutes } from './routes';
 
 import WordleDBI from './api/v4/DBI/DBI';
 
@@ -47,7 +47,7 @@ app.use((req, res, next) => {
   next()
 })
 
-app.use('/api/v4', apiV4)
+RegisterRoutes(app);
 app.use('/', metrics)
 
 app.use(notFound);

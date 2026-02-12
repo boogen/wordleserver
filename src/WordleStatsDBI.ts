@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import { StatsDBI, StatsEvent } from "./StatsDBI";
 
 class RegistrationEvent extends StatsEvent {
@@ -168,6 +169,7 @@ class SpellingBeeDuelEndEvent extends StatsEvent {
     }
 }
 
+@injectable()
 export class Stats extends StatsDBI {
 
     async addRegistrationEvent(authId: string, playerId: number) {

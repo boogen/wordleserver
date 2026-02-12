@@ -1,5 +1,5 @@
 import { query } from "express";
-import { Post, Query, Route } from "tsoa";
+import { Post, BodyProp, Route } from "tsoa";
 import { Stats } from "../../../WordleStatsDBI";
 import { Clue, CrosswordWord, getCrossword, getFirstCrossword, getOrCreateRandomCrossword, GridCoordinates } from "../DBI/crosswords_v3/model";
 import { PlayerCrosswordState } from "../DBI/crosswords_v3/model";
@@ -9,9 +9,12 @@ import { checkLimit, resolvePlayerId } from "../DBI/player/player";
 import { isWordValid } from "../DBI/wordle/model";
 import { ClueState, getCrosswordV3State, PlayerCrosswordV3State, setCrosswordV3State } from "../DBI/crosswords_v3/state";
 import { log } from "console";
+import { inject, injectable } from "inversify";
 
 const WORD_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
+
+const POLISH_ALPHABET = new Set("aąbcćdeęfghijklłmnńoóprsśtuwyzźż".split(""));
 
 interface CrosswordInitReply {
     message: string;
@@ -25,7 +28,6 @@ interface CrosswordGuessReply {
 }
 
 interface CrosswordState {
-    letters: string[];
     grid: string[][];
     clues: ClueState[];
     height: number;
@@ -36,12 +38,19 @@ interface CrosswordState {
 const dbi = new WordleDBI();
 const stats: Stats = new Stats();
 
+@injectable()
 @Route("api/v4/crossword_v3")
-export class CrosswordController {
+export class CrosswordController_v3 {
+    constructor(
+        @inject(WordleDBI) private dbi: WordleDBI,
+        @inject(Stats) private stats: Stats
+    ) {
+
+    }
     @Post("init")
-    public async init(@Query() auth_id: string): Promise<CrosswordInitReply> {
-        const playerId = await resolvePlayerId(auth_id, dbi);
-        var state = await getCrosswordV3State(playerId, dbi);
+    public async init(@BodyProp() auth_id: string): Promise<CrosswordInitReply> {
+        const playerId = await resolvePlayerId(auth_id, this.dbi);
+        var state = await getCrosswordV3State(playerId, this.dbi);
 
         const timestamp = Date.now() / 1000;
         var new_validity_timestamp = GLOBAL_TIME_START;
@@ -50,7 +59,7 @@ export class CrosswordController {
         }
         log('New validity timestamp start:', new_validity_timestamp);
 
-        const crossword = await getOrCreateRandomCrossword(dbi, timestamp, new_validity_timestamp);
+        const crossword = await getOrCreateRandomCrossword(this.dbi, timestamp, new_validity_timestamp);
 
         if (state != null && state.crossword_id != crossword.crossword_id) {
             // Different crossword - create new state
@@ -69,7 +78,7 @@ export class CrosswordController {
     }
 
     @Post("save")
-    public async save(@Query() auth_id: string, @Query() row: number, column: number, letter: string) {
+    public async save(@BodyProp() auth_id: string, @BodyProp() row: number, @BodyProp() column: number, @BodyProp() letter: string) {
         console.log(`row: ${row}, column: ${column}, letter: ${letter}`)
         const playerId = await resolvePlayerId(auth_id, dbi);
         var state = await getCrosswordV3State(playerId, dbi);
@@ -111,11 +120,7 @@ export class CrosswordController {
     }
 
     private convertInternalStateToReplyState(state: PlayerCrosswordV3State): CrosswordState {
-        const letters = Array.from(state.words.join("").normalize('NFC'));
-        const letterList = new Set(letters);
-        log('Letter list:', letters);
         return {
-            letters: Array.from(letterList),
             grid: state.player_grid.concat.apply([], state.player_grid),
             clues: state.clues,
             height: state.height,
@@ -160,7 +165,7 @@ export class CrosswordController {
         return flatten_grid
     }
 
-    private convertClues(clues: Clue[], words: CrosswordWord[]) {
+    private convertClues(clues: Clue[], words: CrosswordWord[]): ClueState[] {
         var wordMap = words.reduce((acc, w) => {
             acc[w.word] = w.coordinates;
             return acc;
@@ -168,10 +173,19 @@ export class CrosswordController {
 
         return clues
             .filter(clue => wordMap[clue.word])
-            .map(clue => ({
-                coordinates: wordMap[clue.word],
-                description: clue.description,
-                length: clue.word.length
-            }));
+            .map(clue => new ClueState(
+                clue.description,
+                wordMap[clue.word],
+                clue.word.length,
+                this.getLettersFromWord(clue.word.normalize('NFC'))
+            ));
+    }
+
+    private getLettersFromWord(word: string): string[] {
+        var letters = new Set(Array.from(word));
+        while (letters.size < 7) {
+            letters.add(Array.from(POLISH_ALPHABET)[Math.floor(Math.random() * POLISH_ALPHABET.size)]);
+        }
+        return Array.from((letters));
     }
 }

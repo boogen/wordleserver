@@ -25,9 +25,12 @@ import { PlayerLimits } from './player/PlayerLimits';
 import { PlayerLimitsModel } from './player/PlayerLimitsModel';
 import { PossibleCrosswordV3 , GlobalCrossword} from './crosswords_v3/model';
 import { PlayerCrosswordV3State } from './crosswords_v3/state';
+import { injectable } from 'inversify';
 
 const _db: IMonkManager = monk(process.env.MONGO_URI!);
 
+
+@injectable()
 export default class WordleDBI {
     db() { return _db; }
     words(): ICollection<Word> { return _db.get("words") }

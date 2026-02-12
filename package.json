@@ -11,7 +11,8 @@
     "test": "mocha --exit",
     "swagger-autogen": "node out/swagger.js",
     "authenticate-google": "ts-node src/authenticate_calendar.ts",
-    "season-test": "ts-node src/spelling_bee_season_manager.ts"
+    "season-test": "ts-node src/spelling_bee_season_manager.ts",
+    "tsoa:gen": "tsoa routes && tsoa spec"
   },
   "keywords": [],
   "author": "CJ R. <cj@null.computer> (https://w3cj.now.sh)",
@@ -33,6 +34,7 @@
     "geoip-lite": "^1.4.4",
     "googleapis": "^109.0.0",
     "helmet": "^4.6.0",
+    "inversify": "^7.11.0",
     "mariadb": "3.0.1",
     "mongo-filter-query": "^1.0.0",
     "monk": "^7.3.4",
@@ -40,6 +42,7 @@
     "node-cron": "^3.0.0",
     "onesignal-node": "^3.3.0",
     "prom-client": "^14.1.0",
+    "reflect-metadata": "^0.2.2",
     "swagger-ui-express": "^4.1.4",
     "tsoa": "5.0.0"
   },

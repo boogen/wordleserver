@@ -1,4 +1,4 @@
-import { Post, Query, Route } from "tsoa";
+import { Post, BodyProp, Route } from "tsoa";
 import { Stats } from "../../../WordleStatsDBI";
 import WordleDBI from "../DBI/DBI";
 import { resolvePlayerId } from "../DBI/player/player";
@@ -11,12 +11,11 @@ import { addBeeGuess, addNewLetterToSpellingBeeState, createBeeState, createLett
 import { notifyAboutRankingChange } from "../ranking";
 import { getSeasonRules } from "../season_rules";
 import { ALPHABET, getNewLetterState, processPlayerGuess, SpellingBeeReplyEnum } from "./spelling_bee_common";
+import { inject, injectable } from "inversify";
 
-const dbi = new WordleDBI()
 const BEE_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
 
-const stats:Stats = new Stats();
 
 interface SpellingBeeStateReply {
     message:SpellingBeeReplyEnum,
@@ -37,33 +36,40 @@ interface SeasonInfo {
     seconds_to_end:number
 }
 
+@injectable()
 @Route("api/v4/spelling_bee")
 export class SpellingBeeController {
+    constructor(
+        @inject(WordleDBI) private dbi: WordleDBI,
+        @inject(Stats) private stats: Stats
+    ) {
+
+    }
     @Post("getState")
-    public async getState(@Query() auth_id:string):Promise<SpellingBeeStateReply> {
-        const player_id = await resolvePlayerId(auth_id, dbi);
+    public async getState(@BodyProp() auth_id:string):Promise<SpellingBeeStateReply> {
+        const player_id = await resolvePlayerId(auth_id, this.dbi);
         var new_validity_timestamp = GLOBAL_TIME_START;
         const timestamp = Date.now() / 1000;
         while (new_validity_timestamp < timestamp) {
             new_validity_timestamp += BEE_VALIDITY;
         }
-        var letters:GlobalBee|null = await getLettersForBee(timestamp, dbi);
+        var letters:GlobalBee|null = await getLettersForBee(timestamp, this.dbi);
         var season_rules = await getSeasonRules()
         if (null === letters) {
-            letters = await createLettersForBee(new_validity_timestamp, season_rules, dbi);
+            letters = await createLettersForBee(new_validity_timestamp, season_rules, this.dbi);
             //initExtraLetters(letters!.required_letters, letters!.letters, season_rules);
         }
-        var state:GuessedWordsBee|null = await getBeeState(player_id, letters.bee_id, dbi);
+        var state:GuessedWordsBee|null = await getBeeState(player_id, letters.bee_id, this.dbi);
         var guesses:string[] = []
         if (state === null) {
-            state = await createBeeState(player_id, letters.bee_id, getNewLetterState(letters.required_letters, letters.letters, season_rules), season_rules.lettersToBuy, dbi)
+            state = await createBeeState(player_id, letters.bee_id, getNewLetterState(letters.required_letters, letters.letters, season_rules), season_rules.lettersToBuy, this.dbi)
             guesses = []
         }
         else {
             guesses = state.guesses
         }
-	    const playerPoints = await dbi.getBeePlayerPoints(player_id, letters.bee_id)
-        var bee_model = await getBeeById(letters.bee_model_id, dbi)
+	    const playerPoints = await this.dbi.getBeePlayerPoints(player_id, letters.bee_id)
+        var bee_model = await getBeeById(letters.bee_model_id, this.dbi)
         return {
             message:SpellingBeeReplyEnum.ok,
             letters:state.letters,
@@ -75,40 +81,40 @@ export class SpellingBeeController {
     }
 
     @Post("guess")
-    public async guess(@Query() auth_id:string, @Query("guess") player_guess:string):Promise<SpellingBeeStateReply> {
+    public async guess(@BodyProp() auth_id:string, @BodyProp("guess") player_guess:string):Promise<SpellingBeeStateReply> {
         var season_rules = getSeasonRules();
-        const player_id = await resolvePlayerId(auth_id, dbi);
+        const player_id = await resolvePlayerId(auth_id, this.dbi);
         const timestamp = Date.now() / 1000;
-        const letters = await getLettersForBee(timestamp, dbi);
-        const bee_model:Bee|null = await getBeeById(letters!.bee_model_id, dbi);
-        var state = await getBeeState(player_id, letters!.bee_id, dbi)
-        var result = await processPlayerGuess(player_guess, state!.guesses, bee_model!, state!.letters, await season_rules, dbi);
+        const letters = await getLettersForBee(timestamp, this.dbi);
+        const bee_model:Bee|null = await getBeeById(letters!.bee_model_id, this.dbi);
+        var state = await getBeeState(player_id, letters!.bee_id, this.dbi)
+        var result = await processPlayerGuess(player_guess, state!.guesses, bee_model!, state!.letters, await season_rules, this.dbi);
 
         if (result.message != SpellingBeeReplyEnum.ok) {
-            var playerPoints = (await dbi.getBeePlayerPoints(player_id, letters!.bee_id));
-            stats.addSpellingBeeGuessEvent(player_id, player_guess, false, 0, playerPoints);
+            var playerPoints = (await this.dbi.getBeePlayerPoints(player_id, letters!.bee_id));
+            this.stats.addSpellingBeeGuessEvent(player_id, player_guess, false, 0, playerPoints);
             return {message: result.message,
                 letters: state!.letters,
                 guessed_words: state!.guesses,
-                player_points: (await dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
+                player_points: (await this.dbi.getBeePlayerPoints(player_id, letters!.bee_id)),
                 max_points: bee_model!.max_points,
                 letters_to_buy_prices: state!.lettersToBuy.map(lb => lb.price)
             }
         }
 
         for (var guess of result.guessesAdded) {
-            state = await addBeeGuess(player_id, letters!.bee_id, guess, dbi)
+            state = await addBeeGuess(player_id, letters!.bee_id, guess, this.dbi)
         }
         var totalPointsAdded = result.pointsAdded.reduce((a, b) => a+b)
-        var oldRank = await dbi.getBeeRanking(letters!.bee_id)
+        var oldRank = await this.dbi.getBeeRanking(letters!.bee_id)
 
-        var newRankingEntry = await dbi.increaseBeeRank(player_id, letters!.bee_id, totalPointsAdded)
+        var newRankingEntry = await this.dbi.increaseBeeRank(player_id, letters!.bee_id, totalPointsAdded)
 
         notifyAboutRankingChange(player_id, oldRank, newRankingEntry.score - totalPointsAdded, newRankingEntry.score, "Wspólna litera")
         const max_points = bee_model!.max_points;
-        state = await saveLettersState(player_id, letters!.bee_id, result.newLetterState, dbi)
-        var player_points = (await dbi.getBeePlayerPoints(player_id, letters!.bee_id));
-        stats.addSpellingBeeGuessEvent(player_id, result.guessesAdded.join(","), true, totalPointsAdded, player_points);
+        state = await saveLettersState(player_id, letters!.bee_id, result.newLetterState, this.dbi)
+        var player_points = (await this.dbi.getBeePlayerPoints(player_id, letters!.bee_id));
+        this.stats.addSpellingBeeGuessEvent(player_id, result.guessesAdded.join(","), true, totalPointsAdded, player_points);
         return {
             message: SpellingBeeReplyEnum.ok,
             letters: state!.letters,
@@ -121,17 +127,17 @@ export class SpellingBeeController {
     }
 
     @Post("buy_letter")
-    public async buy_letter(@Query() auth_id:string):Promise<SpellingBeeStateReply> {
-        const player_id = await resolvePlayerId(auth_id, dbi)
+    public async buy_letter(@BodyProp() auth_id:string):Promise<SpellingBeeStateReply> {
+        const player_id = await resolvePlayerId(auth_id, this.dbi)
         const timestamp = Date.now() / 1000;
-        const letters = await getLettersForBee(timestamp, dbi);
-        const bee_model:Bee|null = await getBeeById(letters!.bee_model_id, dbi);
-        var state = await getBeeState(player_id, letters!.bee_id, dbi)
+        const letters = await getLettersForBee(timestamp, this.dbi);
+        const bee_model:Bee|null = await getBeeById(letters!.bee_model_id, this.dbi);
+        var state = await getBeeState(player_id, letters!.bee_id, this.dbi)
         var lettersToBuy = state!.lettersToBuy; 
         if (lettersToBuy.length == 0) {
             return {message:SpellingBeeReplyEnum.no_letters_to_buy}
         }
-        var currentPlayerPoints:number|undefined = (await dbi.getBeePlayerPoints(player_id, letters!.bee_id))
+        var currentPlayerPoints:number|undefined = (await this.dbi.getBeePlayerPoints(player_id, letters!.bee_id))
         if (!currentPlayerPoints) {
             currentPlayerPoints = 0;
         }
@@ -140,7 +146,7 @@ export class SpellingBeeController {
             return {message: SpellingBeeReplyEnum.not_enough_points}
         }
         var lettersState = state!.letters;
-        var pointInfo = await dbi.increaseBeeRank(player_id, letters!.bee_id, -letterPrice.price)
+        var pointInfo = await this.dbi.increaseBeeRank(player_id, letters!.bee_id, -letterPrice.price)
         var plainLetters = lettersState.map(ls => ls.letter)
         var possibleLetters = ALPHABET.filter(letter => !plainLetters.includes(letter))
         console.log(possibleLetters)
@@ -148,7 +154,7 @@ export class SpellingBeeController {
         var boughtLetter:string = possibleLetters[boughtLetterIndex]
         console.log(boughtLetter + " " + boughtLetterIndex)
         lettersState.push(new LetterState(boughtLetter, letterPrice.useLimit, 0 , false));
-        var newState = await addNewLetterToSpellingBeeState(player_id, letters!.bee_id, lettersState, lettersToBuy, dbi);
+        var newState = await addNewLetterToSpellingBeeState(player_id, letters!.bee_id, lettersState, lettersToBuy, this.dbi);
         return {
             message:SpellingBeeReplyEnum.ok,
             letters:newState!.letters,
