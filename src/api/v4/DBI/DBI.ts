@@ -26,6 +26,7 @@ import { PlayerLimitsModel } from './player/PlayerLimitsModel';
 import { PossibleCrosswordV3 , GlobalCrossword} from './crosswords_v3/model';
 import { PlayerCrosswordV3State } from './crosswords_v3/state';
 import { injectable } from 'inversify';
+import { WordExplanation } from '../../../wordExplainers/word_explanation';
 
 const _db: IMonkManager = monk(process.env.MONGO_URI!);
 
@@ -59,6 +60,7 @@ export default class WordleDBI {
     player_login_timestamp(): ICollection<PlayerLastLogin> { return _db.get("player_login_timestamp") }
     player_limits(): ICollection<PlayerLimits> { return _db.get("player_limits") }
     limits_model(): ICollection<PlayerLimitsModel> { return _db.get("player_limits_models") }
+    words_explanations(): ICollection<WordExplanation> { return _db.get("word_explanations") }
     bee_ranking(bee_id: number): ICollection<RawRankingEntry> {
         var rank = _db.get("bee#" + bee_id + "_ranking");
         rank.createIndex({ player_id: 1 })
@@ -89,6 +91,7 @@ export default class WordleDBI {
         this.spelling_bee_duels().createIndex({ bee_duel_id: 1 }, { unique: true })
         this.spelling_bee_duel_prematch().createIndex({ player_id: 1 })
         this.social_to_auth().createIndex({ socialId: 1 }, { unique: true })
+        this.words_explanations().createIndex({ word: 1 }, { unique: true })
     }
 
     //SEQ
@@ -189,6 +192,14 @@ export default class WordleDBI {
     async increase_request_counter(path: string, last_midnight: number) {
         const stats = this.db().get("request_stats_" + last_midnight);
         stats.findOneAndUpdate({ path: path }, { $inc: { no_of_requests: 1 } }, { upsert: true })
+    }
+
+    async saveWordExplanation(word: string, exp: string): Promise<void> {
+        this.words_explanations().update({ word: word }, { $set: { explanation: exp } }, { upsert: true })
+    }
+    async getWordExplanation(word: string): Promise<string|null> {
+        const result = await this.words_explanations().findOne({ word: word })
+        return result ? result.explanation : null;
     }
 
 }

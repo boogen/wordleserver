@@ -35,5 +35,4 @@ export class StatsDBI {
             if (conn) return conn.end();
         }
     }
-
 }

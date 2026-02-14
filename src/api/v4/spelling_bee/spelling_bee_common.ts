@@ -4,12 +4,57 @@ import { Bee } from "../DBI/spelling_bee/Bee";
 import { LetterState } from "../DBI/spelling_bee/LetterState";
 import { wordExists } from "../DBI/spelling_bee/model";
 import { SeasonRules } from "../season_rules";
+import { RankingEntry } from "../DBI/ranks/RankingEntry";
+import { checkIfFriends } from "../DBI/friends/friends";
+import { oneSignalClient } from "../../../one_signal";
+import { get_nick } from "../player/player_common";
+import { CreateNotificationBody } from "onesignal-node/lib/types";
+import { Logger } from "../../../logger";
 
 const POINTS = [0, .02, .05, .08, .15, .25, .4, .5, .7];
 export const RANKS = ["Noob", "Rookie", "Beginner", "Smartiepants", "Rockstar", "Erudite", "Expert", "Master", "Genius"]
 //export const JOKER:string = "🃏"
 export const JOKER:string = "*"
 export const ALPHABET:string[] = ["a","ą","b", "c", "ć", "d", "e", "ę", "f", "g", "h", "i", "j", "k", "l", "ł", "m", "n", "ń", "o", "ó", "p", "r", "s", "ś", "t", "u", "w", "y", "z", "ź", "ż"]
+
+function createNotification(playerIds:number[], playerNick:string, heading:string):CreateNotificationBody {
+    return {
+        contents: {
+            'en': playerNick + ' wyprzedził Cię w rankingu',
+        },
+        headings: {
+            'en': heading
+        },
+        include_external_user_ids:playerIds.map(id => id.toString())
+    };
+}
+
+export async function notifyAboutRankingChange(
+    player_id:number,
+    oldRank:RankingEntry[],
+    oldPlayerScore:number,
+    newPlayerScore:number,
+    heading:string,
+    dbi:WordleDBI,
+    logger:Logger
+) {
+    var playersOvertakenInRanking:RankingEntry[] = oldRank.filter(e => e.score > oldPlayerScore && e.score < newPlayerScore);
+    var friendsToSendTo:RankingEntry[] = []
+    for (var playerEntry of playersOvertakenInRanking) {
+        if ( await checkIfFriends(playerEntry.player_id, player_id, dbi)) {
+            friendsToSendTo.push(playerEntry);
+        }
+    }
+
+    if (friendsToSendTo.length === 0) {
+        return;
+    }
+
+    oneSignalClient.createNotification(
+            createNotification(friendsToSendTo.map(e => e.player_id), (await get_nick(player_id, dbi)).nick, heading))
+        .then(response => logger.info("OneSignal response status code: %d", response.statusCode))
+    .catch(e => logger.error("OneSignal error: %s", e.body));
+}
 
 export class SpellingBeeChanges {
     constructor(public message:SpellingBeeReplyEnum, public guessesAdded:string[], public pointsAdded:number[], public newLetterState:LetterState[]) {}
@@ -71,7 +116,7 @@ export function pointsToRank(points:number, maxPoints:number):number {
 }
 
 export async function processPlayerGuess(playerGuess:string, guesses:string[], beeModel:Bee, letterState:LetterState[], seasonRules:SeasonRules, dbi:WordleDBI):Promise<SpellingBeeChanges> {
-    var letterCorrectnessMessage = checkGuessForIncorrectLetters(playerGuess, beeModel, letterState);
+    var letterCorrectnessMessage = checkGuessForIncorrectLetters(playerGuess, letterState);
     if (letterCorrectnessMessage != SpellingBeeReplyEnum.ok) {
         return new SpellingBeeChanges(letterCorrectnessMessage, [], [], []);
     }
@@ -96,7 +141,7 @@ export async function processPlayerGuess(playerGuess:string, guesses:string[], b
     var message:SpellingBeeReplyEnum = SpellingBeeReplyEnum.wrong_word;
     var guessesAdded:string[] = [];
     for (var guess of guessesToCheck) {
-        var new_message = await checkSpellingBeeGuess(guess, guesses, beeModel, letterState.map(ls => ls.letter), dbi)
+        var new_message = await checkSpellingBeeGuess(guess, guesses, dbi)
         if (message != SpellingBeeReplyEnum.ok) {
             message = new_message;
         }
@@ -149,7 +194,7 @@ export function wordPointsSeason(word:string, letters:string[], extraRules:Seaso
     return pointsForWord;
 }
 
-export async function checkSpellingBeeGuess(guess:string, current_guesses:string[], bee:Bee, other_letters:string[], dbi:WordleDBI):Promise<SpellingBeeReplyEnum> {
+export async function checkSpellingBeeGuess(guess:string, current_guesses:string[], dbi:WordleDBI):Promise<SpellingBeeReplyEnum> {
     var message = SpellingBeeReplyEnum.ok;
     
     if (current_guesses.includes(guess)) {
@@ -161,7 +206,7 @@ export async function checkSpellingBeeGuess(guess:string, current_guesses:string
     return message;
 }
 
-export function checkGuessForIncorrectLetters(guess:string, bee:Bee, letters:LetterState[]):SpellingBeeReplyEnum {
+export function checkGuessForIncorrectLetters(guess:string, letters:LetterState[]):SpellingBeeReplyEnum {
     var message = SpellingBeeReplyEnum.ok;
     var letterOccurences:Map<string, number> = new Map();
     for (var singleLetter of guess) {

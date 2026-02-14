@@ -8,10 +8,10 @@ import { GuessedWordsBee } from "../DBI/spelling_bee/GuessedWordsBee";
 import { LetterState } from "../DBI/spelling_bee/LetterState";
 import { getBeeById } from "../DBI/spelling_bee/model";
 import { addBeeGuess, addNewLetterToSpellingBeeState, createBeeState, createLettersForBee, getBeeState, getLettersForBee, saveLettersState } from "../DBI/spelling_bee/spelling_bee";
-import { notifyAboutRankingChange } from "../ranking";
-import { getSeasonRules } from "../season_rules";
-import { ALPHABET, getNewLetterState, processPlayerGuess, SpellingBeeReplyEnum } from "./spelling_bee_common";
+import { ALPHABET, getNewLetterState, notifyAboutRankingChange, processPlayerGuess, SpellingBeeReplyEnum } from "./spelling_bee_common";
 import { inject, injectable } from "inversify";
+import { SeasonRulesService } from "../season_rules";
+import { Logger } from "../../../logger";
 
 const BEE_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
@@ -41,10 +41,13 @@ interface SeasonInfo {
 export class SpellingBeeController {
     constructor(
         @inject(WordleDBI) private dbi: WordleDBI,
-        @inject(Stats) private stats: Stats
+        @inject(Stats) private stats: Stats,
+        @inject(SeasonRulesService) private seasonRulesService: SeasonRulesService,
+        @inject(Logger) private logger: Logger
     ) {
-
+        logger.setContext("SpellingBeeController");
     }
+
     @Post("getState")
     public async getState(@BodyProp() auth_id:string):Promise<SpellingBeeStateReply> {
         const player_id = await resolvePlayerId(auth_id, this.dbi);
@@ -54,7 +57,7 @@ export class SpellingBeeController {
             new_validity_timestamp += BEE_VALIDITY;
         }
         var letters:GlobalBee|null = await getLettersForBee(timestamp, this.dbi);
-        var season_rules = await getSeasonRules()
+        var season_rules = await this.seasonRulesService.getSeasonRules()
         if (null === letters) {
             letters = await createLettersForBee(new_validity_timestamp, season_rules, this.dbi);
             //initExtraLetters(letters!.required_letters, letters!.letters, season_rules);
@@ -81,18 +84,18 @@ export class SpellingBeeController {
     }
 
     @Post("guess")
-    public async guess(@BodyProp() auth_id:string, @BodyProp("guess") player_guess:string):Promise<SpellingBeeStateReply> {
-        var season_rules = getSeasonRules();
+    public async guess(@BodyProp() auth_id:string, @BodyProp() guess:string):Promise<SpellingBeeStateReply> {
+        var season_rules = await this.seasonRulesService.getSeasonRules();
         const player_id = await resolvePlayerId(auth_id, this.dbi);
         const timestamp = Date.now() / 1000;
         const letters = await getLettersForBee(timestamp, this.dbi);
         const bee_model:Bee|null = await getBeeById(letters!.bee_model_id, this.dbi);
         var state = await getBeeState(player_id, letters!.bee_id, this.dbi)
-        var result = await processPlayerGuess(player_guess, state!.guesses, bee_model!, state!.letters, await season_rules, this.dbi);
+        var result = await processPlayerGuess(guess, state!.guesses, bee_model!, state!.letters, await season_rules, this.dbi);
 
         if (result.message != SpellingBeeReplyEnum.ok) {
             var playerPoints = (await this.dbi.getBeePlayerPoints(player_id, letters!.bee_id));
-            this.stats.addSpellingBeeGuessEvent(player_id, player_guess, false, 0, playerPoints);
+            this.stats.addSpellingBeeGuessEvent(player_id, guess, false, 0, playerPoints);
             return {message: result.message,
                 letters: state!.letters,
                 guessed_words: state!.guesses,
@@ -110,7 +113,7 @@ export class SpellingBeeController {
 
         var newRankingEntry = await this.dbi.increaseBeeRank(player_id, letters!.bee_id, totalPointsAdded)
 
-        notifyAboutRankingChange(player_id, oldRank, newRankingEntry.score - totalPointsAdded, newRankingEntry.score, "Wspólna litera")
+        notifyAboutRankingChange(player_id, oldRank, newRankingEntry.score - totalPointsAdded, newRankingEntry.score, "Wspólna litera", this.dbi, this.logger)
         const max_points = bee_model!.max_points;
         state = await saveLettersState(player_id, letters!.bee_id, result.newLetterState, this.dbi)
         var player_points = (await this.dbi.getBeePlayerPoints(player_id, letters!.bee_id));
@@ -149,10 +152,10 @@ export class SpellingBeeController {
         var pointInfo = await this.dbi.increaseBeeRank(player_id, letters!.bee_id, -letterPrice.price)
         var plainLetters = lettersState.map(ls => ls.letter)
         var possibleLetters = ALPHABET.filter(letter => !plainLetters.includes(letter))
-        console.log(possibleLetters)
+        this.logger.info("Possible letters: %s", possibleLetters)
         var boughtLetterIndex:number = Math.floor(Math.random() * possibleLetters.length)
         var boughtLetter:string = possibleLetters[boughtLetterIndex]
-        console.log(boughtLetter + " " + boughtLetterIndex)
+        this.logger.info("Bought letter: %s at index %d", boughtLetter, boughtLetterIndex)
         lettersState.push(new LetterState(boughtLetter, letterPrice.useLimit, 0 , false));
         var newState = await addNewLetterToSpellingBeeState(player_id, letters!.bee_id, lettersState, lettersToBuy, this.dbi);
         return {
@@ -166,7 +169,7 @@ export class SpellingBeeController {
     }
     @Post("season_info")
     public async getSeasonRules():Promise<SeasonInfo> {
-        var season_rules = await getSeasonRules();
+        var season_rules = await this.seasonRulesService.getSeasonRules();
         return {season_id: season_rules.id, season_title: season_rules.season_title, rules:season_rules.rules, points_rules: season_rules.points, seconds_to_end:season_rules.getSecondsToEnd()}
     }
 }

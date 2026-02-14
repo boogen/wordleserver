@@ -1,6 +1,6 @@
 import { FindOneResult } from "monk";
 import { NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE } from "../../../duel_settings";
-import { getSeasonRules, LetterToBuy, SeasonRules } from "../../../season_rules";
+import { LetterToBuy, SeasonRules } from "../../../season_rules";
 import { getMaxPoints, getNewLetterState } from "../../../spelling_bee/spelling_bee_common";
 import WordleDBI from "../../DBI";
 import { Bee } from "../Bee";

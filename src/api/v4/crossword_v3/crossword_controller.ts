@@ -1,15 +1,12 @@
-import { query } from "express";
 import { Post, BodyProp, Route } from "tsoa";
 import { Stats } from "../../../WordleStatsDBI";
-import { Clue, CrosswordWord, getCrossword, getFirstCrossword, getOrCreateRandomCrossword, GridCoordinates } from "../DBI/crosswords_v3/model";
-import { PlayerCrosswordState } from "../DBI/crosswords_v3/model";
+import { Clue, CrosswordWord, getOrCreateRandomCrossword, GridCoordinates } from "../DBI/crosswords_v3/model";
 import { PossibleCrosswordV3 } from "../DBI/crosswords_v3/model";
 import WordleDBI from "../DBI/DBI";
-import { checkLimit, resolvePlayerId } from "../DBI/player/player";
-import { isWordValid } from "../DBI/wordle/model";
+import { resolvePlayerId } from "../DBI/player/player";
 import { ClueState, getCrosswordV3State, PlayerCrosswordV3State, setCrosswordV3State } from "../DBI/crosswords_v3/state";
-import { log } from "console";
 import { inject, injectable } from "inversify";
+import { Logger } from "../../../logger";
 
 const WORD_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
@@ -35,17 +32,15 @@ interface CrosswordState {
     completed: boolean;
 }
 
-const dbi = new WordleDBI();
-const stats: Stats = new Stats();
-
 @injectable()
 @Route("api/v4/crossword_v3")
 export class CrosswordController_v3 {
     constructor(
         @inject(WordleDBI) private dbi: WordleDBI,
-        @inject(Stats) private stats: Stats
+        @inject(Stats) private stats: Stats,
+        @inject(Logger) private logger: Logger
     ) {
-
+        logger.setContext("CrosswordControllerV3");
     }
     @Post("init")
     public async init(@BodyProp() auth_id: string): Promise<CrosswordInitReply> {
@@ -57,7 +52,7 @@ export class CrosswordController_v3 {
         while (new_validity_timestamp < timestamp) {
             new_validity_timestamp += WORD_VALIDITY;
         }
-        log('New validity timestamp start:', new_validity_timestamp);
+        this.logger.info("New validity timestamp start: " + new_validity_timestamp);
 
         const crossword = await getOrCreateRandomCrossword(this.dbi, timestamp, new_validity_timestamp);
 
@@ -67,21 +62,21 @@ export class CrosswordController_v3 {
         }
 
         if (state == null) {
-            console.log(crossword)
+            this.logger.info("Crossword: " + JSON.stringify(crossword));
             state = this.convertCrosswordToInternalState(playerId, crossword);
         }
 
-        await setCrosswordV3State(state, dbi)
-        await stats.addCrosswordV3InitEvent(playerId, state.crossword_id);
-        console.log(this.convertInternalStateToReplyState(state));
+        await setCrosswordV3State(state, this.dbi)
+        await this.stats.addCrosswordV3InitEvent(playerId, state.crossword_id);
+        this.logger.info("Crossword state: " + JSON.stringify(this.convertInternalStateToReplyState(state)));
         return { message: 'ok', state: this.convertInternalStateToReplyState(state) };
     }
 
     @Post("save")
     public async save(@BodyProp() auth_id: string, @BodyProp() row: number, @BodyProp() column: number, @BodyProp() letter: string) {
-        console.log(`row: ${row}, column: ${column}, letter: ${letter}`)
-        const playerId = await resolvePlayerId(auth_id, dbi);
-        var state = await getCrosswordV3State(playerId, dbi);
+        this.logger.info(`row: ${row}, column: ${column}, letter: ${letter}`)
+        const playerId = await resolvePlayerId(auth_id, this.dbi);
+        var state = await getCrosswordV3State(playerId, this.dbi);
         if (state == null) {
             throw "state is null"
         }
@@ -102,7 +97,7 @@ export class CrosswordController_v3 {
             throw `letter ${letter} not allowed`;
         }
         state.player_grid[row][column] = letter;
-        await setCrosswordV3State(state, dbi)
+        await setCrosswordV3State(state, this.dbi)
         return { message: 'ok', state: this.convertInternalStateToReplyState(state)};
     }
 

@@ -6,6 +6,7 @@ import { getWord, isWordValid } from "../DBI/wordle/model";
 import { addGuess, getGlobalWord, getOrCreateGlobalWord, getPlayerTries, getPlayerTriesForWord } from "../DBI/wordle/wordle";
 import { GuessValidation } from "./wordle_common";
 import { inject, injectable } from "inversify";
+import { Logger } from "../../../logger";
 
 const WORD_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
@@ -22,9 +23,10 @@ interface WordleStateReply {
 export class WordleController {
     constructor(
         @inject(WordleDBI) private dbi: WordleDBI,
-        @inject(Stats) private stats: Stats
+        @inject(Stats) private stats: Stats,
+        @inject(Logger) private logger: Logger
     ) {
-
+        logger.setContext("WordleController");
     }
 
     @Post("getState")
@@ -32,7 +34,7 @@ export class WordleController {
         const player_id = await resolvePlayerId(auth_id, this.dbi);
         var val = await getWord(this.dbi);
         var word = val[0].word;
-        console.log("word %s player id %s", word, player_id);
+        this.logger.info("word %s player id %s", word, player_id);
 
         const timestamp = Date.now() / 1000;
         var new_validity_timestamp = GLOBAL_TIME_START;
@@ -43,9 +45,10 @@ export class WordleController {
         const tries = await getPlayerTries(player_id, existing!.word_id, timestamp, this.dbi);
         this.stats.addWordleInitEvent(player_id, existing!.word_id)
         const dbi = this.dbi;
+        const logger = this.logger;
         return {
             message: 'ok',
-            guesses: await Promise.all(tries!.guesses.map(async function(g) { return validateGuess(g, existing!.word, dbi) })),
+            guesses: await Promise.all(tries!.guesses.map(async function(g) { return validateGuess(g, existing!.word, dbi, logger) })),
             timeToNext: Math.floor(existing!.validity - timestamp),
             finished: tries!.guesses.length == 6 || tries!.guesses.includes(existing!.word)
         };
@@ -67,7 +70,7 @@ export class WordleController {
         }
         
 
-        const guessResult = await validateGuess(guess, word, this.dbi);
+        const guessResult = await validateGuess(guess, word, this.dbi, this.logger);
 
         if (guessResult.isWord) {
             addGuess(player_id, wordEntry!.word_id, guess, this.dbi);
@@ -78,7 +81,7 @@ export class WordleController {
             await this.dbi.increaseRank(player_id, wordEntry!.word_id, tries, timestamp - t!.start_timestamp)
         }
 
-        console.log("tries: " + tries);
+        this.logger.info("tries: " + tries);
         if (tries == 6) {
             guessResult.correctWord = word;
         }
@@ -87,11 +90,11 @@ export class WordleController {
     }
 }
 
-async function validateGuess(guess:string, word:string, dbi:WordleDBI):Promise<GuessValidation> {
+async function validateGuess(guess:string, word:string, dbi:WordleDBI, logger:Logger):Promise<GuessValidation> {
     const guessed = (guess == word);
     const isWord = await isWordValid(guess, dbi);
    
-    console.log("Guessed word: %s, actual word: %s", guess, word)
+    logger.info("Guessed word: %s, actual word: %s", guess, word)
 
     var result:number[] = [];
     if (isWord) {

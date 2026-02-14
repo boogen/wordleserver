@@ -9,6 +9,7 @@ import { getSpellingBeeDuelStats } from "../DBI/spelling_bee/duel/spelling_bee_d
 import { getSpellingBeeStats } from "../DBI/spelling_bee/spelling_bee";
 import { generateFriendCode } from "../friend/friend_controller";
 import { inject, injectable } from "inversify";
+import { Logger } from "../../../logger";
 
 interface RegistrationReply {
     message:string;
@@ -89,9 +90,10 @@ export async function getPlayerProfile(akserId:number, playerId:number, dbi:Word
 export class PlayerController {
     constructor(
         @inject(WordleDBI) private dbi: WordleDBI,
-        @inject(Stats) private stats: Stats
+        @inject(Stats) private stats: Stats,
+        @inject(Logger) private logger: Logger
     ) {
-
+        logger.setContext("PlayerController");
     }
     @Post("register")
     public async register():Promise<RegistrationReply> {
@@ -107,7 +109,7 @@ export class PlayerController {
 
     @Post("login")
     public async login(@BodyProp() auth_id:string):Promise<LoginReply> {
-        console.log("Logging in auth_id: " + auth_id)
+        this.logger.info("Logging in auth_id: %s", auth_id)
         const player_id:number = (await resolvePlayerId(auth_id, this.dbi));
         var last_login_timestamp = (await getLastLoginTimestamp(player_id, this.dbi));
         var last_midnight = new Date();
@@ -128,7 +130,7 @@ export class PlayerController {
 
     @Post("setNick")
     public async setNick(@BodyProp() auth_id:string, @BodyProp() nick:string):Promise<NickSetReply> {
-        console.log(auth_id)
+        this.logger.info("Setting nick for auth_id: %s to %s", auth_id, nick)
         const player_id:number = (await resolvePlayerId(auth_id, this.dbi));
         await setNick(player_id, nick, this.dbi);
         await this.stats.addSetNickEvent(player_id, nick);
@@ -145,14 +147,14 @@ export class PlayerController {
     @Post("setSocialId")
     public async setSocialId(@BodyProp() auth_id:string, @BodyProp() socialId:string):Promise<SetSocialIdReply> {
         const social_to_auth = await checkSocialId(auth_id, socialId, this.dbi);
-        console.log(social_to_auth)
+        this.logger.info("Social to auth: %s", JSON.stringify(social_to_auth));
         return {message:'ok', authId:social_to_auth!.authId}
     }
 
     @Post("getProfile")
     public async getProfile(@BodyProp() auth_id:string, @BodyProp() player_id:number):Promise<PlayerProfileReply> {
         const id = await resolvePlayerId(auth_id, this.dbi);
-        console.log("Getting profile for player: " + player_id)
+        this.logger.info("Getting profile for player: %s", player_id)
 
         return {message: 'ok', profile: await getPlayerProfile(id, player_id, this.dbi)}
     }

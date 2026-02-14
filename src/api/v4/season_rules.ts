@@ -1,6 +1,7 @@
 import joi, { func, required } from '@hapi/joi';
 import * as fs from 'fs';
-import { getSpellingBeeSeasonManager } from '../../spelling_bee_season_manager';
+import { inject, injectable } from 'inversify';
+import { SpellingBeeSeasonManager } from '../../spelling_bee_season_manager';
 //import { file } from 'googleapis/build/src/apis/file';
 
 const fixedPointsSchema = joi.object({length: joi.number().required(), points: joi.number().required()})
@@ -22,12 +23,22 @@ const profileSchema = joi.object({
     lettersToBuy: joi.array().items(letterToBuySchema)
 });
 
-export async function getDuelSeasonRules():Promise<SeasonRules> {
-    return await getSpellingBeeSeasonManager().getCurrentDuelSeason();
-}
 
-export async function getSeasonRules():Promise<SeasonRules> {
-    return await getSpellingBeeSeasonManager().getCurrentSeason();
+@injectable()
+export class SeasonRulesService {
+    constructor(
+        @inject(SpellingBeeSeasonManager) private seasonManager: SpellingBeeSeasonManager
+    ) {
+
+    }
+
+    public async getDuelSeasonRules():Promise<SeasonRules> {
+        return await this.seasonManager.getCurrentDuelSeason();
+    }
+
+    public async getSeasonRules():Promise<SeasonRules> {
+        return await this.seasonManager.getCurrentSeason();
+    }
 }
 
 export class LetterToBuy {

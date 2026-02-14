@@ -3,6 +3,7 @@ import WordleDBI from "../DBI/DBI";
 import { addFriend, addFriendCode, friendList } from "../DBI/friends/friends";
 import { getProfile, resolvePlayerId } from "../DBI/player/player";
 import { inject, injectable } from "inversify";
+import { Logger } from "../../../logger";
 
 interface FriendCodeReply {
     status:string;
@@ -38,8 +39,9 @@ export function generateFriendCode(length:number):string {
 export class FriendController {
     constructor(
         @inject(WordleDBI) private dbi: WordleDBI,
+        @inject(Logger) private logger: Logger
     ) {
-
+        logger.setContext("FriendController");
     }
 
     @Post("code")
@@ -49,7 +51,7 @@ export class FriendController {
         var generated_friend_code = null;
         do {
             generated_friend_code = generateFriendCode(7);
-            console.log(generated_friend_code)
+            this.logger.info("Generated friend code: " + generated_friend_code);
         } while (!(friend_code = await addFriendCode(player_id, generated_friend_code, this.dbi)));
         return{
             status: "ok",

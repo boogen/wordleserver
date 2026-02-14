@@ -1,4 +1,3 @@
-import { query } from "express";
 import { Post, BodyProp, Route } from "tsoa";
 import { Stats } from "../../../WordleStatsDBI";
 import { getCrosswordState, setCrosswordState } from "../DBI/crosswords/crossword";
@@ -6,9 +5,10 @@ import { getCrossword, getFirstCrossword, getRandomCrossword } from "../DBI/cros
 import { PlayerCrosswordState } from "../DBI/crosswords/PlayerCrosswordState";
 import { PossibleCrossword } from "../DBI/crosswords/PossibleCrossword";
 import WordleDBI from "../DBI/DBI";
-import { checkLimit, resolvePlayerId } from "../DBI/player/player";
+import { resolvePlayerId } from "../DBI/player/player";
 import { isWordValid } from "../DBI/wordle/model";
 import { inject, injectable } from "inversify";
+import { Logger } from "../../../logger";
 
 interface CrosswordInitReply {
     message: string;
@@ -34,9 +34,10 @@ interface CrosswordState {
 export class CrosswordController {
     constructor(
         @inject(WordleDBI) private dbi: WordleDBI,
-        @inject(Stats) private stats: Stats
+        @inject(Stats) private stats: Stats,
+        @inject(Logger) private logger: Logger
     ) {
-
+        logger.setContext("CrosswordController");
     }
     @Post("init")
     public async init(@BodyProp() auth_id: string): Promise<CrosswordInitReply> {
@@ -50,8 +51,8 @@ export class CrosswordController {
 
         if (crosswordState == null || this.isFinished(crosswordState)) {
             const crossword = await getRandomCrossword(this.dbi);
-            console.log(crossword)
-            console.log(crossword.letter_grid)
+            this.logger.info(`Crossword: ${JSON.stringify(crossword)}`);
+            this.logger.info(`Crossword letter_grid: ${JSON.stringify(crossword.letter_grid)}`);
             grid = this.convertGrid(crossword.letter_grid)
             word_list = Object.values(crossword.word_list).map(w => w.word)
             crossword_id = crossword.crossword_id
@@ -77,7 +78,7 @@ export class CrosswordController {
     public async mock(): Promise<CrosswordInitReply> {
         const crossword = await getFirstCrossword(this.dbi);
         var letterList = new Set(crossword!.word_list.map(c => c.word).join(""))
-        console.log(crossword!.letter_grid)
+        this.logger.info("Crossword letter_grid: " + JSON.stringify(crossword!.letter_grid))
         var grid: string[][] = []
         for (var i = 0; i < crossword!.letter_grid.length; i++) {
             var result: string[] = []
@@ -121,7 +122,7 @@ export class CrosswordController {
         const original_grid = crossword!.letter_grid
         const guessed_word = crosswordState!.words.includes(players_word)
         const convertedOriginalGrid = this.convertGrid(original_grid)
-        console.log(original_grid);
+        this.logger.info("Original grid: " + JSON.stringify(original_grid));
         const tries = new Set(crosswordState!.tries)
         var indexToFill = undefined
         for (var i = 0; i < convertedOriginalGrid.length; i++) {
@@ -165,7 +166,7 @@ export class CrosswordController {
         if (indexToFill) {
             convertedOriginalGrid[indexToFill.x][indexToFill.y] = original_grid[indexToFill.x][indexToFill.y]
         }
-        console.log(convertedOriginalGrid);
+        this.logger.info("Converted grid: " + JSON.stringify(convertedOriginalGrid));
         const newState = await setCrosswordState(playerId, crosswordState!.words, guessed_words_array, convertedOriginalGrid, crosswordState!.crossword_id, Array.from(tries), this.dbi)
         await this.stats.addCrosswordGuessEvent(playerId, guessed_words_array.length, tries.size + guessed_words_array.length, this.isFinished(newState!), true)
         return { isWord: true, guessed_word: guessed_word, state: (await this.stateToReply(convertedOriginalGrid, crosswordState!.words, crossword!, this.isFinished(newState!))) }
@@ -173,8 +174,8 @@ export class CrosswordController {
 
     private async stateToReply(grid: string[][], word_list: string[], crossword: PossibleCrossword, finished: boolean): Promise<CrosswordState> {
         var letterList = new Set(word_list.join(""))
-        console.log('word list', word_list);
-        console.log('letter list: ', letterList);
+        this.logger.info("Word list: " + JSON.stringify(word_list));
+        this.logger.info("Letter list: " + JSON.stringify(Array.from(letterList)));
         return {
             letters: Array.from(letterList),
             grid: grid.concat.apply([], grid),
