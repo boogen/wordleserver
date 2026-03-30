@@ -1,4 +1,3 @@
-import { string } from "@hapi/joi";
 import { Post, BodyProp, Route } from "tsoa";
 import { Stats } from "../../../../WordleStatsDBI";
 import WordleDBI from "../../DBI/DBI";
@@ -9,7 +8,7 @@ import { SpellingBeeDuellGuess } from "../../DBI/spelling_bee/duel/SpellingBeeDu
 import { addNewLetterToSpellingBeeDuel, addPlayerGuessInSpellingBeeDuel, addSpellingBeeDuelMatch, checkForExistingDuel, checkForUnfinishedDuel, getAllPlayerDuelsBeeIds, getBestResultPercentage, getDuelsForGivenBee, getLastSpellingBeeDuelOpponents, getRandomDuelBee, getSpellingBeeDuelMatch, markDuelAsFinished, startDuel } from "../../DBI/spelling_bee/duel/spelling_bee_duel";
 import { LetterState } from "../../DBI/spelling_bee/LetterState";
 import { getBeeById, getRandomBee } from "../../DBI/spelling_bee/model";
-import { BOT_THRESHOLD, CHANCE_FOR_BOT, DUEL_DURATION, ELO_COEFFICIENT, MATCH_ELO_DIFF, MATCH_POSITION_DIFF } from "../../duel_settings";
+import { BOT_THRESHOLD, CHANCE_FOR_BOT, DUEL_DURATION, MATCH_ELO_DIFF, MATCH_POSITION_DIFF } from "../../duel_settings";
 import { get_bot_id, get_nick } from "../../player/player_common";
 import { fromOtherSeasonRules, LetterToBuy, SeasonRules, SeasonRulesService } from "../../season_rules";
 import { ALPHABET, notifyAboutRankingChange, processPlayerGuess, SpellingBeeReplyEnum } from "../spelling_bee_common";
@@ -243,7 +242,6 @@ export class SpellingBeeDuelController {
             result = DuelResult.lose
         }
         const currentEloScore:number = await this.dbi.getCurrentSpellingBeeElo(player_id, season_rules.id);
-        const opponentElo:number = await this.dbi.getCurrentSpellingBeeElo(duel.opponent_id, season_rules.id);
         const new_player_elo:number = calculateNewSimpleRank(currentEloScore, result);
         const oldRank = await this.dbi.getSpellingBeeEloRank(season_rules.id)
         notifyAboutRankingChange(player_id, oldRank, currentEloScore, new_player_elo, "Pojedynek", this.dbi, this.logger)
@@ -281,12 +279,12 @@ export class SpellingBeeDuelController {
         var newDuel = await addNewLetterToSpellingBeeDuel(duel!.bee_duel_id, lettersState, lettersToBuy, -letterPrice.price, this.dbi);
         return {
             message:"ok",
-            letters:duel!.letters,
-            guessed_words:duel!.player_guesses.map(g => g.word),
-            player_points:duel!.player_points,
+            letters:newDuel!.letters,
+            guessed_words:newDuel!.player_guesses.map(g => g.word),
+            player_points:newDuel!.player_points,
             time_left:Math.floor(duel!.start_timestamp + DUEL_DURATION - timestamp),
             round_time:DUEL_DURATION,
-            letters_to_buy:duel!.lettersToBuy
+            letters_to_buy:newDuel!.lettersToBuy
         };
     }
 }
@@ -294,7 +292,9 @@ export class SpellingBeeDuelController {
 async function createBotGuesses(bee_model:Bee, player_id:number, season_rules:SeasonRules, dbi:WordleDBI):Promise<SpellingBeeDuellGuess[]> {
     const player_duels_bee_ids:number[] = await getAllPlayerDuelsBeeIds(player_id, season_rules.duelTag, dbi);
     const best_result_percentage:number[] = await getBestResultPercentage(player_id, player_duels_bee_ids, season_rules.duelTag, dbi);
-    const average_percentage:number = best_result_percentage.reduce((a, b) => a+b, 0) / best_result_percentage.length;
+    const average_percentage:number = best_result_percentage.length > 0
+        ? best_result_percentage.reduce((a, b) => a+b, 0) / best_result_percentage.length
+        : 0.5;
     const return_value:SpellingBeeDuellGuess[] = []
     var bot_points:number = average_percentage * BOT_THRESHOLD.get_random() * bee_model.max_points;
     const bot_guess_points:number[] = []
@@ -330,23 +330,3 @@ function calculateNewSimpleRank(playerScore:number, result:DuelResult):number {
 }
 
 
-function calculateNewEloRank(playerScore:number, opponentScore:number, result:DuelResult):number {
-    const rankingDiff:number = playerScore - opponentScore;
-    const expectedResult:number = 1/(Math.pow(10, -rankingDiff/400) + 1);
-    var numericalResult:number = 0;
-    switch (result) {
-        case DuelResult.draw:
-            numericalResult = 0.5;
-            break;
-        case DuelResult.lose:
-            numericalResult = 0;
-            break;
-        case DuelResult.win:
-            numericalResult = 1;
-            break;
-        default:
-            throw new Error("Cannot calculate new elo - incorrect result");
-    }
-
-    return playerScore +  Math.ceil(ELO_COEFFICIENT * (numericalResult - expectedResult));
-}

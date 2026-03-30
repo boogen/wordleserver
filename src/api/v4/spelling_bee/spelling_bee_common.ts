@@ -1,4 +1,3 @@
-import { func } from "@hapi/joi";
 import WordleDBI from "../DBI/DBI";
 import { Bee } from "../DBI/spelling_bee/Bee";
 import { LetterState } from "../DBI/spelling_bee/LetterState";
@@ -161,7 +160,7 @@ class WordPoints {
     constructor(public points:number, public isPanagram:boolean) {}
 }
 
-export function wordPoints(word:String, letters:string[]):WordPoints {
+export function wordPoints(word:string, letters:string[]):WordPoints {
     if (word.length == 4) {
         return new WordPoints(1, false)
     }
@@ -195,15 +194,13 @@ export function wordPointsSeason(word:string, letters:string[], extraRules:Seaso
 }
 
 export async function checkSpellingBeeGuess(guess:string, current_guesses:string[], dbi:WordleDBI):Promise<SpellingBeeReplyEnum> {
-    var message = SpellingBeeReplyEnum.ok;
-    
-    if (current_guesses.includes(guess)) {
-        message = SpellingBeeReplyEnum.already_guessed
-    }
     if (!(await wordExists(guess, dbi))) {
-        message = SpellingBeeReplyEnum.wrong_word
+        return SpellingBeeReplyEnum.wrong_word;
     }
-    return message;
+    if (current_guesses.includes(guess)) {
+        return SpellingBeeReplyEnum.already_guessed;
+    }
+    return SpellingBeeReplyEnum.ok;
 }
 
 export function checkGuessForIncorrectLetters(guess:string, letters:LetterState[]):SpellingBeeReplyEnum {

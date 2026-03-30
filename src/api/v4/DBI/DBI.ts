@@ -99,13 +99,12 @@ export default class WordleDBI {
     async getNextSequenceValue(sequenceName: string): Promise<number> {
         var sequenceDocument = await this.counters().findOneAndUpdate({ id: sequenceName },
             { $inc: { sequence_value: 1 } }, { upsert: true });
-        console.log(sequenceDocument);
         return sequenceDocument!.sequence_value;
     }
 
 
     async updateSpellingBeeEloRank(player_id: number, score_delta: number, rankTag: string) {
-        updateRank(this.spelling_bee_elo_rank(rankTag), player_id, score_delta);
+        await updateRank(this.spelling_bee_elo_rank(rankTag), player_id, score_delta);
     }
 
     async getSpellingBeeEloRankWithFilter(friends: number[], rankTag: string): Promise<RankingEntry[]> {
@@ -195,7 +194,7 @@ export default class WordleDBI {
     }
 
     async saveWordExplanation(word: string, exp: string): Promise<void> {
-        this.words_explanations().update({ word: word }, { $set: { explanation: exp } }, { upsert: true })
+        await this.words_explanations().update({ word: word }, { $set: { explanation: exp } }, { upsert: true })
     }
     async getWordExplanation(word: string): Promise<string|null> {
         const result = await this.words_explanations().findOne({ word: word })

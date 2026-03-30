@@ -1,5 +1,3 @@
-import { any, string } from "@hapi/joi";
-
 export default class Utils {
     static randomString(length:number):string {
         var text = "";
@@ -17,6 +15,6 @@ export class MinMax {
     constructor(public min:number, public max:number){}
 
     get_random():number {
-        return Math.random() * (this.max - this.min) + this.max
+        return Math.random() * (this.max - this.min) + this.min
     }
 }

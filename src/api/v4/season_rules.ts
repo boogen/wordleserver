@@ -1,4 +1,4 @@
-import joi, { func, required } from '@hapi/joi';
+import joi from '@hapi/joi';
 import * as fs from 'fs';
 import { inject, injectable } from 'inversify';
 import { SpellingBeeSeasonManager } from '../../spelling_bee_season_manager';
@@ -85,7 +85,7 @@ export class SeasonRules {
             this.fixedPoints = seasonData.fixedPoints;
         }
         if (seasonData.multipliers) {
-            this.multiplier = seasonData.multpliers;
+            this.multiplier = seasonData.multipliers;
         }
         if (seasonData.pointsForLetters) {
             this.pointsForLetters = seasonData.pointsForLetters;

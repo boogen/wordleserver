@@ -105,8 +105,8 @@ export class SpellingBeeController {
             }
         }
 
-        for (var guess of result.guessesAdded) {
-            state = await addBeeGuess(player_id, letters!.bee_id, guess, this.dbi)
+        for (const addedGuess of result.guessesAdded) {
+            state = await addBeeGuess(player_id, letters!.bee_id, addedGuess, this.dbi)
         }
         var totalPointsAdded = result.pointsAdded.reduce((a, b) => a+b)
         var oldRank = await this.dbi.getBeeRanking(letters!.bee_id)

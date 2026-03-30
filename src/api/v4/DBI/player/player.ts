@@ -19,7 +19,10 @@ export async function addPlayerToAuthMap(authId:string, playerId:number, dbi:Wor
 
 export async function resolvePlayerId(auth_id:string, dbi:WordleDBI):Promise<number> {
     const authEntry = await dbi.player_auth().findOne({auth_id: auth_id});
-    return authEntry!.player_id;
+    if (!authEntry) {
+        throw new Error(`Unknown auth_id`);
+    }
+    return authEntry.player_id;
 }
 
 export async function isAuthIdUsed(auth_id:string, dbi:WordleDBI):Promise<boolean> {
@@ -28,7 +31,7 @@ export async function isAuthIdUsed(auth_id:string, dbi:WordleDBI):Promise<boolea
 }
 
 export async function setNick(playerId:number, nick:string, dbi:WordleDBI) {
-    dbi.player_profile().findOneAndUpdate({id: playerId},  {$set:{nick: nick}}, {upsert: true});
+    await dbi.player_profile().findOneAndUpdate({id: playerId},  {$set:{nick: nick}}, {upsert: true});
 }
 
 export async function getProfile(playerId:number, dbi:WordleDBI):Promise<PlayerProfile|null> {
@@ -40,7 +43,7 @@ export async function getLastLoginTimestamp(player_id:number, dbi:WordleDBI):Pro
 }
 
 export async function updateLastLoginTimestamp(timestamp:number, player_id:number, dbi:WordleDBI) {
-    dbi.player_login_timestamp().findOneAndUpdate({player_id: player_id}, {$set:{timestamp: timestamp}}, {upsert:true})
+    await dbi.player_login_timestamp().findOneAndUpdate({player_id: player_id}, {$set:{timestamp: timestamp}}, {upsert:true})
 }
 
 export async function resetPlayerLimits(player_id:number, dbi:WordleDBI):Promise<PlayerLimits|null> {

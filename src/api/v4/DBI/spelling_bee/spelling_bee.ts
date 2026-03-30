@@ -33,7 +33,7 @@ export async function createLettersForBee(validityTimestamp:number, season_rules
         safety --;
         var letterToRemove = Math.floor(Math.random() * other_letters.length)
         if (other_letters[letterToRemove] != JOKER) {
-            other_letters.splice(letterToRemove);
+            other_letters.splice(letterToRemove, 1);
         }
         if (safety < 0) {
             throw "Error creating letters for bee"
@@ -78,7 +78,6 @@ export async function getSpellingBeeStats(profile_player_id: number, dbi:WordleD
             points += wordPoints(word, letters).points
         }
         var rank = pointsToRank(points, maxPoints);
-        console.log(return_value[rank] + 1)
         return_value[rank] = return_value[rank] + 1
     }
     ))
