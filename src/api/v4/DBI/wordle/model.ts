@@ -5,5 +5,5 @@ export async function getWord(dbi:WordleDBI) {
 }
 
 export async function isWordValid(word:string, dbi:WordleDBI):Promise<boolean> {
-    return dbi.possible_words().findOne({word:word}).then(value => {return value != null});
+    return dbi.possibleWords().findOne({word:word}).then(value => {return value != null});
 }

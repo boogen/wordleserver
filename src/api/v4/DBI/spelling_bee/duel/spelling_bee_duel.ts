@@ -12,7 +12,7 @@ import { SpellingBeeDuellGuess } from "./SpellingBeeDuellGuess";
 import { SpellingBeeDuelMatch } from "./SpellingBeeDuelMatch";
 
 export async function getSpellingBeeDuelStats(player_id: number, profile_player_id: number, dbi:WordleDBI):Promise<Map<String, number>> {
-    var result = await dbi.spelling_bee_duels()
+    var result = await dbi.spellingBeeDuels()
     .aggregate<SpellingBeeDuelAggregate[]>([{$match:{player_id: player_id, opponent_id:profile_player_id, finished:true}},
         {$group:{_id:{$cmp:["$player_points", "$opponent_points"]}, count:{$count:{}}}}]);
     var return_value:Map<String, number> = new Map();
@@ -42,7 +42,7 @@ export async function getRandomDuelBee(opponent_id:number, season_rules:SeasonRu
     if (opponent_id < 0) {
         return getRandomBee(dbi, season_rules);
     }
-    var possibleNotRandom = (await dbi.spelling_bee_duels().find({player_id:opponent_id},)).map(d => d.bee_id);
+    var possibleNotRandom = (await dbi.spellingBeeDuels().find({player_id:opponent_id},)).map(d => d.bee_id);
     possibleNotRandom = Array.from(new Set(possibleNotRandom));
     
     if (possibleNotRandom.length === 0) {
@@ -53,7 +53,7 @@ export async function getRandomDuelBee(opponent_id:number, season_rules:SeasonRu
 }
 
 export async function getDuelsForGivenBee(bee_model_id:number, player_id:number, timestamp:number, duelDuration:number, dbi:WordleDBI):Promise<FindOneResult<SpellingBeeDuel>> {
-    return dbi.spelling_bee_duels().findOne({bee_id:bee_model_id, player_id:player_id, start_timestamp:{$lt:timestamp - duelDuration}}, {sort:{player_points:-1}, limit:1})
+    return dbi.spellingBeeDuels().findOne({bee_id:bee_model_id, player_id:player_id, start_timestamp:{$lt:timestamp - duelDuration}}, {sort:{player_points:-1}, limit:1})
 }
 
 
@@ -71,53 +71,53 @@ export async function startDuel(bee_model:Bee, player_id: number, opponent_id:nu
         seasonRules,
         seasonRules.duelTag ?? undefined
         );
-        await dbi.spelling_bee_duels().insert(return_value);
+        await dbi.spellingBeeDuels().insert(return_value);
 
     return return_value;
 }
 
 export async function getSpellingBeeDuelMatch(player_id:number, season_tag:string, dbi:WordleDBI):Promise<FindOneResult<SpellingBeeDuelMatch>> {
-    return dbi.spelling_bee_duel_prematch().findOne({player_id:player_id, season_tag:season_tag});
+    return dbi.spellingBeeDuelPrematch().findOne({player_id:player_id, season_tag:season_tag});
 }
 
 export async function addSpellingBeeDuelMatch(player_id:number, opponent_id:number, season_tag:string, dbi:WordleDBI) {
-    await dbi.spelling_bee_duel_prematch().insert({player_id:player_id, opponent_id:opponent_id, season_tag:season_tag})
+    await dbi.spellingBeeDuelPrematch().insert({player_id:player_id, opponent_id:opponent_id, season_tag:season_tag})
 }
 
 export async function checkForExistingDuel(player_id:number, timestamp:number, duel_duration:number, dbi:WordleDBI):Promise<FindOneResult<SpellingBeeDuel>> {
-    return dbi.spelling_bee_duels().findOne({player_id:player_id, start_timestamp:{$lt: timestamp, $gt: timestamp - duel_duration}})
+    return dbi.spellingBeeDuels().findOne({player_id:player_id, start_timestamp:{$lt: timestamp, $gt: timestamp - duel_duration}})
 }
 
 export async function checkForUnfinishedDuel(player_id:number, timestamp:number, duel_duration:number, dbi:WordleDBI):Promise<FindOneResult<SpellingBeeDuel>> {
-    return dbi.spelling_bee_duels().findOne({player_id:player_id, start_timestamp:{$lt:timestamp - duel_duration}, finished:false});
+    return dbi.spellingBeeDuels().findOne({player_id:player_id, start_timestamp:{$lt:timestamp - duel_duration}, finished:false});
 }
 
 export async function markDuelAsFinished(bee_duel_id:number, player_id:number, season_tag:string, dbi:WordleDBI) {
-    await dbi.spelling_bee_duel_prematch().findOneAndDelete({player_id:player_id, season_tag:season_tag});
-    await dbi.spelling_bee_duels().findOneAndUpdate({bee_duel_id:bee_duel_id}, {$set: {finished:true}});
+    await dbi.spellingBeeDuelPrematch().findOneAndDelete({player_id:player_id, season_tag:season_tag});
+    await dbi.spellingBeeDuels().findOneAndUpdate({bee_duel_id:bee_duel_id}, {$set: {finished:true}});
 }
 
 export async function markOldDuelsAsFinished(player_id:number, dbi:WordleDBI) {
-    await dbi.spelling_bee_duels().update({player_id:player_id, finished:false}, {$set:{finished:true}})
+    await dbi.spellingBeeDuels().update({player_id:player_id, finished:false}, {$set:{finished:true}})
 }
 
 
 export async function addPlayerGuessInSpellingBeeDuel(duel_id:number, player_id:number, guess:string, points:number, current_duel:SpellingBeeDuel, timestamp:number, dbi:WordleDBI):Promise<SpellingBeeDuel|null> {
-    return dbi.spelling_bee_duels().findOneAndUpdate({bee_duel_id:duel_id},
+    return dbi.spellingBeeDuels().findOneAndUpdate({bee_duel_id:duel_id},
         {$set:{player_points:current_duel.player_points + points},
         $push:{player_guesses: new SpellingBeeDuellGuess(guess, timestamp, current_duel.player_points + points)}
     })
 }
 
 export async function addNewLetterToSpellingBeeDuel(duel_id:number, newLetterState:LetterState[], newLettersToBuy:LetterToBuy[],  letterPrice:number, dbi:WordleDBI) {
-    return dbi.spelling_bee_duels().findOneAndUpdate({bee_duel_id:duel_id},
+    return dbi.spellingBeeDuels().findOneAndUpdate({bee_duel_id:duel_id},
         {$inc:{player_points:letterPrice},
         $set:{letters:newLetterState, lettersToBuy:newLettersToBuy}}
     )
 }
 
 export async function getAllPlayerDuelsBeeIds(player_id:number, duelTag:string|null, dbi:WordleDBI):Promise<number[]> {
-    return dbi.spelling_bee_duels().distinct('bee_id', {player_id:player_id, season_tag:duelTag ?? undefined})
+    return dbi.spellingBeeDuels().distinct('bee_id', {player_id:player_id, season_tag:duelTag ?? undefined})
 }
 
 export async function getBestResultPercentage(player_id:number, bees_ids:number[], duelTag:string|null, dbi:WordleDBI):Promise<number[]> {
@@ -126,7 +126,7 @@ export async function getBestResultPercentage(player_id:number, bees_ids:number[
 
 export async function getSingleBestResultPercentage(player_id:number, bee_id:number, duelTag:string|null, dbi:WordleDBI):Promise<number> {
     const bee_model:Bee|null = await getBeeById(bee_id, dbi);
-    const best_duel:SpellingBeeDuel|null = await dbi.spelling_bee_duels().findOne({player_id:player_id, bee_id:bee_id, season_tag:duelTag ?? undefined}, {sort:{player_points:-1}, limit:1})
+    const best_duel:SpellingBeeDuel|null = await dbi.spellingBeeDuels().findOne({player_id:player_id, bee_id:bee_id, season_tag:duelTag ?? undefined}, {sort:{player_points:-1}, limit:1})
 
     return best_duel!.player_points/bee_model!.max_points;
 }
@@ -135,5 +135,5 @@ export async function getLastSpellingBeeDuelOpponents(player_id:number, dbi:Word
     if (NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE === 0) {
         return [];
     }
-    return dbi.spelling_bee_duels().find({player_id:player_id}, {sort:{start_timestamp: -1}, limit:NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE}).then(duelEntries => duelEntries.map(entry => entry.opponent_id))
+    return dbi.spellingBeeDuels().find({player_id:player_id}, {sort:{start_timestamp: -1}, limit:NUMBER_OF_LAST_OPPONENTS_TO_EXCLUDE}).then(duelEntries => duelEntries.map(entry => entry.opponent_id))
 }

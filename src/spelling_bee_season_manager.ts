@@ -86,7 +86,7 @@ export class SpellingBeeSeasonManager {
             return_value = new SeasonRules({}, id, "Tryb standardowy", "", "", null, "vanilla")
         }
         if (type === "duel") {
-            this.dbi.spelling_bee_elo_rank(return_value.id).createIndex({player_id:1}, {unique:true})
+            this.dbi.spellingBeeEloRank(return_value.id).createIndex({player_id:1}, {unique:true})
         }
         this.spellingBeeRules.set(type, new CachedRules(return_value, now))
         return return_value;

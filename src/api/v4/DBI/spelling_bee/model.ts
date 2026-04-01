@@ -14,7 +14,7 @@ export async function getBeeById(bee_model_id:number, dbi:WordleDBI):Promise<Fin
 }
 
 export async function isBeeWordOnExtraList(word:string, dbi:WordleDBI):Promise<boolean> {
-    return dbi.extra_bee_words().findOne({word:word}).then(value => {return value != null});
+    return dbi.extraBeeWords().findOne({word:word}).then(value => {return value != null});
 }
 
 export async function wordExists(word:string, dbi:WordleDBI) {

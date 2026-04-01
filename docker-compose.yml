@@ -18,9 +18,6 @@ services:
       - proxy
       - mongo
       - stats
-    depends_on:
-      - mongo
-      - mariadb
 
   wordle_prod:
     build:
@@ -41,9 +38,6 @@ services:
       - proxy
       - mongo
       - stats
-    depends_on:
-      - mongo
-      - mariadb
 
   wordle_standalone:
     image: node:latest
@@ -58,6 +52,7 @@ services:
       - ./:/wordle
     environment:
       - MONGO_URI=mongodb://${MONGO_HOST}/wordle
+      - PORT=${PORT}
     networks:
       - proxy
       - mongo
@@ -91,12 +86,12 @@ services:
       - dev
       - prod
     environment:
-      - MARIADB_RANDOM_ROOT_PASSWORD=root_secret
+      - MARIADB_ROOT_PASSWORD=root_secret
       - MARIADB_DATABASE=${STATS_DB_NAME}
       - MARIADB_USER=${STATS_DB_USER}
       - MARIADB_PASSWORD=${STATS_DB_PASSWORD}
     volumes:
-      - /var/lib/mariadb_stats:/data/mysql
+      - /var/lib/mariadb_stats:/var/lib/mysql
       - ./scripts/stats.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - stats

@@ -23,183 +23,192 @@ import { getRank, getRankWithFilter, getScoreFromRank, updateRank } from './rank
 import { PlayerLastLogin } from './player/PlayerLastLogin';
 import { PlayerLimits } from './player/PlayerLimits';
 import { PlayerLimitsModel } from './player/PlayerLimitsModel';
-import { PossibleCrosswordV3 , GlobalCrossword} from './crosswords_v3/model';
+import { PossibleCrosswordV3, GlobalCrossword } from './crosswords_v3/model';
 import { PlayerCrosswordV3State } from './crosswords_v3/state';
 import { injectable } from 'inversify';
 import { WordExplanation } from '../../../wordExplainers/word_explanation';
 
-const _db: IMonkManager = monk(process.env.MONGO_URI!);
-
-
 @injectable()
 export default class WordleDBI {
-    db() { return _db; }
-    words(): ICollection<Word> { return _db.get("words") }
-    player_word(): ICollection<PlayerWord> { return _db.get("player_word") }
-    possible_words(): ICollection<Word> { return _db.get("possible_words") }
-    player_tries(): ICollection<PlayerTries> { return _db.get("player_tries") }
-    player_challenge_tries(): ICollection<PlayerTries> { return _db.get("player_challenge_tries") }
-    player_auth(): ICollection<PlayerAuth> { return _db.get("player_auth") }
-    counters(): ICollection<Counter> { return _db.get("counters") }
-    friend_codes(): ICollection<FriendCode> { return _db.get("friend_codes") }
-    player_profile(): ICollection<PlayerProfile> { return _db.get("player_profile") }
-    global_word(): ICollection<GlobalWord> { return _db.get("global_word") }
-    possible_crosswords(): ICollection<PossibleCrossword> { return _db.get("possible_crosswords_v2") }
-    possible_crosswords_v3(): ICollection<PossibleCrosswordV3> { return _db.get("possible_crosswords_v3") }
-    crossword_v3(): ICollection<GlobalCrossword> { return _db.get("crossword_v3") }
-    player_crossword_state(): ICollection<PlayerCrosswordState> { return _db.get("player_crossword_state") }
-    player_crossword_v3_state(): ICollection<PlayerCrosswordV3State> { return _db.get("player_crossword_v3_state") }
-    global_bee(): ICollection<GlobalBee> { return _db.get("global_bee_v2") }
-    guessed_words_bee(): ICollection<GuessedWordsBee> { return _db.get("guessed_words_bee_v2") }
-    bees(noOfRequiredLetters: number): ICollection<Bee> { return _db.get("bees_v2_" + noOfRequiredLetters) }
-    extra_bee_words(): ICollection<Word> { return _db.get("bees_fallback") }
-    spelling_bee_duels(): ICollection<SpellingBeeDuel> { return _db.get("spelling_bee_duels_v2") }
-    spelling_bee_elo_rank(rankTag: string): ICollection<SpellingBeeDuelEloRankEntry> { return _db.get("elo_rank_spelling_bee_duel_" + rankTag); }
-    spelling_bee_duel_prematch(): ICollection<SpellingBeeDuelMatch> { return _db.get("spelling_bee_duel_prematch_v2"); }
-    social_to_auth(): ICollection<SocialToAuth> { return _db.get("social_to_auth") }
-    player_login_timestamp(): ICollection<PlayerLastLogin> { return _db.get("player_login_timestamp") }
-    player_limits(): ICollection<PlayerLimits> { return _db.get("player_limits") }
-    limits_model(): ICollection<PlayerLimitsModel> { return _db.get("player_limits_models") }
-    words_explanations(): ICollection<WordExplanation> { return _db.get("word_explanations") }
-    bee_ranking(bee_id: number): ICollection<RawRankingEntry> {
-        var rank = _db.get("bee#" + bee_id + "_ranking");
-        rank.createIndex({ player_id: 1 })
-        rank.createIndex({ score: 1 });
+    private readonly _db: IMonkManager;
+    private readonly indexedCollections = new Set<string>();
+
+    constructor() {
+        this._db = monk(process.env.MONGO_URI!);
+        this.friendCodes().createIndex({ friend_code: 1 }, { unique: true });
+        this.friendCodes().createIndex({ player_id: 1 }, { unique: true });
+        this.playerWord().createIndex({ word_id: 1, player_id: 1 });
+        this.playerAuth().createIndex({ auth_id: 1 }, { unique: true });
+        this.playerProfile().createIndex({ id: 1 }, { unique: true });
+        this.globalWord().createIndex({ validity: 1 }, { unique: true });
+        this.globalWord().createIndex({ word_id: 1 }, { unique: true });
+        this.playerChallengeTries().createIndex({ word_id: 1, id: 1 }, { unique: true });
+        this.playerCrosswordState().createIndex({ player_id: 1 }, { unique: true });
+        this.globalBee().createIndex({ validity: 1 }, { unique: true });
+        this.globalBee().createIndex({ bee_id: 1 }, { unique: true });
+        this.guessedWordsBee().createIndex({ player_id: 1, bee_id: 1 }, { unique: true });
+        for (let i = 1; i < 4; i++) {
+            this.bees(i).createIndex({ id: 1 }, { unique: true });
+        }
+        this.extraBeeWords().createIndex({ word: 1 }, { unique: true });
+        this.spellingBeeDuels().createIndex({ player_id: 1 });
+        this.spellingBeeDuels().createIndex({ bee_id: 1 });
+        this.spellingBeeDuels().createIndex({ bee_duel_id: 1 }, { unique: true });
+        this.spellingBeeDuelPrematch().createIndex({ player_id: 1 });
+        this.socialToAuth().createIndex({ socialId: 1 }, { unique: true });
+        this.wordsExplanations().createIndex({ word: 1 }, { unique: true });
+    }
+
+    db(): IMonkManager { return this._db; }
+
+    words(): ICollection<Word> { return this._db.get("words"); }
+    playerWord(): ICollection<PlayerWord> { return this._db.get("player_word"); }
+    possibleWords(): ICollection<Word> { return this._db.get("possible_words"); }
+    playerTries(): ICollection<PlayerTries> { return this._db.get("player_tries"); }
+    playerChallengeTries(): ICollection<PlayerTries> { return this._db.get("player_challenge_tries"); }
+    playerAuth(): ICollection<PlayerAuth> { return this._db.get("player_auth"); }
+    counters(): ICollection<Counter> { return this._db.get("counters"); }
+    friendCodes(): ICollection<FriendCode> { return this._db.get("friend_codes"); }
+    playerProfile(): ICollection<PlayerProfile> { return this._db.get("player_profile"); }
+    globalWord(): ICollection<GlobalWord> { return this._db.get("global_word"); }
+    possibleCrosswords(): ICollection<PossibleCrossword> { return this._db.get("possible_crosswords_v2"); }
+    possibleCrosswordsV3(): ICollection<PossibleCrosswordV3> { return this._db.get("possible_crosswords_v3"); }
+    crosswordV3(): ICollection<GlobalCrossword> { return this._db.get("crossword_v3"); }
+    playerCrosswordState(): ICollection<PlayerCrosswordState> { return this._db.get("player_crossword_state"); }
+    playerCrosswordV3State(): ICollection<PlayerCrosswordV3State> { return this._db.get("player_crossword_v3_state"); }
+    globalBee(): ICollection<GlobalBee> { return this._db.get("global_bee_v2"); }
+    guessedWordsBee(): ICollection<GuessedWordsBee> { return this._db.get("guessed_words_bee_v2"); }
+    bees(noOfRequiredLetters: number): ICollection<Bee> { return this._db.get("bees_v2_" + noOfRequiredLetters); }
+    extraBeeWords(): ICollection<Word> { return this._db.get("bees_fallback"); }
+    spellingBeeDuels(): ICollection<SpellingBeeDuel> { return this._db.get("spelling_bee_duels_v2"); }
+    spellingBeeEloRank(rankTag: string): ICollection<SpellingBeeDuelEloRankEntry> { return this._db.get("elo_rank_spelling_bee_duel_" + rankTag); }
+    spellingBeeDuelPrematch(): ICollection<SpellingBeeDuelMatch> { return this._db.get("spelling_bee_duel_prematch_v2"); }
+    socialToAuth(): ICollection<SocialToAuth> { return this._db.get("social_to_auth"); }
+    playerLoginTimestamp(): ICollection<PlayerLastLogin> { return this._db.get("player_login_timestamp"); }
+    playerLimits(): ICollection<PlayerLimits> { return this._db.get("player_limits"); }
+    limitsModel(): ICollection<PlayerLimitsModel> { return this._db.get("player_limits_models"); }
+    wordsExplanations(): ICollection<WordExplanation> { return this._db.get("word_explanations"); }
+
+    private beeRanking(beeId: number): ICollection<RawRankingEntry> {
+        const name = "bee#" + beeId + "_ranking";
+        const rank = this._db.get<RawRankingEntry>(name);
+        if (!this.indexedCollections.has(name)) {
+            this.indexedCollections.add(name);
+            rank.createIndex({ player_id: 1 });
+            rank.createIndex({ score: 1 });
+        }
         return rank;
     }
 
-    constructor() {
-        this.friend_codes().createIndex({ friend_code: 1 }, { unique: true })
-        this.friend_codes().createIndex({ player_id: 1 }, { unique: true })
-        this.player_word().createIndex({ word_id: 1, player_id: 1 }),
-            this.player_auth().createIndex({ auth_id: 1 }, { unique: true });
-        this.player_profile().createIndex({ id: 1 }, { unique: true });
-        this.global_word().createIndex({ validity: 1 }, { unique: true });
-        this.global_word().createIndex({ word_id: 1 }, { unique: true });
-        //        _player_tries.createIndex({word_id:1, id: 1}, {unique: true});
-        this.player_challenge_tries().createIndex({ word_id: 1, id: 1 }, { unique: true });
-        this.player_crossword_state().createIndex({ player_id: 1 }, { unique: true });
-        this.global_bee().createIndex({ validity: 1 }, { unique: true });
-        this.global_bee().createIndex({ bee_id: 1 }, { unique: true })
-        this.guessed_words_bee().createIndex({ player_id: 1, bee_id: 1 }, { unique: true })
-        for (var i = 1; i < 4; i++) {
-            this.bees(i).createIndex({ id: 1 }, { unique: true });
+    private wordleRanking(wordId: number): ICollection<RawRankingEntry> {
+        const name = "word#" + wordId + "_ranking";
+        const rank = this._db.get<RawRankingEntry>(name);
+        if (!this.indexedCollections.has(name)) {
+            this.indexedCollections.add(name);
+            rank.createIndex({ player_id: 1 });
+            rank.createIndex({ score: 1 });
         }
-        this.extra_bee_words().createIndex({ word: 1 }, { unique: true })
-        this.spelling_bee_duels().createIndex({ player_id: 1 })
-        this.spelling_bee_duels().createIndex({ bee_id: 1 })
-        this.spelling_bee_duels().createIndex({ bee_duel_id: 1 }, { unique: true })
-        this.spelling_bee_duel_prematch().createIndex({ player_id: 1 })
-        this.social_to_auth().createIndex({ socialId: 1 }, { unique: true })
-        this.words_explanations().createIndex({ word: 1 }, { unique: true })
+        return rank;
     }
 
-    //SEQ
+    private toRankingEntries(rawRank: RawRankingEntry[]): RankingEntry[] {
+        return rawRank.map((entry, index) => ({
+            score: entry.score,
+            position: index + 1,
+            player_id: entry.player_id,
+        }));
+    }
+
+    // SEQ
 
     async getNextSequenceValue(sequenceName: string): Promise<number> {
-        var sequenceDocument = await this.counters().findOneAndUpdate({ id: sequenceName },
-            { $inc: { sequence_value: 1 } }, { upsert: true });
+        const sequenceDocument = await this.counters().findOneAndUpdate(
+            { id: sequenceName },
+            { $inc: { sequence_value: 1 } },
+            { upsert: true }
+        );
         return sequenceDocument!.sequence_value;
     }
 
+    // Spelling Bee ELO
 
-    async updateSpellingBeeEloRank(player_id: number, score_delta: number, rankTag: string) {
-        await updateRank(this.spelling_bee_elo_rank(rankTag), player_id, score_delta);
+    async updateSpellingBeeEloRank(playerId: number, scoreDelta: number, rankTag: string): Promise<void> {
+        await updateRank(this.spellingBeeEloRank(rankTag), playerId, scoreDelta);
     }
 
     async getSpellingBeeEloRankWithFilter(friends: number[], rankTag: string): Promise<RankingEntry[]> {
-        return getRankWithFilter(this.spelling_bee_elo_rank(rankTag), { player_id: { $in: friends } });
+        return getRankWithFilter(this.spellingBeeEloRank(rankTag), { player_id: { $in: friends } });
     }
 
     async getSpellingBeeEloRank(rankTag: string): Promise<RankingEntry[]> {
-        return getRank(this.spelling_bee_elo_rank(rankTag));
+        return getRank(this.spellingBeeEloRank(rankTag));
     }
 
-    async getCurrentSpellingBeeElo(player_id: number, rankTag: string): Promise<number> {
-        return getScoreFromRank(player_id, this.spelling_bee_elo_rank(rankTag), DEFAULT_ELO);
+    async getCurrentSpellingBeeElo(playerId: number, rankTag: string): Promise<number> {
+        return getScoreFromRank(playerId, this.spellingBeeEloRank(rankTag), DEFAULT_ELO);
     }
 
-    async getOpponentsFromSpellingBeeEloRank(player_id: number, maxDiff: number, positionDiff: number, rankTag: string): Promise<number[]> {
-        const returnValue = await this.getSpellingBeeEloRank(rankTag);
-        const playerRankingEntry: RankingEntry | undefined = returnValue.find(re => re.player_id === player_id);
-        if (playerRankingEntry === undefined) {
+    async getOpponentsFromSpellingBeeEloRank(playerId: number, maxDiff: number, positionDiff: number, rankTag: string): Promise<number[]> {
+        const rankings = await this.getSpellingBeeEloRank(rankTag);
+        const playerEntry = rankings.find(re => re.player_id === playerId);
+        if (playerEntry === undefined) {
             return [];
         }
-        var opponentsByPosition = returnValue.filter(re => Math.abs(playerRankingEntry.position - re.position) <= positionDiff);
-        var opponentsByElo = returnValue.filter(re => Math.abs(playerRankingEntry.score - re.score) <= maxDiff);
-        var result = opponentsByElo.length > opponentsByPosition.length ? opponentsByElo : opponentsByPosition;
-
-        return result.filter(re => re.player_id !== player_id).map(re => re.player_id);
+        const byPosition = rankings.filter(re => Math.abs(playerEntry.position - re.position) <= positionDiff);
+        const byElo = rankings.filter(re => Math.abs(playerEntry.score - re.score) <= maxDiff);
+        const result = byElo.length > byPosition.length ? byElo : byPosition;
+        return result.filter(re => re.player_id !== playerId).map(re => re.player_id);
     }
 
-    async increaseBeeRank(player_id: number, bee_id: number, points_delta: number): Promise<RawRankingEntry> {
-        return updateRank(this.bee_ranking(bee_id), player_id, points_delta)
+    // Bee ranking
+
+    async increaseBeeRank(playerId: number, beeId: number, pointsDelta: number): Promise<RawRankingEntry> {
+        return updateRank(this.beeRanking(beeId), playerId, pointsDelta);
     }
 
-    async getBeePlayerPoints(player_id: number, bee_id: number) {
-        return getScoreFromRank(player_id, this.bee_ranking(bee_id))
+    async getBeePlayerPoints(playerId: number, beeId: number) {
+        return getScoreFromRank(playerId, this.beeRanking(beeId));
     }
 
-    async getBeeRankingWithFilter(bee_id: number, friends: number[]): Promise<RankingEntry[]> {
-        return await getRankWithFilter(this.bee_ranking(bee_id), { player_id: { $in: friends } });
+    async getBeeRankingWithFilter(beeId: number, friends: number[]): Promise<RankingEntry[]> {
+        return getRankWithFilter(this.beeRanking(beeId), { player_id: { $in: friends } });
     }
 
-    async getBeeRanking(bee_id: number): Promise<RankingEntry[]> {
-        return await getRank(this.bee_ranking(bee_id));
+    async getBeeRanking(beeId: number): Promise<RankingEntry[]> {
+        return getRank(this.beeRanking(beeId));
     }
 
+    // Wordle ranking
 
-
-    //RANK
-
-    async increaseRank(player_id: number, word_id: number, tries: number, timestamp: number) {
-        const rank = this.db().get("word#" + word_id + "_ranking");
-        rank.createIndex({ player_id: 1 })
-        rank.createIndex({ score: 1 });
-        return rank.findOneAndUpdate({ player_id: player_id }, { $setOnInsert: { score: tries, time: timestamp } }, { upsert: true })
+    async increaseRank(playerId: number, wordId: number, tries: number, timestamp: number) {
+        return this.wordleRanking(wordId).findOneAndUpdate(
+            { player_id: playerId },
+            { $setOnInsert: { score: tries, time: timestamp } },
+            { upsert: true }
+        );
     }
 
-    async getWordleRanking(word_id: number) {
-        const rank = this.db().get("word#" + word_id + "_ranking");
-        rank.createIndex({ player_id: 1 })
-        rank.createIndex({ score: 1 });
-        var rawRank = (await rank.find({}, { sort: { score: 1, time: 1 }, limit: 100 }))
-        var returnValue: RankingEntry[] = []
-        var position = 0
-        for (var entry of rawRank) {
-            position += 1
-            returnValue.push({ score: entry.score, position: position, player_id: entry.player_id })
-        }
-        return returnValue
+    async getWordleRanking(wordId: number): Promise<RankingEntry[]> {
+        const rawRank = await this.wordleRanking(wordId).find({}, { sort: { score: 1, time: 1 }, limit: 100 });
+        return this.toRankingEntries(rawRank);
     }
 
-    async getWordleRankingWithFilter(word_id: number, friends: number[]) {
-        const rank = this.db().get("word#" + word_id + "_ranking");
-        rank.createIndex({ player_id: 1 })
-        rank.createIndex({ score: 1 });
-        var rawRank = (await rank.find({ player_id: { $in: friends } }, { sort: { score: 1, time: 1 }, limit: 100 }))
-        var returnValue: RankingEntry[] = []
-        var position = 0
-        for (var entry of rawRank) {
-            position += 1
-            returnValue.push({ score: entry.score, position: position, player_id: entry.player_id })
-        }
-        return returnValue
-
+    async getWordleRankingWithFilter(wordId: number, friends: number[]): Promise<RankingEntry[]> {
+        const rawRank = await this.wordleRanking(wordId).find({ player_id: { $in: friends } }, { sort: { score: 1, time: 1 }, limit: 100 });
+        return this.toRankingEntries(rawRank);
     }
 
-    async increase_request_counter(path: string, last_midnight: number) {
-        const stats = this.db().get("request_stats_" + last_midnight);
-        stats.findOneAndUpdate({ path: path }, { $inc: { no_of_requests: 1 } }, { upsert: true })
+    async increaseRequestCounter(path: string, lastMidnight: number): Promise<void> {
+        const stats = this._db.get("request_stats_" + lastMidnight);
+        stats.findOneAndUpdate({ path }, { $inc: { no_of_requests: 1 } }, { upsert: true });
     }
 
     async saveWordExplanation(word: string, exp: string): Promise<void> {
-        await this.words_explanations().update({ word: word }, { $set: { explanation: exp } }, { upsert: true })
+        await this.wordsExplanations().update({ word }, { $set: { explanation: exp } }, { upsert: true });
     }
-    async getWordExplanation(word: string): Promise<string|null> {
-        const result = await this.words_explanations().findOne({ word: word })
+
+    async getWordExplanation(word: string): Promise<string | null> {
+        const result = await this.wordsExplanations().findOne({ word });
         return result ? result.explanation : null;
     }
-
 }
-

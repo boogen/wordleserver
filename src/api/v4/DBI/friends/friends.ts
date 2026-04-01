@@ -3,7 +3,7 @@ import WordleDBI from "../DBI";
 import { FriendCode } from "./FriendCode";
 
 export async function addFriend(player_id:number, friend_code:string, dbi:WordleDBI):Promise<boolean> {
-    const friend_id = (await dbi.friend_codes().findOne({friend_code: friend_code}))?.player_id;
+    const friend_id = (await dbi.friendCodes().findOne({friend_code: friend_code}))?.player_id;
     if (friend_id === undefined || player_id === friend_id) {
         return false;
     }
@@ -32,12 +32,12 @@ export async function friendList(player_id:number, dbi:WordleDBI):Promise<number
 }
 
 export async function getFriendCode(playerId:number, dbi:WordleDBI):Promise<FindOneResult<FriendCode>> {
-    return dbi.friend_codes().findOne({player_id:playerId});
+    return dbi.friendCodes().findOne({player_id:playerId});
 }
 
 export async function addFriendCode(player_id:number, friend_code:string, dbi:WordleDBI):Promise<FindOneResult<FriendCode>> {
     try {
-        return dbi.friend_codes().findOneAndUpdate({player_id: player_id}, {$setOnInsert:{player_id: player_id, friend_code: friend_code}}, {upsert:true});
+        return dbi.friendCodes().findOneAndUpdate({player_id: player_id}, {$setOnInsert:{player_id: player_id, friend_code: friend_code}}, {upsert:true});
     }
     catch(error) {
         console.log(error)

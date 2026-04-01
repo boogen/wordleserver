@@ -13,7 +13,7 @@ export class PlayerCrosswordV3State {
 
 export async function getCrosswordV3State(playerId: number, dbi: WordleDBI): Promise<PlayerCrosswordV3State | null> {
     try {
-        const state = dbi.player_crossword_v3_state().findOne({ player_id: playerId });
+        const state = dbi.playerCrosswordV3State().findOne({ player_id: playerId });
         return state;
     }
     catch (error) {
@@ -24,7 +24,7 @@ export async function getCrosswordV3State(playerId: number, dbi: WordleDBI): Pro
 
 export async function setCrosswordV3State(state: PlayerCrosswordV3State, dbi: WordleDBI): Promise<FindOneResult<PlayerCrosswordV3State>> {
     try {
-        return dbi.player_crossword_v3_state().findOneAndUpdate({ player_id: state.player_id }, { $set: state }, { upsert: true });
+        return dbi.playerCrosswordV3State().findOneAndUpdate({ player_id: state.player_id }, { $set: state }, { upsert: true });
     }
     catch (error) {
         console.log(error);

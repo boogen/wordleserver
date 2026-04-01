@@ -59,7 +59,7 @@ export class SpellingBeeChanges {
     constructor(public message:SpellingBeeReplyEnum, public guessesAdded:string[], public pointsAdded:number[], public newLetterState:LetterState[]) {}
 }
 
-export function getMaxPoints(words:String[], letters:string[]):number {
+export function getMaxPoints(words:string[], letters:string[]):number {
     var sum = 0;
     for (var word of words) {
         sum += wordPoints(word, letters).points

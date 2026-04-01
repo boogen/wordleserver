@@ -7,18 +7,18 @@ import { PlayerProfile } from "./PlayerProfile";
 import { SocialToAuth } from "./SocialToAuth";
 
 export async function checkSocialId(authId:string, socialId:string, dbi:WordleDBI):Promise<FindOneResult<SocialToAuth>> {
-    var result = await dbi.social_to_auth().findOneAndUpdate({socialId:socialId}, {$setOnInsert:{authId:authId, socialId:socialId}}, {upsert:true})
+    var result = await dbi.socialToAuth().findOneAndUpdate({socialId:socialId}, {$setOnInsert:{authId:authId, socialId:socialId}}, {upsert:true})
     if (result?.authId === null) {
-        return dbi.social_to_auth().findOneAndUpdate({socialId:socialId}, {$set:{authId:authId, socialId:socialId}}, {upsert:true})
+        return dbi.socialToAuth().findOneAndUpdate({socialId:socialId}, {$set:{authId:authId, socialId:socialId}}, {upsert:true})
     }
     return result;
 }
 export async function addPlayerToAuthMap(authId:string, playerId:number, dbi:WordleDBI) {
-    return await dbi.player_auth().insert({auth_id: authId, player_id: playerId});
+    return await dbi.playerAuth().insert({auth_id: authId, player_id: playerId});
 }
 
 export async function resolvePlayerId(auth_id:string, dbi:WordleDBI):Promise<number> {
-    const authEntry = await dbi.player_auth().findOne({auth_id: auth_id});
+    const authEntry = await dbi.playerAuth().findOne({auth_id: auth_id});
     if (!authEntry) {
         throw new Error(`Unknown auth_id`);
     }
@@ -26,35 +26,35 @@ export async function resolvePlayerId(auth_id:string, dbi:WordleDBI):Promise<num
 }
 
 export async function isAuthIdUsed(auth_id:string, dbi:WordleDBI):Promise<boolean> {
-    const authEntry = await dbi.player_auth().findOne({auth_id:auth_id})
+    const authEntry = await dbi.playerAuth().findOne({auth_id:auth_id})
     return authEntry !== null
 }
 
 export async function setNick(playerId:number, nick:string, dbi:WordleDBI) {
-    await dbi.player_profile().findOneAndUpdate({id: playerId},  {$set:{nick: nick}}, {upsert: true});
+    await dbi.playerProfile().findOneAndUpdate({id: playerId},  {$set:{nick: nick}}, {upsert: true});
 }
 
 export async function getProfile(playerId:number, dbi:WordleDBI):Promise<PlayerProfile|null> {
-    return dbi.player_profile().findOne({id: playerId});
+    return dbi.playerProfile().findOne({id: playerId});
 }
 
 export async function getLastLoginTimestamp(player_id:number, dbi:WordleDBI):Promise<PlayerLastLogin | null> {
-    return dbi.player_login_timestamp().findOne({player_id:player_id})
+    return dbi.playerLoginTimestamp().findOne({player_id:player_id})
 }
 
 export async function updateLastLoginTimestamp(timestamp:number, player_id:number, dbi:WordleDBI) {
-    await dbi.player_login_timestamp().findOneAndUpdate({player_id: player_id}, {$set:{timestamp: timestamp}}, {upsert:true})
+    await dbi.playerLoginTimestamp().findOneAndUpdate({player_id: player_id}, {$set:{timestamp: timestamp}}, {upsert:true})
 }
 
 export async function resetPlayerLimits(player_id:number, dbi:WordleDBI):Promise<PlayerLimits|null> {
     return null;
-    // const new_limits = await dbi.limits_model().findOne({player_category:"free"});
-    // return dbi.player_limits().findOneAndUpdate({player_id:player_id}, {$set:{limits:new_limits!.limits}},
+    // const new_limits = await dbi.limitsModel().findOne({player_category:"free"});
+    // return dbi.playerLimits().findOneAndUpdate({player_id:player_id}, {$set:{limits:new_limits!.limits}},
     //     {upsert:true})
 }
 
 export async function getPlayerLimits(player_id:number, dbi:WordleDBI):Promise<PlayerLimits|null> {
-    return dbi.player_limits().findOne({player_id:player_id});
+    return dbi.playerLimits().findOne({player_id:player_id});
 }
 
 export async function checkLimit(limitName:string, player_id:number, dbi:WordleDBI):Promise<boolean> {
@@ -71,6 +71,6 @@ export async function checkLimit(limitName:string, player_id:number, dbi:WordleD
     //     return false;
     // }
     // limit!.limit -= 1;
-    // dbi.player_limits().findOneAndUpdate({player_id:player_id}, {$set: playerLimits}, {upsert:false})
+    // dbi.playerLimits().findOneAndUpdate({player_id:player_id}, {$set: playerLimits}, {upsert:false})
     return true;
 }

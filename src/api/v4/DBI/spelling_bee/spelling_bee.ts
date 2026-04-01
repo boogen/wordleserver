@@ -9,7 +9,7 @@ import { LetterState } from "./LetterState";
 import { getBeeById, getRandomBee } from "./model";
 
 export async function getLettersForBee(timestamp:number, dbi:WordleDBI):Promise<FindOneResult<GlobalBee>> {
-    return dbi.global_bee().findOne({validity:{$gt: timestamp}});
+    return dbi.globalBee().findOne({validity:{$gt: timestamp}});
 }
 
 
@@ -39,34 +39,34 @@ export async function createLettersForBee(validityTimestamp:number, season_rules
             throw "Error creating letters for bee"
         }
     }
-    return dbi.global_bee().insert(new GlobalBee(bee_id, bee.id, validityTimestamp, other_letters, bee.required_letters))
+    return dbi.globalBee().insert(new GlobalBee(bee_id, bee.id, validityTimestamp, other_letters, bee.required_letters))
 }
 
 export async function addNewLetterToSpellingBeeState(player_id:number, bee_id:number, letters:LetterState[], lettersToBuy:LetterToBuy[], dbi:WordleDBI):Promise<FindOneResult<GuessedWordsBee>> {
-    return dbi.guessed_words_bee().findOneAndUpdate({player_id:player_id, bee_id:bee_id}, {$set:{letters:letters, lettersToBuy:lettersToBuy}})
+    return dbi.guessedWordsBee().findOneAndUpdate({player_id:player_id, bee_id:bee_id}, {$set:{letters:letters, lettersToBuy:lettersToBuy}})
 }
 
 export async function createBeeState(player_id:number, bee_id:number, letters:LetterState[], lettersToBuy:LetterToBuy[], dbi:WordleDBI):Promise<GuessedWordsBee> {
-    return dbi.guessed_words_bee().insert({player_id:player_id, bee_id:bee_id, guesses:[], letters:letters, lettersToBuy:lettersToBuy})
+    return dbi.guessedWordsBee().insert({player_id:player_id, bee_id:bee_id, guesses:[], letters:letters, lettersToBuy:lettersToBuy})
 }
 
 export async function getBeeState(player_id:number, bee_id:number, dbi:WordleDBI):Promise<FindOneResult<GuessedWordsBee>> {
-    return dbi.guessed_words_bee().findOne({player_id: player_id, bee_id: bee_id});
+    return dbi.guessedWordsBee().findOne({player_id: player_id, bee_id: bee_id});
 }
 
 export async function addBeeGuess(player_id:number, bee_id:number, guess:string, dbi:WordleDBI):Promise<FindOneResult<GuessedWordsBee>> {
-    return dbi.guessed_words_bee().findOneAndUpdate({player_id: player_id, bee_id: bee_id}, {$push: {guesses: guess}}, {upsert:true})
+    return dbi.guessedWordsBee().findOneAndUpdate({player_id: player_id, bee_id: bee_id}, {$push: {guesses: guess}}, {upsert:true})
 }
 
 export async function saveLettersState(player_id:number, bee_id:number, lettersState:LetterState[], dbi:WordleDBI):Promise<FindOneResult<GuessedWordsBee>> {
-    return dbi.guessed_words_bee().findOneAndUpdate({player_id: player_id, bee_id: bee_id}, {$set: {letters: lettersState}}, {upsert:true})
+    return dbi.guessedWordsBee().findOneAndUpdate({player_id: player_id, bee_id: bee_id}, {$set: {letters: lettersState}}, {upsert:true})
 }
 
 export async function getSpellingBeeStats(profile_player_id: number, dbi:WordleDBI):Promise<Array<number>> {
-    var result = await dbi.guessed_words_bee().find({player_id:profile_player_id});
+    var result = await dbi.guessedWordsBee().find({player_id:profile_player_id});
     var return_value:number[] = new Array(RANKS.length).fill(0);
     await Promise.all(result.map(async gw => {
-        const global_bee = await dbi.global_bee().findOne({bee_id:gw.bee_id})
+        const global_bee = await dbi.globalBee().findOne({bee_id:gw.bee_id})
         if (!global_bee) {
             return;
         }

@@ -43,7 +43,7 @@ const dbi = new WordleDBI();
 app.use((req, res, next) => {
   var d = new Date();
   d.setHours(0, 0, 0, 0);
-  dbi.increase_request_counter(req.path, d.getTime() / 1000);
+  dbi.increaseRequestCounter(req.path, d.getTime() / 1000);
   next()
 })
 
