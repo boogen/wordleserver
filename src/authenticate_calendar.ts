@@ -12,6 +12,16 @@ const SCOPES = ['https://www.googleapis.com/auth/calendar.events.readonly', 'htt
 
 async function loadSavedCredentialsIfExist():Promise<any> {
   try {
+    if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REFRESH_TOKEN) {
+      const client = new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET
+      );
+      client.setCredentials({
+        refresh_token: process.env.GOOGLE_REFRESH_TOKEN
+      });
+      return client;
+    }
     const content = await fs.readFile(TOKEN_PATH, 'utf-8');
     const credentials = JSON.parse(content);
     return google.auth.fromJSON(credentials);
@@ -21,8 +31,13 @@ async function loadSavedCredentialsIfExist():Promise<any> {
 }
 
 async function saveCredentials(client:JSONClient) {
-  const content = await fs.readFile(CREDENTIALS_PATH);
-  const keys = JSON.parse(content.toString());
+  let keys;
+  if (process.env.GOOGLE_CREDENTIALS) {
+    keys = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+  } else {
+    const content = await fs.readFile(CREDENTIALS_PATH);
+    keys = JSON.parse(content.toString());
+  }
   const key = keys.installed || keys.web;
   const payload = JSON.stringify({
     type: 'authorized_user',
@@ -38,10 +53,20 @@ export async function authorize() {
   if (client) {
     return client;
   }
-  client = await authenticate({
-    scopes: SCOPES,
-    keyfilePath: CREDENTIALS_PATH,
-  });
+  
+  if (process.env.GOOGLE_CREDENTIALS) {
+    const keys = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+    client = await authenticate({
+      scopes: SCOPES,
+      keyfilePath: CREDENTIALS_PATH, // This will still fail if file doesn't exist, but authenticate doesn't support object input easily
+    });
+  } else {
+    client = await authenticate({
+      scopes: SCOPES,
+      keyfilePath: CREDENTIALS_PATH,
+    });
+  }
+  
   if (client!.credentials) {
     await saveCredentials(client!);
   }

@@ -63,6 +63,16 @@ To connect to external databases on production, set the following environment va
 
 If these are set to external addresses, you can stop the internal `mongo` and `mariadb` services.
 
+### Google Calendar Configuration
+The application uses Google Calendar for game seasons. To authenticate without files in production:
+
+Set these environment variables:
+- `GOOGLE_CLIENT_ID`: Your Google OAuth Client ID.
+- `GOOGLE_CLIENT_SECRET`: Your Google OAuth Client Secret.
+- `GOOGLE_REFRESH_TOKEN`: A valid refresh token.
+
+If these are provided, the application will bypass the need for `credentials.json` and `token.json`.
+
 ### Other variables
 - `PORT`: Port the API listens on (default 5000).
 - `ONE_SIGNAL_API_KEY`, `GEMINI_API_KEY`: API keys for external services.
