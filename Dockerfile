@@ -11,6 +11,7 @@ RUN npm install
 COPY . .
 RUN npm run tsoa:gen
 RUN npx tsc
+RUN cp -r src/gemini/prompts out/gemini/
 
 # Stage 2: Production environment
 FROM node:18-alpine
@@ -25,7 +26,7 @@ RUN npm install --production
 COPY --from=builder /app/out ./out
 COPY --from=builder /app/model ./model
 # Copy any other necessary assets (e.g., public folder if it exists)
-# COPY --from=builder /app/public ./public 
+# COPY --from=builder /app/public ./public
 
 ENV NODE_ENV=production
 ENV PORT=5000
