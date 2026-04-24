@@ -23,18 +23,20 @@ services:
       - mariadb
 
   wordle_prod:
-    image: node:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: always
-    command: "sh -c 'npm clean-install && npm install typescript -g && tsc && npm run dev'"
     ports:
       - 5000:5000
-    working_dir: /wordle
     profiles:
       - prod
-    volumes:
-      - ./:/wordle
     environment:
-      - MONGO_URI=mongodb://${MONGO_HOST}/wordle
+      - MONGO_URI=mongodb://${MONGO_HOST:-mongo_wordle}/wordle
+      - MARIADB_HOST=${MARIADB_HOST:-stats_db}
+      - MARIADB_USER=${STATS_DB_USER}
+      - MARIADB_PASSWORD=${STATS_DB_PASSWORD}
+      - MARIADB_DATABASE=${STATS_DB_NAME}
     networks:
       - proxy
       - mongo
@@ -64,7 +66,6 @@ services:
       - mongo
       - mariadb
 
-
   mongo:
     image: mongo
     container_name: mongo_wordle
@@ -73,12 +74,13 @@ services:
       - MONGO_HOST=mongo_wordle
     profiles:
       - standalone
+      - dev
+      - prod
     volumes:
       - /var/lib/mongodb_wordle:/data/db
       - ./scripts/init.sh:/docker-entrypoint-initdb.d/init.sh
     networks:
       - mongo
-
 
   mariadb:
     image: mariadb
@@ -86,6 +88,8 @@ services:
     container_name: stats_db
     profiles:
       - standalone
+      - dev
+      - prod
     environment:
       - MARIADB_RANDOM_ROOT_PASSWORD=root_secret
       - MARIADB_DATABASE=${STATS_DB_NAME}
@@ -98,17 +102,20 @@ services:
       - stats
 
   model:
-    image: python:3
+    build:
+      context: .
+      dockerfile: Dockerfile.data
     scale: 0
-    command: "sh -c 'pip3 install pymongo argparse && python3 upload.py -s -d ${MONGO_DB} -c ../model/crosswrds_uniq -b ../model/new_spelling_bee -p ../model/possible_words.txt -w ../model/words.txt -dh mongo_wordle -f ../model/fallback_bee -m'"
+    command: "python3 upload.py -s -d ${MONGO_DB} -c ../model/crosswrds_uniq -b ../model/new_spelling_bee -p ../model/possible_words.txt -w ../model/words.txt -dh mongo_wordle -f ../model/fallback_bee -m"
     volumes:
       - ./:/wordle
     working_dir: /wordle/scripts
+    profiles:
+      - model
     depends_on:
       - mongo
     networks:
       - mongo
-
 
 networks:
   mongo:

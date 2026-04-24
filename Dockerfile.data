@@ -1,0 +1,8 @@
+FROM python:3.9.1
+FROM alpine:latest
+ADD . /wordleserver
+WORKDIR /wordleserver/scripts
+RUN apk add py3-pip
+RUN pip3 install pymongo argparse
+# The upload script is run via docker-compose command to ensure DB is ready
+
