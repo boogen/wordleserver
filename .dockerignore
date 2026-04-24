@@ -15,7 +15,7 @@ __pycache__
 .python
 venv
 .venv
-credentials.json
+# credentials.json  <-- Commented out to allow including in the image
 token.json
 token.json.bak
 swagger_output.json
