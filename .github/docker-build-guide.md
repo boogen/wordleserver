@@ -31,6 +31,24 @@ We use the `docker/metadata-action` to automatically tag our images. The followi
 3.  Push the tag: `git push origin v1.0.0`
 4.  The action will automatically build and publish the image with the version tag.
 
+## Deployment with Portainer
+
+To deploy this project using Portainer Stacks:
+
+1.  **Add GHCR Registry**:
+    -   Go to **Registries** > **Add registry** > **Custom**.
+    -   URL: `ghcr.io`
+    -   Username: Your GitHub username.
+    -   Password: A GitHub Personal Access Token (PAT) with `read:packages` permissions.
+
+2.  **Create Stack**:
+    -   Use the `docker-compose.yml` content but replace the `build:` section in `wordle_prod` with:
+        `image: ghcr.io/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME:latest`
+    -   Add all required environment variables in the Portainer "Environment variables" section.
+
+3.  **Data Upload**:
+    -   To run the data loader in Portainer, you can temporarily change the stack to run the `model` service or run it via the console on the server.
+
 ## Environment Variables
 The application expects standard environment variables to be provided at runtime.
 
