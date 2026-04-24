@@ -5,8 +5,6 @@ WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
-# Force p-retry 4.0.0 via overrides to fix @google/genai ESM issue
-RUN npm pkg set 'overrides.p-retry'='4.0.0'
 RUN npm install
 
 # Copy source code and build

@@ -13,17 +13,19 @@ The build process is controlled by the `.github/workflows/docker-publish.yml` fi
 ### Modifying Branches
 To change which branches trigger a build, edit the `on.push.branches` section in the workflow file.
 
-## Versioning Strategy
+## Versioning and Branch Tags
 
-We use the `docker/metadata-action` to automatically tag our images. The following tags are generated for every build:
+The Docker image is tagged automatically based on the branch it was built from:
 
-1.  **Branch Tag**: Images built from a branch are tagged with the branch name (e.g., `ghcr.io/owner/repo:main`).
-2.  **SHA Tag**: Every build gets a unique tag based on the Git commit SHA (e.g., `ghcr.io/owner/repo:sha-a1b2c3d`).
-3.  **Semantic Versioning**: When you push a Git tag (e.g., `v1.2.3`), the image is tagged with:
-    -   `1.2.3` (Full version)
-    -   `1.2` (Minor version)
-    -   `1` (Major version)
-    -   `latest`
+- **RC Branch**: `ghcr.io/boogen/wordleserver:rc`
+- **Main Branch**: `ghcr.io/boogen/wordleserver:main` (or `master`)
+- **Specific Versions**: `ghcr.io/boogen/wordleserver:v1.0.0` (when using Git tags)
+
+### Recommended Portainer Image Tag
+For your Release Candidate environment, use:
+`image: ghcr.io/boogen/wordleserver:rc`
+
+This ensures you always get the latest code from the `rc` branch without accidentally pulling experimental code or older stable releases.
 
 ### How to Create a Release
 1.  Ensure your code is merged into `main`.
