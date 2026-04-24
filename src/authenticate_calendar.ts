@@ -12,40 +12,55 @@ const SCOPES = ['https://www.googleapis.com/auth/calendar.events.readonly', 'htt
 
 async function loadSavedCredentialsIfExist():Promise<any> {
   try {
-    if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REFRESH_TOKEN) {
-      const client = new google.auth.OAuth2(
-        process.env.GOOGLE_CLIENT_ID,
-        process.env.GOOGLE_CLIENT_SECRET
-      );
-      client.setCredentials({
-        refresh_token: process.env.GOOGLE_REFRESH_TOKEN
-      });
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+
+    if (clientId && clientSecret && refreshToken) {
+      const client = new google.auth.OAuth2(clientId, clientSecret);
+      client.setCredentials({ refresh_token: refreshToken });
       return client;
     }
-    const content = await fs.readFile(TOKEN_PATH, 'utf-8');
-    const credentials = JSON.parse(content);
-    return google.auth.fromJSON(credentials);
+    
+    // Fallback to token.json only if we can read it
+    try {
+      const content = await fs.readFile(TOKEN_PATH, 'utf-8');
+      const credentials = JSON.parse(content);
+      return google.auth.fromJSON(credentials);
+    } catch (e) {
+      return null;
+    }
   } catch (err) {
     return null;
   }
 }
 
 async function saveCredentials(client:JSONClient) {
-  let keys;
-  if (process.env.GOOGLE_CREDENTIALS) {
-    keys = JSON.parse(process.env.GOOGLE_CREDENTIALS);
-  } else {
-    const content = await fs.readFile(CREDENTIALS_PATH);
-    keys = JSON.parse(content.toString());
+  // Only try to save if we have credentials file, otherwise we are using env vars
+  try {
+    let keys;
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+    if (clientId && clientSecret) {
+        keys = { installed: { client_id: clientId, client_secret: clientSecret } };
+    } else {
+        const content = await fs.readFile(CREDENTIALS_PATH);
+        keys = JSON.parse(content.toString());
+    }
+
+    const key = keys.installed || keys.web;
+    const payload = JSON.stringify({
+      type: 'authorized_user',
+      client_id: key.client_id,
+      client_secret: key.client_secret,
+      refresh_token: client.credentials.refresh_token,
+    });
+    await fs.writeFile(TOKEN_PATH, payload);
+  } catch (e) {
+    // If we can't save (e.g. read-only filesystem), just skip. 
+    // In prod we should be using env vars anyway.
   }
-  const key = keys.installed || keys.web;
-  const payload = JSON.stringify({
-    type: 'authorized_user',
-    client_id: key.client_id,
-    client_secret: key.client_secret,
-    refresh_token: client.credentials.refresh_token,
-  });
-  await fs.writeFile(TOKEN_PATH, payload);
 }
 
 export async function authorize() {
@@ -54,21 +69,20 @@ export async function authorize() {
     return client;
   }
   
-  if (process.env.GOOGLE_CREDENTIALS) {
-    const keys = JSON.parse(process.env.GOOGLE_CREDENTIALS);
-    client = await authenticate({
-      scopes: SCOPES,
-      keyfilePath: CREDENTIALS_PATH, // This will still fail if file doesn't exist, but authenticate doesn't support object input easily
-    });
-  } else {
-    client = await authenticate({
-      scopes: SCOPES,
-      keyfilePath: CREDENTIALS_PATH,
-    });
+  // If we reach here, we don't have env vars and don't have token.json
+  // We check if we are in production - if so, we shouldn't attempt interactive auth
+  if (process.env.NODE_ENV === 'production' || process.env.GOOGLE_CLIENT_ID) {
+      console.warn("Google credentials not found. Ensure GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REFRESH_TOKEN are set.");
+      return null;
   }
+
+  client = await authenticate({
+    scopes: SCOPES,
+    keyfilePath: CREDENTIALS_PATH,
+  });
   
-  if (client!.credentials) {
-    await saveCredentials(client!);
+  if (client && client.credentials) {
+    await saveCredentials(client);
   }
   return client;
 }
