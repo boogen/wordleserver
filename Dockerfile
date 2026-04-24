@@ -29,6 +29,9 @@ COPY --from=builder /app/model ./model
 
 ENV NODE_ENV=production
 ENV PORT=5000
+ENV LOGS_DIR=/app/logs
+RUN mkdir -p /app/logs
+
 EXPOSE 5000
 
 CMD ["npm", "start"]

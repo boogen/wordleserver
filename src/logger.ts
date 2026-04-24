@@ -33,14 +33,14 @@ export class Logger {
         ],
         });
 
-        if (process.env.NODE_ENV !== 'production') {
-            this.internalLogger.add(new transports.Console({
-                format: format.combine(
-                format.colorize(),
-                logFormat
-                ),
-            }));
-        }
+        // Always add console transport in Docker/Production, 
+        // but use colorization only in non-production
+        this.internalLogger.add(new transports.Console({
+            format: format.combine(
+            process.env.NODE_ENV !== 'production' ? format.colorize() : format.uncolorize(),
+            logFormat
+            ),
+        }));
     }
 
     setContext(context: string) {
