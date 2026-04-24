@@ -15,7 +15,7 @@ export async function addFriend(player_id:number, friend_code:string, dbi:Wordle
             friends.insert({id: friendId});
         }
     }
-    addFriendToList(player_id, friend_id, dbi.db())
+    await addFriendToList(player_id, friend_id, dbi.db())
     //addFriendToList(friend_id, player_id, this.db())
     return true;
 }

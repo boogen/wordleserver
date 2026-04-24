@@ -13,13 +13,15 @@ import { FriendController } from './api/v4/friend/friend_controller';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { PlayerController } from './api/v4/player/player_controller';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { WordleController } from './api/v4/wordle/wordle_controller';
+import { RankingController } from './api/v4/ranking_controller';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { SpellingBeeDuelController } from './api/v4/spelling_bee/duel/spelling_bee_duel_controller';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { SpellingBeeController } from './api/v4/spelling_bee/spelling_bee_controller';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { WordleChallengeController } from './api/v4/wordle/wordle_challenge/wordle_challenge_controller';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { SpellingBeeDuelController } from './api/v4/spelling_bee/duel/spelling_bee_duel_controller';
+import { WordleController } from './api/v4/wordle/wordle_controller';
 import { iocContainer } from './ioc';
 import type { IocContainer, IocContainerFactory } from '@tsoa/runtime';
 import type { RequestHandler, Router } from 'express';
@@ -51,7 +53,7 @@ const models: TsoaRoute.Models = {
     "CrosswordState": {
         "dataType": "refObject",
         "properties": {
-            "grid": {"dataType":"array","array":{"dataType":"array","array":{"dataType":"string"}},"required":true},
+            "grid": {"dataType":"array","array":{"dataType":"string"},"required":true},
             "clues": {"dataType":"array","array":{"dataType":"refObject","ref":"ClueState"},"required":true},
             "height": {"dataType":"double","required":true},
             "width": {"dataType":"double","required":true},
@@ -240,77 +242,23 @@ const models: TsoaRoute.Models = {
         "additionalProperties": true,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GuessValidation": {
+    "PositionInRank": {
         "dataType": "refObject",
         "properties": {
-            "isWord": {"dataType":"boolean","required":true},
-            "guess": {"dataType":"string","required":true},
-            "answer": {"dataType":"array","array":{"dataType":"double"},"required":true},
-            "isGuessed": {"dataType":"boolean","required":true},
-            "correctWord": {"dataType":"string"},
+            "position": {"dataType":"double","required":true},
+            "score": {"dataType":"double","required":true},
+            "player": {"dataType":"string","required":true},
+            "player_id": {"dataType":"double","required":true},
         },
         "additionalProperties": true,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "WordleStateReply": {
+    "RankingReply": {
         "dataType": "refObject",
         "properties": {
-            "message": {"dataType":"string","required":true},
-            "guesses": {"dataType":"array","array":{"dataType":"refObject","ref":"GuessValidation"}},
-            "finished": {"dataType":"boolean"},
-            "timeToNext": {"dataType":"double","required":true},
-        },
-        "additionalProperties": true,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "SpellingBeeReplyEnum": {
-        "dataType": "refEnum",
-        "enums": ["ok","already_guessed","wrong_word","no_main_letter","invalid_letter_used","no letters to buy","not_enough_points"],
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "LetterState": {
-        "dataType": "refObject",
-        "properties": {
-            "letter": {"dataType":"string","required":true},
-            "usageLimit": {"dataType":"double","required":true},
-            "pointsForLetter": {"dataType":"double","required":true},
-            "required": {"dataType":"boolean","required":true},
-        },
-        "additionalProperties": true,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "SpellingBeeStateReply": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"ref":"SpellingBeeReplyEnum","required":true},
-            "letters": {"dataType":"array","array":{"dataType":"refObject","ref":"LetterState"}},
-            "guessed_words": {"dataType":"array","array":{"dataType":"string"}},
-            "player_points": {"dataType":"double"},
-            "max_points": {"dataType":"double"},
-            "points": {"dataType":"double"},
-            "letters_to_buy_prices": {"dataType":"array","array":{"dataType":"double"}},
-        },
-        "additionalProperties": true,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "SeasonInfo": {
-        "dataType": "refObject",
-        "properties": {
-            "season_id": {"dataType":"string","required":true},
-            "season_title": {"dataType":"string","required":true},
-            "rules": {"dataType":"string","required":true},
-            "points_rules": {"dataType":"string","required":true},
-            "seconds_to_end": {"dataType":"double","required":true},
-        },
-        "additionalProperties": true,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "WordleChallengeStateReply": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
-            "guesses": {"dataType":"array","array":{"dataType":"refObject","ref":"GuessValidation"}},
-            "finished": {"dataType":"boolean"},
+            "message": {"dataType":"string","default":"ok"},
+            "myInfo": {"dataType":"union","subSchemas":[{"ref":"PositionInRank"},{"dataType":"undefined"}],"required":true},
+            "ranking": {"dataType":"array","array":{"dataType":"refObject","ref":"PositionInRank"},"required":true},
         },
         "additionalProperties": true,
     },
@@ -357,6 +305,17 @@ const models: TsoaRoute.Models = {
         "additionalProperties": true,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "LetterState": {
+        "dataType": "refObject",
+        "properties": {
+            "letter": {"dataType":"string","required":true},
+            "usageLimit": {"dataType":"double","required":true},
+            "pointsForLetter": {"dataType":"double","required":true},
+            "required": {"dataType":"boolean","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "LetterToBuy": {
         "dataType": "refObject",
         "properties": {
@@ -390,6 +349,11 @@ const models: TsoaRoute.Models = {
         "additionalProperties": true,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SpellingBeeReplyEnum": {
+        "dataType": "refEnum",
+        "enums": ["ok","already_guessed","wrong_word","no_main_letter","invalid_letter_used","no letters to buy","not_enough_points"],
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SpellingBeeDuelGuessReply": {
         "dataType": "refObject",
         "properties": {
@@ -414,6 +378,65 @@ const models: TsoaRoute.Models = {
             "new_player_elo": {"dataType":"double","required":true},
             "player_elo_diff": {"dataType":"double","required":true},
             "time_left": {"dataType":"double"},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SpellingBeeStateReply": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"ref":"SpellingBeeReplyEnum","required":true},
+            "letters": {"dataType":"array","array":{"dataType":"refObject","ref":"LetterState"}},
+            "guessed_words": {"dataType":"array","array":{"dataType":"string"}},
+            "player_points": {"dataType":"double"},
+            "max_points": {"dataType":"double"},
+            "points": {"dataType":"double"},
+            "letters_to_buy_prices": {"dataType":"array","array":{"dataType":"double"}},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SeasonInfo": {
+        "dataType": "refObject",
+        "properties": {
+            "season_id": {"dataType":"string","required":true},
+            "season_title": {"dataType":"string","required":true},
+            "rules": {"dataType":"string","required":true},
+            "points_rules": {"dataType":"string","required":true},
+            "seconds_to_end": {"dataType":"double","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GuessValidation": {
+        "dataType": "refObject",
+        "properties": {
+            "isWord": {"dataType":"boolean","required":true},
+            "guess": {"dataType":"string","required":true},
+            "answer": {"dataType":"array","array":{"dataType":"double"},"required":true},
+            "isGuessed": {"dataType":"boolean","required":true},
+            "correctWord": {"dataType":"string"},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "WordleChallengeStateReply": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
+            "guesses": {"dataType":"array","array":{"dataType":"refObject","ref":"GuessValidation"}},
+            "finished": {"dataType":"boolean"},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "WordleStateReply": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
+            "guesses": {"dataType":"array","array":{"dataType":"refObject","ref":"GuessValidation"}},
+            "finished": {"dataType":"boolean"},
+            "timeToNext": {"dataType":"double","required":true},
         },
         "additionalProperties": true,
     },
@@ -946,11 +969,11 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/api/v4/wordle/getState',
-            ...(fetchMiddlewares<RequestHandler>(WordleController)),
-            ...(fetchMiddlewares<RequestHandler>(WordleController.prototype.getState)),
+        app.post('/api/v4/ranking/spelling_bee_duel/global',
+            ...(fetchMiddlewares<RequestHandler>(RankingController)),
+            ...(fetchMiddlewares<RequestHandler>(RankingController.prototype.spellingBeeDuelGlobal)),
 
-            async function WordleController_getState(request: any, response: any, next: any) {
+            async function RankingController_spellingBeeDuelGlobal(request: any, response: any, next: any) {
             const args = {
                     auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
             };
@@ -963,24 +986,234 @@ export function RegisterRoutes(app: Router) {
 
                 const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
 
-                const controller: any = await container.get<WordleController>(WordleController);
+                const controller: any = await container.get<RankingController>(RankingController);
                 if (typeof controller['setStatus'] === 'function') {
                 controller.setStatus(undefined);
                 }
 
 
-              const promise = controller.getState.apply(controller, validatedArgs as any);
+              const promise = controller.spellingBeeDuelGlobal.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/api/v4/wordle/validate',
-            ...(fetchMiddlewares<RequestHandler>(WordleController)),
-            ...(fetchMiddlewares<RequestHandler>(WordleController.prototype.validateGuess)),
+        app.post('/api/v4/ranking/spelling_bee_duel/friends',
+            ...(fetchMiddlewares<RequestHandler>(RankingController)),
+            ...(fetchMiddlewares<RequestHandler>(RankingController.prototype.spellingBeeDuelFriends)),
 
-            async function WordleController_validateGuess(request: any, response: any, next: any) {
+            async function RankingController_spellingBeeDuelFriends(request: any, response: any, next: any) {
+            const args = {
+                    auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<RankingController>(RankingController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.spellingBeeDuelFriends.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v4/ranking/spelling_bee/global',
+            ...(fetchMiddlewares<RequestHandler>(RankingController)),
+            ...(fetchMiddlewares<RequestHandler>(RankingController.prototype.spellingBeeGlobal)),
+
+            async function RankingController_spellingBeeGlobal(request: any, response: any, next: any) {
+            const args = {
+                    auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<RankingController>(RankingController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.spellingBeeGlobal.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v4/ranking/spelling_bee/friends',
+            ...(fetchMiddlewares<RequestHandler>(RankingController)),
+            ...(fetchMiddlewares<RequestHandler>(RankingController.prototype.spellingBeeFriends)),
+
+            async function RankingController_spellingBeeFriends(request: any, response: any, next: any) {
+            const args = {
+                    auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<RankingController>(RankingController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.spellingBeeFriends.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v4/ranking/wordle_daily_challenge/global',
+            ...(fetchMiddlewares<RequestHandler>(RankingController)),
+            ...(fetchMiddlewares<RequestHandler>(RankingController.prototype.wordleDailyChallengeGlobal)),
+
+            async function RankingController_wordleDailyChallengeGlobal(request: any, response: any, next: any) {
+            const args = {
+                    auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<RankingController>(RankingController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.wordleDailyChallengeGlobal.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v4/ranking/wordle_daily_challenge/friends',
+            ...(fetchMiddlewares<RequestHandler>(RankingController)),
+            ...(fetchMiddlewares<RequestHandler>(RankingController.prototype.wordleDailyChallengeFriends)),
+
+            async function RankingController_wordleDailyChallengeFriends(request: any, response: any, next: any) {
+            const args = {
+                    auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<RankingController>(RankingController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.wordleDailyChallengeFriends.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v4/spelling_bee_duel/prematch',
+            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController)),
+            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController.prototype.prematch)),
+
+            async function SpellingBeeDuelController_prematch(request: any, response: any, next: any) {
+            const args = {
+                    auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<SpellingBeeDuelController>(SpellingBeeDuelController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.prematch.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v4/spelling_bee_duel/start',
+            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController)),
+            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController.prototype.start)),
+
+            async function SpellingBeeDuelController_start(request: any, response: any, next: any) {
+            const args = {
+                    auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<SpellingBeeDuelController>(SpellingBeeDuelController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.start.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v4/spelling_bee_duel/guess',
+            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController)),
+            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController.prototype.guess)),
+
+            async function SpellingBeeDuelController_guess(request: any, response: any, next: any) {
             const args = {
                     auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
                     guess: {"in":"body-prop","name":"guess","required":true,"dataType":"string"},
@@ -994,13 +1227,73 @@ export function RegisterRoutes(app: Router) {
 
                 const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
 
-                const controller: any = await container.get<WordleController>(WordleController);
+                const controller: any = await container.get<SpellingBeeDuelController>(SpellingBeeDuelController);
                 if (typeof controller['setStatus'] === 'function') {
                 controller.setStatus(undefined);
                 }
 
 
-              const promise = controller.validateGuess.apply(controller, validatedArgs as any);
+              const promise = controller.guess.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v4/spelling_bee_duel/end',
+            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController)),
+            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController.prototype.end)),
+
+            async function SpellingBeeDuelController_end(request: any, response: any, next: any) {
+            const args = {
+                    auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<SpellingBeeDuelController>(SpellingBeeDuelController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.end.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v4/spelling_bee_duel/buy_letter',
+            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController)),
+            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController.prototype.buy_letter)),
+
+            async function SpellingBeeDuelController_buy_letter(request: any, response: any, next: any) {
+            const args = {
+                    auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<SpellingBeeDuelController>(SpellingBeeDuelController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.buy_letter.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);
@@ -1188,11 +1481,11 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/api/v4/spelling_bee_duel/prematch',
-            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController)),
-            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController.prototype.prematch)),
+        app.post('/api/v4/wordle/getState',
+            ...(fetchMiddlewares<RequestHandler>(WordleController)),
+            ...(fetchMiddlewares<RequestHandler>(WordleController.prototype.getState)),
 
-            async function SpellingBeeDuelController_prematch(request: any, response: any, next: any) {
+            async function WordleController_getState(request: any, response: any, next: any) {
             const args = {
                     auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
             };
@@ -1205,54 +1498,24 @@ export function RegisterRoutes(app: Router) {
 
                 const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
 
-                const controller: any = await container.get<SpellingBeeDuelController>(SpellingBeeDuelController);
+                const controller: any = await container.get<WordleController>(WordleController);
                 if (typeof controller['setStatus'] === 'function') {
                 controller.setStatus(undefined);
                 }
 
 
-              const promise = controller.prematch.apply(controller, validatedArgs as any);
+              const promise = controller.getState.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/api/v4/spelling_bee_duel/start',
-            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController)),
-            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController.prototype.start)),
+        app.post('/api/v4/wordle/validate',
+            ...(fetchMiddlewares<RequestHandler>(WordleController)),
+            ...(fetchMiddlewares<RequestHandler>(WordleController.prototype.validateGuess)),
 
-            async function SpellingBeeDuelController_start(request: any, response: any, next: any) {
-            const args = {
-                    auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
-
-                const controller: any = await container.get<SpellingBeeDuelController>(SpellingBeeDuelController);
-                if (typeof controller['setStatus'] === 'function') {
-                controller.setStatus(undefined);
-                }
-
-
-              const promise = controller.start.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/api/v4/spelling_bee_duel/guess',
-            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController)),
-            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController.prototype.guess)),
-
-            async function SpellingBeeDuelController_guess(request: any, response: any, next: any) {
+            async function WordleController_validateGuess(request: any, response: any, next: any) {
             const args = {
                     auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
                     guess: {"in":"body-prop","name":"guess","required":true,"dataType":"string"},
@@ -1266,73 +1529,13 @@ export function RegisterRoutes(app: Router) {
 
                 const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
 
-                const controller: any = await container.get<SpellingBeeDuelController>(SpellingBeeDuelController);
+                const controller: any = await container.get<WordleController>(WordleController);
                 if (typeof controller['setStatus'] === 'function') {
                 controller.setStatus(undefined);
                 }
 
 
-              const promise = controller.guess.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/api/v4/spelling_bee_duel/end',
-            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController)),
-            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController.prototype.end)),
-
-            async function SpellingBeeDuelController_end(request: any, response: any, next: any) {
-            const args = {
-                    auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
-
-                const controller: any = await container.get<SpellingBeeDuelController>(SpellingBeeDuelController);
-                if (typeof controller['setStatus'] === 'function') {
-                controller.setStatus(undefined);
-                }
-
-
-              const promise = controller.end.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/api/v4/spelling_bee_duel/buy_letter',
-            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController)),
-            ...(fetchMiddlewares<RequestHandler>(SpellingBeeDuelController.prototype.buy_letter)),
-
-            async function SpellingBeeDuelController_buy_letter(request: any, response: any, next: any) {
-            const args = {
-                    auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
-
-                const controller: any = await container.get<SpellingBeeDuelController>(SpellingBeeDuelController);
-                if (typeof controller['setStatus'] === 'function') {
-                controller.setStatus(undefined);
-                }
-
-
-              const promise = controller.buy_letter.apply(controller, validatedArgs as any);
+              const promise = controller.validateGuess.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);

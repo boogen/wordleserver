@@ -13,6 +13,7 @@ Sentry.init({ dsn: process.env.SENTRY_DNS });
 import { notFound, errorHandler } from './middlewares';
 import { RegisterRoutes } from './routes';
 
+import { iocContainer } from './ioc';
 import WordleDBI from './api/v4/DBI/DBI';
 
 export const app = express();
@@ -29,7 +30,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.get("/error", (req: Request, res: Response) => {
   try {
-    throw "aaa";
+    throw new Error("aaa");
   }
   catch (error) {
     // Sentry.captureException(error);
@@ -38,12 +39,12 @@ app.get("/error", (req: Request, res: Response) => {
   res.send("error");
 });
 
-const dbi = new WordleDBI();
+const dbi = iocContainer.get(WordleDBI);
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   var d = new Date();
   d.setHours(0, 0, 0, 0);
-  dbi.increaseRequestCounter(req.path, d.getTime() / 1000);
+  await dbi.increaseRequestCounter(req.path, d.getTime() / 1000);
   next()
 })
 

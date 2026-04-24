@@ -203,7 +203,7 @@ export class SpellingBeeDuelController {
         for (var i = 0; i < result.guessesAdded.length; i++) {
             duel = await addPlayerGuessInSpellingBeeDuel(duel!.bee_duel_id, player_id, result.guessesAdded[i], result.pointsAdded[i], duel!, timestamp, this.dbi);
         }
-        var totalPoints = result.pointsAdded.reduce((a, b) => a + b);
+        var totalPoints = result.pointsAdded.reduce((a, b) => a + b, 0);
         this.stats.addSpellingBeeDuelGuessEvent(player_id, duel!.bee_duel_id, totalPoints, duel!.player_points);
         return new SpellingBeeDuelGuessReply(result.message,
             {
@@ -244,8 +244,8 @@ export class SpellingBeeDuelController {
         const currentEloScore:number = await this.dbi.getCurrentSpellingBeeElo(player_id, season_rules.id);
         const new_player_elo:number = calculateNewSimpleRank(currentEloScore, result);
         const oldRank = await this.dbi.getSpellingBeeEloRank(season_rules.id)
-        notifyAboutRankingChange(player_id, oldRank, currentEloScore, new_player_elo, "Pojedynek", this.dbi, this.logger)
-        this.dbi.updateSpellingBeeEloRank(player_id, new_player_elo - currentEloScore, season_rules.id);
+        await notifyAboutRankingChange(player_id, oldRank, currentEloScore, new_player_elo, "Pojedynek", this.dbi, this.logger)
+        await this.dbi.updateSpellingBeeEloRank(player_id, new_player_elo - currentEloScore, season_rules.id);
         this.stats.addSpellingBeeDuelEndEvent(player_id, duel!.bee_duel_id, result, currentEloScore, new_player_elo)
         return new SpellingBeeDuelEnd(result, duel.player_points, duel.opponent_points, new_player_elo, new_player_elo - currentEloScore)
     }

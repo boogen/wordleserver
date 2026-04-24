@@ -122,16 +122,20 @@ export async function processPlayerGuess(playerGuess:string, guesses:string[], b
 
     var guessesToCheck:string[] = []
     if (playerGuess.includes(JOKER)) {
-        guessesToCheck = ALPHABET.map(letter => {
-            var readyWord = playerGuess;
-            var jokersUsed:number[] = [];
-            while(readyWord.includes(JOKER)) {
-                jokersUsed.push(readyWord.indexOf(JOKER));
-                readyWord = readyWord.replace(JOKER, letter)
+        guessesToCheck = [playerGuess];
+        while (guessesToCheck.some(g => g.includes(JOKER))) {
+            let nextRound: string[] = [];
+            for (let g of guessesToCheck) {
+                if (g.includes(JOKER)) {
+                    for (let letter of ALPHABET) {
+                        nextRound.push(g.replace(JOKER, letter));
+                    }
+                } else {
+                    nextRound.push(g);
+                }
             }
-            return readyWord;
-            }
-        )
+            guessesToCheck = nextRound;
+        }
     }
     else {
         guessesToCheck = [playerGuess]

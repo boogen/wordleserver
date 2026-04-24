@@ -18,14 +18,8 @@ interface CrosswordInitReply {
     state?: CrosswordState
 }
 
-interface CrosswordGuessReply {
-    isWord: boolean;
-    guessed_word: boolean;
-    state: CrosswordState;
-}
-
 interface CrosswordState {
-    grid: string[][];
+    grid: string[];
     clues: ClueState[];
     height: number;
     width: number;
@@ -78,23 +72,23 @@ export class CrosswordController_v3 {
         const playerId = await resolvePlayerId(auth_id, this.dbi);
         var state = await getCrosswordV3State(playerId, this.dbi);
         if (state == null) {
-            throw "state is null"
+            throw new Error("state is null")
         }
         if (row < 0 || row >= state.height) {
-            throw "row out of bounds"
+            throw new Error("row out of bounds")
         }
         if (column < 0 || column >= state.width) {
-            throw "column out of bounds"
+            throw new Error("column out of bounds")
         }
         if (state.grid[row][column] == null) {
-            throw "letter not on crossword"
+            throw new Error("letter not on crossword")
         }
         if (letter.length > 1) {
-            throw "letter is not of length 1"
+            throw new Error("letter is not of length 1")
         }
         var letterList = new Set(state.words.join("").normalize('NFC'))
         if (!letterList.has(letter) && letter !== "") {
-            throw `letter ${letter} not allowed`;
+            throw new Error(`letter ${letter} not allowed`);
         }
         state.player_grid[row][column] = letter;
         await setCrosswordV3State(state, this.dbi)
@@ -116,7 +110,7 @@ export class CrosswordController_v3 {
 
     private convertInternalStateToReplyState(state: PlayerCrosswordV3State): CrosswordState {
         return {
-            grid: state.player_grid.concat.apply([], state.player_grid),
+            grid: state.player_grid.flat(),
             clues: state.clues,
             height: state.height,
             width: state.width,

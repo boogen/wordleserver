@@ -125,9 +125,13 @@ export default class WordleDBI {
         const sequenceDocument = await this.counters().findOneAndUpdate(
             { id: sequenceName },
             { $inc: { sequence_value: 1 } },
-            { upsert: true }
+            { upsert: true, returnOriginal: false }
         );
-        return sequenceDocument!.sequence_value;
+        if (!sequenceDocument) {
+            const newDoc = await this.counters().findOne({ id: sequenceName });
+            return newDoc!.sequence_value;
+        }
+        return sequenceDocument.sequence_value;
     }
 
     // Spelling Bee ELO
@@ -200,7 +204,7 @@ export default class WordleDBI {
 
     async increaseRequestCounter(path: string, lastMidnight: number): Promise<void> {
         const stats = this._db.get("request_stats_" + lastMidnight);
-        stats.findOneAndUpdate({ path }, { $inc: { no_of_requests: 1 } }, { upsert: true });
+        await stats.findOneAndUpdate({ path }, { $inc: { no_of_requests: 1 } }, { upsert: true });
     }
 
     async saveWordExplanation(word: string, exp: string): Promise<void> {

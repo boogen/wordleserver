@@ -108,12 +108,12 @@ export class SpellingBeeController {
         for (const addedGuess of result.guessesAdded) {
             state = await addBeeGuess(player_id, letters!.bee_id, addedGuess, this.dbi)
         }
-        var totalPointsAdded = result.pointsAdded.reduce((a, b) => a+b)
+        var totalPointsAdded = result.pointsAdded.reduce((a, b) => a+b, 0)
         var oldRank = await this.dbi.getBeeRanking(letters!.bee_id)
 
         var newRankingEntry = await this.dbi.increaseBeeRank(player_id, letters!.bee_id, totalPointsAdded)
 
-        notifyAboutRankingChange(player_id, oldRank, newRankingEntry.score - totalPointsAdded, newRankingEntry.score, "Wspólna litera", this.dbi, this.logger)
+        await notifyAboutRankingChange(player_id, oldRank, newRankingEntry.score - totalPointsAdded, newRankingEntry.score, "Wspólna litera", this.dbi, this.logger)
         const max_points = bee_model!.max_points;
         state = await saveLettersState(player_id, letters!.bee_id, result.newLetterState, this.dbi)
         var player_points = (await this.dbi.getBeePlayerPoints(player_id, letters!.bee_id));

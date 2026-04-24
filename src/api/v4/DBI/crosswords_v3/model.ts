@@ -38,8 +38,11 @@ export async function getOrCreateRandomCrossword(dbi: WordleDBI, timestamp: numb
     var crossword = (await dbi.crosswordV3().findOneAndUpdate(
         {validity:{$gt: timestamp}},
         {$setOnInsert: {crossword_id:new_crossword.crossword_id, validity: new_validity, crossword_serial: new_crossword_id}},
-        {upsert: true}
+        {upsert: true, returnOriginal: false}
     ))
+    if (!crossword) {
+        crossword = await dbi.crosswordV3().findOne({validity: new_validity});
+    }
     log('Selected crossword:', crossword!.crossword_id);
     return (await dbi.possibleCrosswordsV3().findOne({crossword_id:crossword!.crossword_id}))!;
 }
