@@ -5,11 +5,11 @@ import { log } from "console";
 
 
 export class CrosswordWord {
-    constructor(public word: string, public coordinates: GridCoordinates) { }
+    constructor(public word: string, public col: number, public row: number, public direction: string) { }
 }
 
 export class GridCoordinates {
-    constructor(public column: number, public row: number, public direction: string) { }
+    constructor(public col: number, public row: number, public direction: string) { }
 }
 
 export class Clue {

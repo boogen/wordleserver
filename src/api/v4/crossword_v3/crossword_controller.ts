@@ -119,8 +119,12 @@ export class CrosswordController_v3 {
             let wordGuessed = true;
             let word = "";
             for (let i = 0; i < clue.length; i++) {
-                const r = clue.coordinates.direction === 'across' ? clue.coordinates.row : clue.coordinates.row + i;
-                const c = clue.coordinates.direction === 'across' ? clue.coordinates.column + i : clue.coordinates.column;
+                const r = clue.coordinates.direction === 'H' ? clue.coordinates.row : clue.coordinates.row + i;
+                const c = clue.coordinates.direction === 'H' ? clue.coordinates.col + i : clue.coordinates.col;
+                if (state.grid[r] == null || state.grid[r][c] == null) {
+                    wordGuessed = false;
+                    break;
+                }
                 word += state.grid[r][c];
                 if (state.grid[r][c] !== state.player_grid[r][c]) {
                     wordGuessed = false;
@@ -192,7 +196,7 @@ export class CrosswordController_v3 {
 
     private convertClues(clues: Clue[], words: CrosswordWord[]): ClueState[] {
         var wordMap = words.reduce((acc, w) => {
-            acc[w.word] = w.coordinates;
+            acc[w.word] = new GridCoordinates(w.col, w.row, w.direction);
             return acc;
         }, {} as Record<string, GridCoordinates>);
 
