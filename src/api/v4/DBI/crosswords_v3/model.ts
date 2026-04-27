@@ -21,7 +21,7 @@ export class PossibleCrosswordV3 {
 }
 
 export class GlobalCrossword {
-    constructor(public crossword_id:number, public validity:number, public crossword_serial:number, public id?: ObjectId) { }
+    constructor(public crossword_id:number, validity:number, crossword_serial:number, public id?: ObjectId) { }
 }
 
 export class PlayerCrosswordState {
