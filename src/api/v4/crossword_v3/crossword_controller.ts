@@ -42,10 +42,8 @@ export class CrosswordController_v3 {
         var state = await getCrosswordV3State(playerId, this.dbi);
 
         const timestamp = Date.now() / 1000;
-        var new_validity_timestamp = GLOBAL_TIME_START;
-        while (new_validity_timestamp < timestamp) {
-            new_validity_timestamp += WORD_VALIDITY;
-        }
+        const new_validity_timestamp = this.getCurrentCrosswordValidity();
+
         this.logger.info("New validity timestamp start: " + new_validity_timestamp);
 
         const crossword = await getOrCreateRandomCrossword(this.dbi, timestamp, new_validity_timestamp);
@@ -64,6 +62,15 @@ export class CrosswordController_v3 {
         await this.stats.addCrosswordV3InitEvent(playerId, state.crossword_id);
         this.logger.info("Crossword state: " + JSON.stringify(this.convertInternalStateToReplyState(state)));
         return { message: 'ok', state: this.convertInternalStateToReplyState(state) };
+    }
+
+    private getCurrentCrosswordValidity(): number {
+        const timestamp = Date.now() / 1000;
+        var new_validity_timestamp = GLOBAL_TIME_START;
+        while (new_validity_timestamp < timestamp) {
+            new_validity_timestamp += WORD_VALIDITY;
+        }
+        return new_validity_timestamp;
     }
 
     @Post("save")
@@ -90,9 +97,38 @@ export class CrosswordController_v3 {
         if (!letterList.has(letter) && letter !== "") {
             throw new Error(`letter ${letter} not allowed`);
         }
+        const oldGuessedWords = new Set(this.getGuessedWords(state));
         state.player_grid[row][column] = letter;
         await setCrosswordV3State(state, this.dbi)
+        const finished = this.isFinished(state);
+        const currentGuessedWords = this.getGuessedWords(state);
+
+        for (const word of currentGuessedWords) {
+            if (!oldGuessedWords.has(word)) {
+                await this.stats.addCrosswordV3GuessedWordEvent(state.crossword_id, this.getCurrentCrosswordValidity(), playerId, word);
+            }
+        }
+
+        await this.stats.addCrosswordV3GuessEvent(playerId, currentGuessedWords.length, finished, true);
         return { message: 'ok', state: this.convertInternalStateToReplyState(state)};
+    }
+
+    private getGuessedWords(state: PlayerCrosswordV3State): string[] {
+        let guessedWords: string[] = [];
+        for (const clue of state.clues) {
+            let wordGuessed = true;
+            let word = "";
+            for (let i = 0; i < clue.length; i++) {
+                const r = clue.coordinates.direction === 'across' ? clue.coordinates.row : clue.coordinates.row + i;
+                const c = clue.coordinates.direction === 'across' ? clue.coordinates.column + i : clue.coordinates.column;
+                word += state.grid[r][c];
+                if (state.grid[r][c] !== state.player_grid[r][c]) {
+                    wordGuessed = false;
+                }
+            }
+            if (wordGuessed) guessedWords.push(word);
+        }
+        return guessedWords;
     }
 
     private convertCrosswordToInternalState(player_id: number, crossword: PossibleCrosswordV3): PlayerCrosswordV3State {
