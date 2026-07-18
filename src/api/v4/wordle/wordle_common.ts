@@ -1,6 +1,6 @@
 export interface GuessValidation {
     isWord:boolean;
-    guess:string;
+    word:string;
     answer:number[];
     isGuessed:boolean;
     correctWord?:string;

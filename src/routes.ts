@@ -415,7 +415,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "isWord": {"dataType":"boolean","required":true},
-            "guess": {"dataType":"string","required":true},
+            "word": {"dataType":"string","required":true},
             "answer": {"dataType":"array","array":{"dataType":"double"},"required":true},
             "isGuessed": {"dataType":"boolean","required":true},
             "correctWord": {"dataType":"string"},
@@ -1462,7 +1462,7 @@ export function RegisterRoutes(app: Router) {
             async function WordleChallengeController_validate(request: any, response: any, next: any) {
             const args = {
                     auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
-                    guess: {"in":"body-prop","name":"guess","required":true,"dataType":"string"},
+                    word: {"in":"body-prop","name":"word","required":true,"dataType":"string"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -1523,7 +1523,7 @@ export function RegisterRoutes(app: Router) {
             async function WordleController_validateGuess(request: any, response: any, next: any) {
             const args = {
                     auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
-                    guess: {"in":"body-prop","name":"guess","required":true,"dataType":"string"},
+                    word: {"in":"body-prop","name":"word","required":true,"dataType":"string"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

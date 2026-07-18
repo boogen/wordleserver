@@ -55,25 +55,25 @@ export class WordleController {
     }
 
     @Post("validate")
-    public async validateGuess(@BodyProp() auth_id:string, @BodyProp() guess:string):Promise<GuessValidation> {
+    public async validateGuess(@BodyProp() auth_id:string, @BodyProp() word:string):Promise<GuessValidation> {
         const player_id = await resolvePlayerId(auth_id, this.dbi)
         const timestamp = Date.now() / 1000;
         const wordEntry = await getGlobalWord(timestamp, this.dbi);
 
-        const word = wordEntry!.word;
+        const answer = wordEntry!.word;
         
         const t = await getPlayerTriesForWord(player_id, wordEntry!.word_id, this.dbi);
         var tries = t!.guesses.length;
-        if (t!.guesses.includes(guess) || tries >=6) {
-            this.stats.addWordleGuessEvent(player_id, tries, guess == word)
-            return {isWord: false, guess: guess, answer: [], isGuessed: guess == word};
+        if (t!.guesses.includes(word) || tries >=6) {
+            this.stats.addWordleGuessEvent(player_id, tries, word == answer)
+            return {isWord: false, word: word, answer: [], isGuessed: word == answer};
         }
         
 
-        const guessResult = await validateGuess(guess, word, this.dbi, this.logger);
+        const guessResult = await validateGuess(word, answer, this.dbi, this.logger);
 
         if (guessResult.isWord) {
-            addGuess(player_id, wordEntry!.word_id, guess, this.dbi);
+            addGuess(player_id, wordEntry!.word_id, word, this.dbi);
             tries += 1;
         }
 
@@ -83,39 +83,39 @@ export class WordleController {
 
         this.logger.info("tries: " + tries);
         if (tries == 6) {
-            guessResult.correctWord = word;
+            guessResult.correctWord = answer;
         }
-        this.stats.addWordleGuessEvent(player_id, tries, guess == word)
+        this.stats.addWordleGuessEvent(player_id, tries, word == answer)
         return guessResult;
     }
 }
 
-async function validateGuess(guess:string, word:string, dbi:WordleDBI, logger:Logger):Promise<GuessValidation> {
-    const guessed = (guess == word);
-    const isWord = await isWordValid(guess, dbi);
+async function validateGuess(word:string, answer:string, dbi:WordleDBI, logger:Logger):Promise<GuessValidation> {
+    const guessed = (word == answer);
+    const isWord = await isWordValid(word, dbi);
    
-    logger.info("Guessed word: %s, actual word: %s", guess, word)
+    logger.info("Guessed word: %s, actual word: %s", word, answer)
 
     var result:number[] = [];
     if (isWord) {
         var usedLetters:boolean[] = [];
-        for (var i = 0; i < guess.length; i++) {
+        for (var i = 0; i < word.length; i++) {
             result.push(0);
             usedLetters.push(false);
         }
 
-        for (var i = 0; i < guess.length; i++) {
-            if (guess.charAt(i) == word.charAt(i)) {
+        for (var i = 0; i < word.length; i++) {
+            if (word.charAt(i) == answer.charAt(i)) {
                 result[i] = 2;
                 usedLetters[i] = true;
             }
         }
-        for (var i = 0; i < guess.length; i++) {
+        for (var i = 0; i < word.length; i++) {
             if (result[i] > 0) {
                 continue;
             }
-            for (var j = 0; j < word.length; j++) {
-                if (word[j] === guess[i] && !usedLetters[j]) {
+            for (var j = 0; j < answer.length; j++) {
+                if (answer[j] === word[i] && !usedLetters[j]) {
                     result[i] = 1;
                     usedLetters[j] = true;
                     break;
@@ -123,5 +123,5 @@ async function validateGuess(guess:string, word:string, dbi:WordleDBI, logger:Lo
             }
         }
     }
-    return {isWord: isWord, guess: guess, answer: result, isGuessed: guessed, correctWord:""};
+    return {isWord: isWord, word: word, answer: result, isGuessed: guessed, correctWord:""};
 }
