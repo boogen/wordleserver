@@ -585,7 +585,7 @@ export function RegisterRoutes(app: Router) {
             async function CrosswordController_guess(request: any, response: any, next: any) {
             const args = {
                     auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
-                    guess: {"in":"body-prop","name":"guess","required":true,"dataType":"string"},
+                    word: {"in":"body-prop","name":"word","required":true,"dataType":"string"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

@@ -105,9 +105,9 @@ export class CrosswordController {
     }
 
     @Post("guess")
-    public async guess(@BodyProp() auth_id: string, @BodyProp() guess: string): Promise<CrosswordGuessReply> {
+    public async guess(@BodyProp() auth_id: string, @BodyProp() word: string): Promise<CrosswordGuessReply> {
         const playerId = await resolvePlayerId(auth_id, this.dbi);
-        const players_word = guess.toLowerCase();
+        const players_word = word.toLowerCase();
         const isWord = await isWordValid(players_word, this.dbi);
         var crosswordState = await getCrosswordState(playerId, this.dbi);
         var grid = crosswordState!.grid;
