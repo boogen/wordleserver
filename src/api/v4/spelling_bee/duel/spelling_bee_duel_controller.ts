@@ -180,13 +180,13 @@ export class SpellingBeeDuelController {
     }
 
     @Post("guess")
-    public async guess(@BodyProp() auth_id:string, @BodyProp() guess:string):Promise<SpellingBeeDuelGuessReply> {
+    public async guess(@BodyProp() auth_id:string, @BodyProp() word:string):Promise<SpellingBeeDuelGuessReply> {
         const player_id = await resolvePlayerId(auth_id, this.dbi);
         const timestamp = Date.now() / 1000;
         var duel:SpellingBeeDuel|null = await checkForExistingDuel(player_id, timestamp, DUEL_DURATION, this.dbi);
         const bee_model:Bee|null = await getBeeById(duel!.bee_id, this.dbi)
         const season_rules:SeasonRules = fromOtherSeasonRules(duel!.season_rules);
-        const result = await processPlayerGuess(guess, duel!.player_guesses.map(g => g.word), bee_model!, duel!.letters, season_rules, this.dbi);
+        const result = await processPlayerGuess(word, duel!.player_guesses.map(g => g.word), bee_model!, duel!.letters, season_rules, this.dbi);
         if (result.message != SpellingBeeReplyEnum.ok) {
             return new SpellingBeeDuelGuessReply(
                 result.message, 
