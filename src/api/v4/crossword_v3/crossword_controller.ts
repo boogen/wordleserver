@@ -12,7 +12,6 @@ import { boolean } from "@hapi/joi";
 const WORD_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
 
-const POLISH_ALPHABET = new Set("aąbcćdeęfghijklłmnńoóprsśtuwyzźż".split(""));
 
 interface CrosswordInitReply {
     message: string;
@@ -203,10 +202,6 @@ export class CrosswordController_v3 {
     }
 
     private getLettersFromWord(word: string): string[] {
-        var letters = new Set(Array.from(word));
-        while (letters.size < 7) {
-            letters.add(Array.from(POLISH_ALPHABET)[Math.floor(Math.random() * POLISH_ALPHABET.size)]);
-        }
-        return Array.from((letters));
+        return Array.from(new Set(Array.from(word)));
     }
 }
