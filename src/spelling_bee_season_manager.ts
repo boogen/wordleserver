@@ -56,6 +56,13 @@ export class SpellingBeeSeasonManager {
         if (this.spellingBeeRules.has(type) && (new Date().getTime() - this.spellingBeeRules.get(type)!.time.getTime()) / (1000 * 60) < this.rulesThrottle.get(type)! ) {
             return this.spellingBeeRules.get(type)!.rules;
         }
+        if (process.env.FORCE_VANILLA_SEASON) {
+            var id = "vanilla";
+            if (type === "duel") {
+                id += "_" + eventList!.filter(e => new Date(e.end?.dateTime?.toString()!) <  now).length;
+            }
+            return new SeasonRules({}, id, "Tryb standardowy", "", "", null, "vanilla");
+        }
         const clients = await this.initCalendarClient()
         var eventList = (await clients.calendarClient!.events.list({calendarId:calendarId})).data.items
         var now  = new Date()

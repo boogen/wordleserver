@@ -10,6 +10,23 @@ export class CrosswordWord {
 
 export class GridCoordinates {
     constructor(public column: number, public row: number, public direction: string) { }
+
+
+
+    public static fromJSON(data: any): GridCoordinates {
+        return new GridCoordinates(data.column, data.row, data.direction);
+    }
+
+    public getNext():GridCoordinates {
+        return this.translate(1);
+    }
+
+    public translate(amount:number):GridCoordinates {
+        if (this.direction === 'H') {
+            return new GridCoordinates(this.column + amount, this.row, this.direction);
+        }
+        return new GridCoordinates(this.column, this.row + amount, this.direction);
+    }
 }
 
 export class Clue {
@@ -21,35 +38,35 @@ export class PossibleCrosswordV3 {
 }
 
 export class GlobalCrossword {
-    constructor(public crossword_id:number, validity:number, crossword_serial:number, public id?: ObjectId) { }
+    constructor(public crossword_id:number, validity:number, crossword_serial:number, public mode:string, public id?: ObjectId) { }
 }
 
 export class PlayerCrosswordState {
     constructor(public player_id: number, public crossword_id: number, public grid: string[][], public words: string[], public id?: ObjectId) { }
 }
 
-export async function getCrossword(crossword_id: number, dbi: WordleDBI): Promise<FindOneResult<PossibleCrosswordV3>> {
-    return dbi.possibleCrosswordsV3().findOne({ crossword_id: crossword_id });
+export async function getCrossword(crossword_id: number, dbi: WordleDBI, mode: string): Promise<FindOneResult<PossibleCrosswordV3>> {
+    return dbi.possibleCrosswordsV3(mode).findOne({ crossword_id: crossword_id });
 }
 
-export async function getOrCreateRandomCrossword(dbi: WordleDBI, timestamp: number, new_validity: number): Promise<PossibleCrosswordV3> {
-    var new_crossword_id:number = await dbi.getNextSequenceValue("global_crossword")
-    var new_crossword = (await dbi.possibleCrosswordsV3().aggregate([{ $sample: { size: 1 } }]))[0]
+export async function getOrCreateRandomCrossword(dbi: WordleDBI, timestamp: number, new_validity: number, mode: string): Promise<PossibleCrosswordV3> {
+    var new_crossword_id:number = await dbi.getNextSequenceValue("global_crossword_" + mode)
+    var new_crossword = (await dbi.possibleCrosswordsV3(mode).aggregate([{ $sample: { size: 1 } }]))[0]
     var crossword = (await dbi.crosswordV3().findOneAndUpdate(
-        {validity:{$gt: timestamp}},
-        {$setOnInsert: {crossword_id:new_crossword.crossword_id, validity: new_validity, crossword_serial: new_crossword_id}},
+        {validity:{$gt: timestamp}, mode: mode},
+        {$setOnInsert: {crossword_id:new_crossword.crossword_id, validity: new_validity, crossword_serial: new_crossword_id, mode: mode}},
         {upsert: true, returnOriginal: false}
     ))
     if (!crossword) {
-        crossword = await dbi.crosswordV3().findOne({validity: new_validity});
+        crossword = await dbi.crosswordV3().findOne({validity: new_validity, mode: mode});
     }
     log('Selected crossword:', crossword!.crossword_id);
-    return (await dbi.possibleCrosswordsV3().findOne({crossword_id:crossword!.crossword_id}))!;
+    return (await dbi.possibleCrosswordsV3(mode).findOne({crossword_id:crossword!.crossword_id}))!;
 }
 
-export async function getFirstCrossword(dbi: WordleDBI): Promise<PossibleCrosswordV3 | null> {
+export async function getFirstCrossword(dbi: WordleDBI, mode: string): Promise<PossibleCrosswordV3 | null> {
     try {
-        return (await dbi.possibleCrosswordsV3().find())[0];
+        return (await dbi.possibleCrosswordsV3(mode).find())[0];
     }
     catch (error) {
         console.log(error)

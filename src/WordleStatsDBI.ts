@@ -98,14 +98,14 @@ class CrosswordV3InitEvent extends StatsEvent {
 }
 
 class CrosswordV3GuessEvent extends StatsEvent {
-    constructor(public playerId: number, public noOfGuessedWords: number, public noOfGuesses: number, public isFinished: boolean, public isWord: boolean, public timestamp: number) {
+    constructor(public playerId: number, public crosswordId: number, public crosswordValidity: number, public guessed: boolean, public word: string, public finished: boolean, public timestamp: number) {
         super();
     }
     getTableName(): string {
         return "crossword_v3_guess";
     }
     getValues(): any[] {
-        return [this.playerId, this.noOfGuessedWords, this.noOfGuesses, this.isFinished, this.isWord, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
+        return [this.playerId, this.crosswordId, this.crosswordValidity, this.guessed, this.word, this.finished, new Date(this.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')];
     }
 }
 
@@ -204,8 +204,8 @@ export class Stats extends StatsDBI {
         this.addStat(new CrosswordV3InitEvent(playerId, crosswordId, Date.now() / 1000))
     }
 
-    async addCrosswordV3GuessEvent(playerId: number, noOfGuessedWords: number, noOfGuesses: number, isFinished: boolean, isWord: boolean) {
-        this.addStat(new CrosswordV3GuessEvent(playerId, noOfGuessedWords, noOfGuesses, isFinished, isWord, Date.now() / 1000))
+    async addCrosswordV3GuessEvent(playerId: number, crosswordId: number, crosswordValidity: number, guessed:boolean, word:string, finished:boolean) {
+        this.addStat(new CrosswordV3GuessEvent(playerId, crosswordId, crosswordValidity, guessed, word, finished, Date.now() / 1000))
     }
 
 

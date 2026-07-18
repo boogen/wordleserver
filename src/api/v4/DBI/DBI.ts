@@ -72,7 +72,7 @@ export default class WordleDBI {
     playerProfile(): ICollection<PlayerProfile> { return this._db.get("player_profile"); }
     globalWord(): ICollection<GlobalWord> { return this._db.get("global_word"); }
     possibleCrosswords(): ICollection<PossibleCrossword> { return this._db.get("possible_crosswords_v2"); }
-    possibleCrosswordsV3(): ICollection<PossibleCrosswordV3> { return this._db.get("possible_crosswords_v3"); }
+    possibleCrosswordsV3(mode: string): ICollection<PossibleCrosswordV3> { return this._db.get("possible_crosswords_v3." + mode); }
     crosswordV3(): ICollection<GlobalCrossword> { return this._db.get("crossword_v3"); }
     playerCrosswordState(): ICollection<PlayerCrosswordState> { return this._db.get("player_crossword_state"); }
     playerCrosswordV3State(): ICollection<PlayerCrosswordV3State> { return this._db.get("player_crossword_v3_state"); }
