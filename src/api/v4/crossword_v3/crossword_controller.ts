@@ -43,7 +43,7 @@ export class CrosswordController_v3 {
         logger.setContext("CrosswordControllerV3");
     }
     @Post("init")
-    public async init(@BodyProp() auth_id: string, @BodyProp() mode: string): Promise<CrosswordInitReply> {
+    public async init(@BodyProp() auth_id: string, @BodyProp() mode: string = "adult"): Promise<CrosswordInitReply> {
         const playerId = await resolvePlayerId(auth_id, this.dbi);
         var state = await getCrosswordV3State(playerId, mode, this.dbi);
 
@@ -79,7 +79,7 @@ export class CrosswordController_v3 {
     }
 
     @Post("save")
-    public async save(@BodyProp() auth_id: string, @BodyProp() mode: string, @BodyProp() row: number, @BodyProp() column: number, @BodyProp() letter: string) {
+    public async save(@BodyProp() auth_id: string, @BodyProp() mode: string = "adult", @BodyProp() row: number, @BodyProp() column: number, @BodyProp() letter: string) {
         this.logger.info(`row: ${row}, column: ${column}, letter: ${letter}`)
         const playerId = await resolvePlayerId(auth_id, this.dbi);
         var state = await getCrosswordV3State(playerId, mode, this.dbi);

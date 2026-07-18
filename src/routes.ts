@@ -461,7 +461,7 @@ export function RegisterRoutes(app: Router) {
             async function CrosswordController_v3_init(request: any, response: any, next: any) {
             const args = {
                     auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
-                    mode: {"in":"body-prop","name":"mode","required":true,"dataType":"string"},
+                    mode: {"default":"adult","in":"body-prop","name":"mode","dataType":"string"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -492,7 +492,7 @@ export function RegisterRoutes(app: Router) {
             async function CrosswordController_v3_save(request: any, response: any, next: any) {
             const args = {
                     auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
-                    mode: {"in":"body-prop","name":"mode","required":true,"dataType":"string"},
+                    mode: {"default":"adult","in":"body-prop","name":"mode","dataType":"string"},
                     row: {"in":"body-prop","name":"row","required":true,"dataType":"double"},
                     column: {"in":"body-prop","name":"column","required":true,"dataType":"double"},
                     letter: {"in":"body-prop","name":"letter","required":true,"dataType":"string"},
