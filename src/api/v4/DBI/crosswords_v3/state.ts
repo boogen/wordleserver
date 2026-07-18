@@ -47,7 +47,7 @@ export class PlayerCrosswordV3State {
     public getWordFromPlayerGrid(coordinates:GridCoordinates, length:number):string|null {
         var coords = coordinates;
         var word = ""
-        for (var i = 0; i <= length; i++) {
+        for (var i = 0; i < length; i++) {
             const letter = this.getPlayerGridLetter(coords.row, coords.column)
             if (letter === null) {
                 return null;
@@ -63,6 +63,9 @@ export class PlayerCrosswordV3State {
     }
 
     private getPlayerGridLetter(row:number, column:number):string|null {
+        if (row < 0 || row >= this.player_grid.length || column < 0 || column >= (this.player_grid[row]?.length ?? 0)) {
+            return null;
+        }
         var letter = this.player_grid[row][column]
         if (letter === "-") {
             return null;
