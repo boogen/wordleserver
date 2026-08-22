@@ -49,9 +49,11 @@ export async function getCrossword(crossword_id: number, dbi: WordleDBI, mode: s
     return dbi.possibleCrosswordsV3(mode).findOne({ crossword_id: crossword_id });
 }
 
-export async function getOrCreateRandomCrossword(dbi: WordleDBI, timestamp: number, new_validity: number, mode: string): Promise<PossibleCrosswordV3> {
+export async function getOrCreateSerialCrossword(dbi: WordleDBI, timestamp: number, new_validity: number, mode: string): Promise<PossibleCrosswordV3> {
     var new_crossword_id:number = await dbi.getNextSequenceValue("global_crossword_" + mode)
-    var new_crossword = (await dbi.possibleCrosswordsV3(mode).aggregate([{ $sample: { size: 1 } }]))[0]
+    var total = await dbi.possibleCrosswordsV3(mode).count();
+    var serial_index = new_crossword_id % total;
+    var new_crossword = (await dbi.possibleCrosswordsV3(mode).aggregate([{ $skip: serial_index }, { $limit: 1 }]))[0]
     var crossword = (await dbi.crosswordV3().findOneAndUpdate(
         {validity:{$gt: timestamp}, mode: mode},
         {$setOnInsert: {crossword_id:new_crossword.crossword_id, validity: new_validity, crossword_serial: new_crossword_id, mode: mode}},

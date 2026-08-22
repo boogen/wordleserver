@@ -1,6 +1,6 @@
 import { Post, BodyProp, Route } from "tsoa";
 import { Stats } from "../../../WordleStatsDBI";
-import { Clue, CrosswordWord, getOrCreateRandomCrossword, GridCoordinates } from "../DBI/crosswords_v3/model";
+import { Clue, CrosswordWord, getOrCreateSerialCrossword, GridCoordinates } from "../DBI/crosswords_v3/model";
 import { PossibleCrosswordV3 } from "../DBI/crosswords_v3/model";
 import WordleDBI from "../DBI/DBI";
 import { resolvePlayerId } from "../DBI/player/player";
@@ -51,7 +51,7 @@ export class CrosswordController_v3 {
         const new_validity_timestamp = this.getCrosswordValidity()
         this.logger.info("New validity timestamp start: " + new_validity_timestamp);
 
-        const crossword = await getOrCreateRandomCrossword(this.dbi, timestamp, new_validity_timestamp, mode);
+        const crossword = await getOrCreateSerialCrossword(this.dbi, timestamp, new_validity_timestamp, mode);
 
         if (state != null && state.crossword_id != crossword.crossword_id) {
             // Different crossword - create new state
