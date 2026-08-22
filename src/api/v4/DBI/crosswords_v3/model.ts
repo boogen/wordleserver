@@ -50,17 +50,20 @@ export async function getCrossword(crossword_id: number, dbi: WordleDBI, mode: s
 }
 
 export async function getOrCreateSerialCrossword(dbi: WordleDBI, timestamp: number, new_validity: number, mode: string): Promise<PossibleCrosswordV3> {
-    var new_crossword_id:number = await dbi.getNextSequenceValue("global_crossword_" + mode)
-    var total = await dbi.possibleCrosswordsV3(mode).count();
-    var serial_index = new_crossword_id % total;
-    var new_crossword = (await dbi.possibleCrosswordsV3(mode).aggregate([{ $skip: serial_index }, { $limit: 1 }]))[0]
-    var crossword = (await dbi.crosswordV3().findOneAndUpdate(
-        {validity:{$gt: timestamp}, mode: mode},
-        {$setOnInsert: {crossword_id:new_crossword.crossword_id, validity: new_validity, crossword_serial: new_crossword_id, mode: mode}},
-        {upsert: true, returnOriginal: false}
-    ))
+    var crossword = await dbi.crosswordV3().findOne({validity:{$gt: timestamp}, mode: mode});
     if (!crossword) {
-        crossword = await dbi.crosswordV3().findOne({validity: new_validity, mode: mode});
+        var new_crossword_id:number = await dbi.getNextSequenceValue("global_crossword_" + mode)
+        var total = await dbi.possibleCrosswordsV3(mode).count();
+        var serial_index = new_crossword_id % total;
+        var new_crossword = (await dbi.possibleCrosswordsV3(mode).aggregate([{ $skip: serial_index }, { $limit: 1 }]))[0]
+        crossword = (await dbi.crosswordV3().findOneAndUpdate(
+            {validity: new_validity, mode: mode},
+            {$setOnInsert: {crossword_id:new_crossword.crossword_id, validity: new_validity, crossword_serial: new_crossword_id, mode: mode}},
+            {upsert: true, returnOriginal: false}
+        ))
+        if (!crossword) {
+            crossword = await dbi.crosswordV3().findOne({validity: new_validity, mode: mode});
+        }
     }
     log('Selected crossword:', crossword!.crossword_id);
     return (await dbi.possibleCrosswordsV3(mode).findOne({crossword_id:crossword!.crossword_id}))!;
