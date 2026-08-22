@@ -27,7 +27,7 @@ export class ClueState {
 }
 
 export class PlayerCrosswordV3State {
-    constructor(public player_id: number, public crossword_id: number, public grid: string[][], public player_grid: string[][], public words: string[], public clues: ClueState[], public width: number, public height: number, public mode: string, public id?: ObjectId) { }
+    constructor(public player_id: number, public crossword_id: number, public grid: string[][], public player_grid: string[][], public words: string[], public clues: ClueState[], public width: number, public height: number, public mode: string, public revision: number = 0, public id?: ObjectId) { }
 
     static fromJSON(data: any): PlayerCrosswordV3State {
         return new PlayerCrosswordV3State(
@@ -40,6 +40,7 @@ export class PlayerCrosswordV3State {
             data.width,
             data.height,
             data.mode,
+            data.revision ?? 0,
             data.id || data._id
         );
     }
@@ -59,7 +60,19 @@ export class PlayerCrosswordV3State {
     }
 
     public finished(): boolean {
-        return JSON.stringify(this.grid) === JSON.stringify(this.player_grid);
+        // Cells outside the crossword are null in the solution grid but " " in the player grid,
+        // so the two grids can never be compared wholesale - skip the blanks.
+        for (var row = 0; row < this.grid.length; row++) {
+            for (var column = 0; column < this.grid[row].length; column++) {
+                if (this.grid[row][column] == null) {
+                    continue;
+                }
+                if (this.grid[row][column] !== this.player_grid[row][column]) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private getPlayerGridLetter(row:number, column:number):string|null {
@@ -96,4 +109,21 @@ export async function setCrosswordV3State(state: PlayerCrosswordV3State, dbi: Wo
         console.log(error);
         return null;
     }
+}
+
+// Writes the whole player grid in one shot, but only if `revision` is newer than the one
+// already stored. Saves arrive over independent HTTP requests and can overtake each other,
+// so without this guard an older grid could land last and wipe out newer letters.
+// Returns false when the write was stale and therefore skipped.
+export async function saveCrosswordV3Grid(player_id: number, mode: string, player_grid: string[][], revision: number, dbi: WordleDBI): Promise<boolean> {
+    const updated = await dbi.playerCrosswordV3State().findOneAndUpdate(
+        {
+            player_id: player_id,
+            mode: mode,
+            $or: [{ revision: { $exists: false } }, { revision: { $lt: revision } }]
+        },
+        { $set: { player_grid: player_grid, revision: revision } },
+        { returnOriginal: false }
+    );
+    return updated != null;
 }

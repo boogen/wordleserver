@@ -58,6 +58,7 @@ const models: TsoaRoute.Models = {
             "height": {"dataType":"double","required":true},
             "width": {"dataType":"double","required":true},
             "completed": {"dataType":"boolean","required":true},
+            "revision": {"dataType":"double","required":true},
         },
         "additionalProperties": true,
     },
@@ -513,6 +514,39 @@ export function RegisterRoutes(app: Router) {
 
 
               const promise = controller.save.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v4/crossword_v3/save_state',
+            ...(fetchMiddlewares<RequestHandler>(CrosswordController_v3)),
+            ...(fetchMiddlewares<RequestHandler>(CrosswordController_v3.prototype.saveState)),
+
+            async function CrosswordController_v3_saveState(request: any, response: any, next: any) {
+            const args = {
+                    auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
+                    grid: {"in":"body-prop","name":"grid","required":true,"dataType":"string"},
+                    revision: {"in":"body-prop","name":"revision","required":true,"dataType":"double"},
+                    mode: {"default":"adult","in":"body-prop","name":"mode","dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<CrosswordController_v3>(CrosswordController_v3);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.saveState.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);

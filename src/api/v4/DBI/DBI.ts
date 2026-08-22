@@ -44,6 +44,7 @@ export default class WordleDBI {
         this.globalWord().createIndex({ word_id: 1 }, { unique: true });
         this.playerChallengeTries().createIndex({ word_id: 1, id: 1 }, { unique: true });
         this.playerCrosswordState().createIndex({ player_id: 1 }, { unique: true });
+        this.playerCrosswordV3State().createIndex({ player_id: 1, mode: 1 });
         this.globalBee().createIndex({ validity: 1 }, { unique: true });
         this.globalBee().createIndex({ bee_id: 1 }, { unique: true });
         this.guessedWordsBee().createIndex({ player_id: 1, bee_id: 1 }, { unique: true });

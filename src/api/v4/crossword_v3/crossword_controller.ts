@@ -4,7 +4,7 @@ import { Clue, CrosswordWord, getOrCreateRandomCrossword, GridCoordinates } from
 import { PossibleCrosswordV3 } from "../DBI/crosswords_v3/model";
 import WordleDBI from "../DBI/DBI";
 import { resolvePlayerId } from "../DBI/player/player";
-import { ClueState, getCrosswordV3State, PlayerCrosswordV3State, setCrosswordV3State } from "../DBI/crosswords_v3/state";
+import { ClueState, getCrosswordV3State, PlayerCrosswordV3State, saveCrosswordV3Grid, setCrosswordV3State } from "../DBI/crosswords_v3/state";
 import { inject, injectable } from "inversify";
 import { Logger } from "../../../logger";
 import { boolean } from "@hapi/joi";
@@ -24,6 +24,7 @@ interface CrosswordState {
     height: number;
     width: number;
     completed: boolean;
+    revision: number;
 }
 
 interface CompleteGuess {
@@ -106,8 +107,87 @@ export class CrosswordController_v3 {
         if (word !== null) {
             this.stats.addCrosswordV3GuessEvent(playerId, state.crossword_id, this.getCrosswordValidity(), word.guessed, word.word, state.finished())
         }
+        state.revision += 1;
         await setCrosswordV3State(state, this.dbi)
         return { message: 'ok', state: this.convertInternalStateToReplyState(state)};
+    }
+
+    // Saves the whole grid in a single request instead of one round trip per letter, so the
+    // client can keep accepting input while a save is in flight. See save() for the legacy
+    // per-letter endpoint, still used by builds already in the stores.
+    @Post("save_state")
+    public async saveState(@BodyProp() auth_id: string, @BodyProp() grid: string, @BodyProp() revision: number, @BodyProp() mode: string = "adult") {
+        const playerId = await resolvePlayerId(auth_id, this.dbi);
+        const state = await getCrosswordV3State(playerId, mode, this.dbi);
+        if (state == null) {
+            throw new Error("state is null")
+        }
+        if (!Number.isInteger(revision) || revision < 0) {
+            throw new Error("revision is not a non-negative integer")
+        }
+
+        const player_grid = this.parseGridBlob(state, grid);
+        const saved = new PlayerCrosswordV3State(state.player_id, state.crossword_id, state.grid, player_grid,
+            state.words, state.clues, state.width, state.height, state.mode, revision, state.id);
+
+        if (!await saveCrosswordV3Grid(playerId, mode, player_grid, revision, this.dbi)) {
+            this.logger.info(`Stale crossword save for player ${playerId} at revision ${revision}, ignoring`);
+            const current = await getCrosswordV3State(playerId, mode, this.dbi);
+            return { message: 'ok', applied: false, state: this.convertInternalStateToReplyState(current ?? state) };
+        }
+
+        this.reportGuessedWords(playerId, state, saved);
+        return { message: 'ok', applied: true, state: this.convertInternalStateToReplyState(saved) };
+    }
+
+    // The blob is one character per cell, row-major: " " off-grid, "-" empty, otherwise the letter.
+    // Every cell is validated exactly as save() validates a single one, so this endpoint is no
+    // more permissive than the per-letter one.
+    private parseGridBlob(state: PlayerCrosswordV3State, blob: string): string[][] {
+        const cells = Array.from((blob ?? "").normalize('NFC'));
+        if (cells.length !== state.width * state.height) {
+            throw new Error(`grid size mismatch, expected ${state.width * state.height} cells, got ${cells.length}`)
+        }
+        const letterList = new Set(state.words.join("").normalize('NFC'));
+        const player_grid: string[][] = [];
+        for (var row = 0; row < state.height; row++) {
+            const parsed_row: string[] = [];
+            for (var column = 0; column < state.width; column++) {
+                const letter = cells[row * state.width + column];
+                if (state.grid[row][column] == null) {
+                    if (letter !== " ") {
+                        throw new Error("letter not on crossword")
+                    }
+                    parsed_row.push(" ");
+                }
+                else if (letter === "-" || letter === " ") {
+                    parsed_row.push("-");
+                }
+                else if (!letterList.has(letter)) {
+                    throw new Error(`letter ${letter} not allowed`);
+                }
+                else {
+                    parsed_row.push(letter);
+                }
+            }
+            player_grid.push(parsed_row);
+        }
+        return player_grid;
+    }
+
+    // A blob can complete several words at once, so emit one guess event per word that changed
+    // into a complete one - that is what save() reports a letter at a time.
+    private reportGuessedWords(playerId: number, before: PlayerCrosswordV3State, after: PlayerCrosswordV3State) {
+        const validity = this.getCrosswordValidity();
+        const finished = after.finished();
+        for (const index in after.clues) {
+            const clue = after.clues[index];
+            const word = after.getWordFromPlayerGrid(clue.coordinates, clue.length);
+            if (word === null || word === before.getWordFromPlayerGrid(clue.coordinates, clue.length)) {
+                continue;
+            }
+            this.stats.addCrosswordV3GuessEvent(playerId, after.crossword_id, validity, word === after.words[index], word, finished);
+        }
     }
 
     private getGuessedWord(row:number, column:number, state: PlayerCrosswordV3State):CompleteGuess | null {
@@ -145,27 +225,13 @@ export class CrosswordController_v3 {
             clues: state.clues,
             height: state.height,
             width: state.width,
-            completed: this.isFinished(state)
+            completed: this.isFinished(state),
+            revision: state.revision
         }
     }
 
     private isFinished(crosswordState: PlayerCrosswordV3State) {
-        if (crosswordState == null) {
-            return false;
-        }
-        var grid = crosswordState.grid;
-        for (var i = 0; i < grid.length; i++) {
-            for (var j = 0; j < grid[i].length; j++) {
-                if (grid[i][j] == null) {
-                    continue;
-                }
-                if (grid[i][j] != crosswordState.player_grid[i][j]) {
-                    return false;
-                }
-                    
-            }
-        }
-        return true;
+        return crosswordState != null && crosswordState.finished();
     }
 
     private convertGrid(grid: string[][], isNew = true) {
