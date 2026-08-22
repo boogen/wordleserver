@@ -1,6 +1,6 @@
 import { Post, BodyProp, Route } from "tsoa";
 import { Stats } from "../../../WordleStatsDBI";
-import { Clue, CrosswordWord, getOrCreateSerialCrossword, GridCoordinates } from "../DBI/crosswords_v3/model";
+import { Clue, CrosswordWord, getOrCreateSerialCrossword, GridCoordinates, getCrosswordSerial, CrosswordCompletion, CrosswordLeaderboardEntry } from "../DBI/crosswords_v3/model";
 import { PossibleCrosswordV3 } from "../DBI/crosswords_v3/model";
 import WordleDBI from "../DBI/DBI";
 import { resolvePlayerId } from "../DBI/player/player";
@@ -8,6 +8,8 @@ import { ClueState, getCrosswordV3State, PlayerCrosswordV3State, saveCrosswordV3
 import { inject, injectable } from "inversify";
 import { Logger } from "../../../logger";
 import { boolean } from "@hapi/joi";
+import { friendList } from "../DBI/friends/friends";
+import { get_nick } from "../player/player_common";
 
 const WORD_VALIDITY = 86400;
 const GLOBAL_TIME_START = 1647774000;
@@ -30,6 +32,28 @@ interface CrosswordState {
 interface CompleteGuess {
     word:string;
     guessed:boolean;
+}
+
+interface CompletionEntry {
+    player_id: number;
+    nick: string;
+    finished_at: number;
+}
+
+interface CompletionsReply {
+    message: string;
+    completions: CompletionEntry[];
+}
+
+interface LeaderboardEntry {
+    player_id: number;
+    nick: string;
+    count: number;
+}
+
+interface LeaderboardReply {
+    message: string;
+    leaderboard: LeaderboardEntry[];
 }
 
 @injectable()
@@ -109,6 +133,12 @@ export class CrosswordController_v3 {
         }
         state.revision += 1;
         await setCrosswordV3State(state, this.dbi)
+        if (state.finished()) {
+            const serial = await getCrosswordSerial(state.crossword_id, mode, this.dbi);
+            if (serial !== null) {
+                await this.dbi.saveCrosswordV3Completion(state.crossword_id, serial, playerId);
+            }
+        }
         return { message: 'ok', state: this.convertInternalStateToReplyState(state)};
     }
 
@@ -134,6 +164,13 @@ export class CrosswordController_v3 {
             this.logger.info(`Stale crossword save for player ${playerId} at revision ${revision}, ignoring`);
             const current = await getCrosswordV3State(playerId, mode, this.dbi);
             return { message: 'ok', applied: false, state: this.convertInternalStateToReplyState(current ?? state) };
+        }
+
+        if (saved.finished()) {
+            const serial = await getCrosswordSerial(state.crossword_id, mode, this.dbi);
+            if (serial !== null) {
+                await this.dbi.saveCrosswordV3Completion(state.crossword_id, serial, playerId);
+            }
         }
 
         this.reportGuessedWords(playerId, state, saved);
@@ -269,5 +306,55 @@ export class CrosswordController_v3 {
 
     private getLettersFromWord(word: string): string[] {
         return Array.from(new Set(Array.from(word)));
+    }
+
+    @Post("completions")
+    public async completions(@BodyProp() crossword_id: number, @BodyProp() crossword_serial: number): Promise<CompletionsReply> {
+        const raw = await this.dbi.getCrosswordV3Completions(crossword_id, crossword_serial);
+        const completions = await Promise.all(raw.map(async c => ({
+            player_id: c.player_id,
+            nick: (await get_nick(c.player_id, this.dbi)).nick,
+            finished_at: c.finished_at
+        })));
+        return { message: 'ok', completions };
+    }
+
+    @Post("completions/friends")
+    public async completionsFriends(@BodyProp() auth_id: string, @BodyProp() crossword_id: number, @BodyProp() crossword_serial: number): Promise<CompletionsReply> {
+        const playerId = await resolvePlayerId(auth_id, this.dbi);
+        var friends = await friendList(playerId, this.dbi);
+        friends.push(playerId);
+        const raw = await this.dbi.getCrosswordV3CompletionsWithFilter(crossword_id, crossword_serial, friends);
+        const completions = await Promise.all(raw.map(async c => ({
+            player_id: c.player_id,
+            nick: (await get_nick(c.player_id, this.dbi)).nick,
+            finished_at: c.finished_at
+        })));
+        return { message: 'ok', completions };
+    }
+
+    @Post("global_leaderboard")
+    public async globalLeaderboard(): Promise<LeaderboardReply> {
+        const raw = await this.dbi.getCrosswordV3GlobalLeaderboard();
+        const leaderboard = await Promise.all(raw.map(async e => ({
+            player_id: e.player_id,
+            nick: (await get_nick(e.player_id, this.dbi)).nick,
+            count: e.count
+        })));
+        return { message: 'ok', leaderboard };
+    }
+
+    @Post("global_leaderboard/friends")
+    public async globalLeaderboardFriends(@BodyProp() auth_id: string): Promise<LeaderboardReply> {
+        const playerId = await resolvePlayerId(auth_id, this.dbi);
+        var friends = await friendList(playerId, this.dbi);
+        friends.push(playerId);
+        const raw = await this.dbi.getCrosswordV3GlobalLeaderboardWithFilter(friends);
+        const leaderboard = await Promise.all(raw.map(async e => ({
+            player_id: e.player_id,
+            nick: (await get_nick(e.player_id, this.dbi)).nick,
+            count: e.count
+        })));
+        return { message: 'ok', leaderboard };
     }
 }

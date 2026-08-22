@@ -23,7 +23,7 @@ import { getRank, getRankWithFilter, getScoreFromRank, updateRank } from './rank
 import { PlayerLastLogin } from './player/PlayerLastLogin';
 import { PlayerLimits } from './player/PlayerLimits';
 import { PlayerLimitsModel } from './player/PlayerLimitsModel';
-import { PossibleCrosswordV3, GlobalCrossword } from './crosswords_v3/model';
+import { PossibleCrosswordV3, GlobalCrossword, CrosswordCompletion, CrosswordLeaderboardEntry } from './crosswords_v3/model';
 import { PlayerCrosswordV3State } from './crosswords_v3/state';
 import { injectable } from 'inversify';
 import { WordExplanation } from '../../../wordExplainers/word_explanation';
@@ -45,6 +45,9 @@ export default class WordleDBI {
         this.playerChallengeTries().createIndex({ word_id: 1, id: 1 }, { unique: true });
         this.playerCrosswordState().createIndex({ player_id: 1 }, { unique: true });
         this.playerCrosswordV3State().createIndex({ player_id: 1, mode: 1 });
+        this.crosswordV3Completions().createIndex({ crossword_id: 1, crossword_serial: 1, finished_at: 1 });
+        this.crosswordV3Completions().createIndex({ player_id: 1 });
+        this.crosswordV3Completions().createIndex({ crossword_serial: 1, player_id: 1 }, { unique: true });
         this.globalBee().createIndex({ validity: 1 }, { unique: true });
         this.globalBee().createIndex({ bee_id: 1 }, { unique: true });
         this.guessedWordsBee().createIndex({ player_id: 1, bee_id: 1 }, { unique: true });
@@ -77,6 +80,7 @@ export default class WordleDBI {
     crosswordV3(): ICollection<GlobalCrossword> { return this._db.get("crossword_v3"); }
     playerCrosswordState(): ICollection<PlayerCrosswordState> { return this._db.get("player_crossword_state"); }
     playerCrosswordV3State(): ICollection<PlayerCrosswordV3State> { return this._db.get("player_crossword_v3_state"); }
+    crosswordV3Completions(): ICollection<CrosswordCompletion> { return this._db.get("crossword_v3_completions"); }
     globalBee(): ICollection<GlobalBee> { return this._db.get("global_bee_v2"); }
     guessedWordsBee(): ICollection<GuessedWordsBee> { return this._db.get("guessed_words_bee_v2"); }
     bees(noOfRequiredLetters: number): ICollection<Bee> { return this._db.get("bees_v2_" + noOfRequiredLetters); }
@@ -201,6 +205,45 @@ export default class WordleDBI {
     async getWordleRankingWithFilter(wordId: number, friends: number[]): Promise<RankingEntry[]> {
         const rawRank = await this.wordleRanking(wordId).find({ player_id: { $in: friends } }, { sort: { score: 1, time: 1 }, limit: 100 });
         return this.toRankingEntries(rawRank);
+    }
+
+    async saveCrosswordV3Completion(crosswordId: number, crosswordSerial: number, playerId: number): Promise<void> {
+        await this.crosswordV3Completions().findOneAndUpdate(
+            { crossword_serial: crosswordSerial, player_id: playerId },
+            { $setOnInsert: { crossword_id: crosswordId, crossword_serial: crosswordSerial, player_id: playerId, finished_at: Math.floor(Date.now() / 1000) } },
+            { upsert: true }
+        );
+    }
+
+    async getCrosswordV3Completions(crosswordId: number, crosswordSerial: number): Promise<CrosswordCompletion[]> {
+        return this.crosswordV3Completions().find(
+            { crossword_id: crosswordId, crossword_serial: crosswordSerial },
+            { sort: { finished_at: 1 } }
+        );
+    }
+
+    async getCrosswordV3CompletionsWithFilter(crosswordId: number, crosswordSerial: number, playerIds: number[]): Promise<CrosswordCompletion[]> {
+        return this.crosswordV3Completions().find(
+            { crossword_id: crosswordId, crossword_serial: crosswordSerial, player_id: { $in: playerIds } },
+            { sort: { finished_at: 1 } }
+        );
+    }
+
+    async getCrosswordV3GlobalLeaderboard(): Promise<CrosswordLeaderboardEntry[]> {
+        return this.crosswordV3Completions().aggregate([
+            { $group: { _id: "$player_id", count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $project: { player_id: "$_id", count: 1, _id: 0 } }
+        ]);
+    }
+
+    async getCrosswordV3GlobalLeaderboardWithFilter(playerIds: number[]): Promise<CrosswordLeaderboardEntry[]> {
+        return this.crosswordV3Completions().aggregate([
+            { $match: { player_id: { $in: playerIds } } },
+            { $group: { _id: "$player_id", count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $project: { player_id: "$_id", count: 1, _id: 0 } }
+        ]);
     }
 
     async increaseRequestCounter(path: string, lastMidnight: number): Promise<void> {

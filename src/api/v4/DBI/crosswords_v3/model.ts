@@ -38,7 +38,7 @@ export class PossibleCrosswordV3 {
 }
 
 export class GlobalCrossword {
-    constructor(public crossword_id:number, validity:number, crossword_serial:number, public mode:string, public id?: ObjectId) { }
+    constructor(public crossword_id:number, validity:number, public crossword_serial:number, public mode:string, public id?: ObjectId) { }
 }
 
 export class PlayerCrosswordState {
@@ -77,4 +77,17 @@ export async function getFirstCrossword(dbi: WordleDBI, mode: string): Promise<P
         console.log(error)
         return null;
     }
+}
+
+export class CrosswordCompletion {
+    constructor(public crossword_id: number, public crossword_serial: number, public player_id: number, public finished_at: number, public id?: ObjectId) { }
+}
+
+export class CrosswordLeaderboardEntry {
+    constructor(public player_id: number, public count: number) { }
+}
+
+export async function getCrosswordSerial(crossword_id: number, mode: string, dbi: WordleDBI): Promise<number | null> {
+    const global = await dbi.crosswordV3().findOne({ crossword_id: crossword_id, mode: mode });
+    return global ? global.crossword_serial : null;
 }

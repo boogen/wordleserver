@@ -72,6 +72,44 @@ const models: TsoaRoute.Models = {
         "additionalProperties": true,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CompletionEntry": {
+        "dataType": "refObject",
+        "properties": {
+            "player_id": {"dataType":"double","required":true},
+            "nick": {"dataType":"string","required":true},
+            "finished_at": {"dataType":"double","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CompletionsReply": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
+            "completions": {"dataType":"array","array":{"dataType":"refObject","ref":"CompletionEntry"},"required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "LeaderboardEntry": {
+        "dataType": "refObject",
+        "properties": {
+            "player_id": {"dataType":"double","required":true},
+            "nick": {"dataType":"string","required":true},
+            "count": {"dataType":"double","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "LeaderboardReply": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
+            "leaderboard": {"dataType":"array","array":{"dataType":"refObject","ref":"LeaderboardEntry"},"required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CrosswordGuessReply": {
         "dataType": "refObject",
         "properties": {
@@ -547,6 +585,128 @@ export function RegisterRoutes(app: Router) {
 
 
               const promise = controller.saveState.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v4/crossword_v3/completions',
+            ...(fetchMiddlewares<RequestHandler>(CrosswordController_v3)),
+            ...(fetchMiddlewares<RequestHandler>(CrosswordController_v3.prototype.completions)),
+
+            async function CrosswordController_v3_completions(request: any, response: any, next: any) {
+            const args = {
+                    crossword_id: {"in":"body-prop","name":"crossword_id","required":true,"dataType":"double"},
+                    crossword_serial: {"in":"body-prop","name":"crossword_serial","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<CrosswordController_v3>(CrosswordController_v3);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.completions.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v4/crossword_v3/completions/friends',
+            ...(fetchMiddlewares<RequestHandler>(CrosswordController_v3)),
+            ...(fetchMiddlewares<RequestHandler>(CrosswordController_v3.prototype.completionsFriends)),
+
+            async function CrosswordController_v3_completionsFriends(request: any, response: any, next: any) {
+            const args = {
+                    auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
+                    crossword_id: {"in":"body-prop","name":"crossword_id","required":true,"dataType":"double"},
+                    crossword_serial: {"in":"body-prop","name":"crossword_serial","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<CrosswordController_v3>(CrosswordController_v3);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.completionsFriends.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v4/crossword_v3/global_leaderboard',
+            ...(fetchMiddlewares<RequestHandler>(CrosswordController_v3)),
+            ...(fetchMiddlewares<RequestHandler>(CrosswordController_v3.prototype.globalLeaderboard)),
+
+            async function CrosswordController_v3_globalLeaderboard(request: any, response: any, next: any) {
+            const args = {
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<CrosswordController_v3>(CrosswordController_v3);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.globalLeaderboard.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v4/crossword_v3/global_leaderboard/friends',
+            ...(fetchMiddlewares<RequestHandler>(CrosswordController_v3)),
+            ...(fetchMiddlewares<RequestHandler>(CrosswordController_v3.prototype.globalLeaderboardFriends)),
+
+            async function CrosswordController_v3_globalLeaderboardFriends(request: any, response: any, next: any) {
+            const args = {
+                    auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<CrosswordController_v3>(CrosswordController_v3);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.globalLeaderboardFriends.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);
