@@ -215,16 +215,16 @@ export default class WordleDBI {
         );
     }
 
-    async getCrosswordV3Completions(crosswordId: number, crosswordSerial: number): Promise<CrosswordCompletion[]> {
+    async getCrosswordV3Completions(crosswordSerial: number): Promise<CrosswordCompletion[]> {
         return this.crosswordV3Completions().find(
-            { crossword_id: crosswordId, crossword_serial: crosswordSerial },
+            { crossword_serial: crosswordSerial },
             { sort: { finished_at: 1 } }
         );
     }
 
-    async getCrosswordV3CompletionsWithFilter(crosswordId: number, crosswordSerial: number, playerIds: number[]): Promise<CrosswordCompletion[]> {
+    async getCrosswordV3CompletionsWithFilter(crosswordSerial: number, playerIds: number[]): Promise<CrosswordCompletion[]> {
         return this.crosswordV3Completions().find(
-            { crossword_id: crosswordId, crossword_serial: crosswordSerial, player_id: { $in: playerIds } },
+            { crossword_serial: crosswordSerial, player_id: { $in: playerIds } },
             { sort: { finished_at: 1 } }
         );
     }

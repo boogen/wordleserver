@@ -309,8 +309,8 @@ export class CrosswordController_v3 {
     }
 
     @Post("completions")
-    public async completions(@BodyProp() crossword_id: number, @BodyProp() crossword_serial: number): Promise<CompletionsReply> {
-        const raw = await this.dbi.getCrosswordV3Completions(crossword_id, crossword_serial);
+    public async completions(@BodyProp() crossword_serial: number): Promise<CompletionsReply> {
+        const raw = await this.dbi.getCrosswordV3Completions(crossword_serial);
         const completions = await Promise.all(raw.map(async c => ({
             player_id: c.player_id,
             nick: (await get_nick(c.player_id, this.dbi)).nick,
@@ -320,11 +320,11 @@ export class CrosswordController_v3 {
     }
 
     @Post("completions/friends")
-    public async completionsFriends(@BodyProp() auth_id: string, @BodyProp() crossword_id: number, @BodyProp() crossword_serial: number): Promise<CompletionsReply> {
+    public async completionsFriends(@BodyProp() auth_id: string, @BodyProp() crossword_serial: number): Promise<CompletionsReply> {
         const playerId = await resolvePlayerId(auth_id, this.dbi);
         var friends = await friendList(playerId, this.dbi);
         friends.push(playerId);
-        const raw = await this.dbi.getCrosswordV3CompletionsWithFilter(crossword_id, crossword_serial, friends);
+        const raw = await this.dbi.getCrosswordV3CompletionsWithFilter(crossword_serial, friends);
         const completions = await Promise.all(raw.map(async c => ({
             player_id: c.player_id,
             nick: (await get_nick(c.player_id, this.dbi)).nick,
