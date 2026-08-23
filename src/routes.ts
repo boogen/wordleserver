@@ -597,7 +597,6 @@ export function RegisterRoutes(app: Router) {
 
             async function CrosswordController_v3_completions(request: any, response: any, next: any) {
             const args = {
-                    crossword_id: {"in":"body-prop","name":"crossword_id","required":true,"dataType":"double"},
                     crossword_serial: {"in":"body-prop","name":"crossword_serial","required":true,"dataType":"double"},
             };
 
@@ -629,7 +628,6 @@ export function RegisterRoutes(app: Router) {
             async function CrosswordController_v3_completionsFriends(request: any, response: any, next: any) {
             const args = {
                     auth_id: {"in":"body-prop","name":"auth_id","required":true,"dataType":"string"},
-                    crossword_id: {"in":"body-prop","name":"crossword_id","required":true,"dataType":"double"},
                     crossword_serial: {"in":"body-prop","name":"crossword_serial","required":true,"dataType":"double"},
             };
 

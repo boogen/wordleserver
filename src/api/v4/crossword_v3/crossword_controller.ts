@@ -1,6 +1,6 @@
 import { Post, BodyProp, Route } from "tsoa";
 import { Stats } from "../../../WordleStatsDBI";
-import { Clue, CrosswordWord, getOrCreateSerialCrossword, GridCoordinates, getCrosswordSerial, CrosswordCompletion, CrosswordLeaderboardEntry } from "../DBI/crosswords_v3/model";
+import { Clue, CrosswordWord, getOrCreateSerialCrossword, GridCoordinates, getCrosswordSerial, getCurrentCrosswordSerial, CrosswordCompletion, CrosswordLeaderboardEntry } from "../DBI/crosswords_v3/model";
 import { PossibleCrosswordV3 } from "../DBI/crosswords_v3/model";
 import WordleDBI from "../DBI/DBI";
 import { resolvePlayerId } from "../DBI/player/player";
@@ -309,8 +309,13 @@ export class CrosswordController_v3 {
     }
 
     @Post("completions")
-    public async completions(@BodyProp() crossword_serial: number): Promise<CompletionsReply> {
-        const raw = await this.dbi.getCrosswordV3Completions(crossword_serial);
+    public async completions(@BodyProp() mode: string = "adult"): Promise<CompletionsReply> {
+        const timestamp = Date.now() / 1000;
+        const serial = await getCurrentCrosswordSerial(timestamp, mode, this.dbi);
+        if (serial === null) {
+            return { message: 'ok', completions: [] };
+        }
+        const raw = await this.dbi.getCrosswordV3Completions(serial);
         const completions = await Promise.all(raw.map(async c => ({
             player_id: c.player_id,
             nick: (await get_nick(c.player_id, this.dbi)).nick,
@@ -320,11 +325,16 @@ export class CrosswordController_v3 {
     }
 
     @Post("completions/friends")
-    public async completionsFriends(@BodyProp() auth_id: string, @BodyProp() crossword_serial: number): Promise<CompletionsReply> {
+    public async completionsFriends(@BodyProp() auth_id: string, @BodyProp() mode: string = "adult"): Promise<CompletionsReply> {
         const playerId = await resolvePlayerId(auth_id, this.dbi);
         var friends = await friendList(playerId, this.dbi);
         friends.push(playerId);
-        const raw = await this.dbi.getCrosswordV3CompletionsWithFilter(crossword_serial, friends);
+        const timestamp = Date.now() / 1000;
+        const serial = await getCurrentCrosswordSerial(timestamp, mode, this.dbi);
+        if (serial === null) {
+            return { message: 'ok', completions: [] };
+        }
+        const raw = await this.dbi.getCrosswordV3CompletionsWithFilter(serial, friends);
         const completions = await Promise.all(raw.map(async c => ({
             player_id: c.player_id,
             nick: (await get_nick(c.player_id, this.dbi)).nick,

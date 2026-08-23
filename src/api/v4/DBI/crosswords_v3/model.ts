@@ -91,3 +91,8 @@ export async function getCrosswordSerial(crossword_id: number, mode: string, dbi
     const global = await dbi.crosswordV3().findOne({ crossword_id: crossword_id, mode: mode });
     return global ? global.crossword_serial : null;
 }
+
+export async function getCurrentCrosswordSerial(timestamp: number, mode: string, dbi: WordleDBI): Promise<number | null> {
+    const global = await dbi.crosswordV3().findOne({ validity: { $gt: timestamp }, mode: mode });
+    return global ? global.crossword_serial : null;
+}
