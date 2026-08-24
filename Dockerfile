@@ -24,6 +24,7 @@ RUN npm install --production
 
 # Copy compiled code from builder
 COPY --from=builder /app/out ./out
+COPY --from=builder /app/src ./src
 COPY --from=builder /app/model ./model
 # Copy any other necessary assets (e.g., public folder if it exists)
 # COPY --from=builder /app/public ./public

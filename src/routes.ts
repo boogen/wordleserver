@@ -7,6 +7,8 @@ import { CrosswordController_v3 } from './api/v4/crossword_v3/crossword_controll
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { CrosswordController } from './api/v4/crossword/crossword_controller';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { DebugController } from './api/v4/debug/debug_controller';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { ExplainerController } from './api/v4/explainer/explainer_controller';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { FriendController } from './api/v4/friend/friend_controller';
@@ -116,6 +118,15 @@ const models: TsoaRoute.Models = {
             "isWord": {"dataType":"boolean","required":true},
             "guessed_word": {"dataType":"boolean","required":true},
             "state": {"ref":"CrosswordState","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "DebugNotifyReply": {
+        "dataType": "refObject",
+        "properties": {
+            "status": {"dataType":"string","required":true},
+            "message": {"dataType":"string"},
         },
         "additionalProperties": true,
     },
@@ -795,6 +806,39 @@ export function RegisterRoutes(app: Router) {
 
 
               const promise = controller.guess.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v4/debug/notify',
+            ...(fetchMiddlewares<RequestHandler>(DebugController)),
+            ...(fetchMiddlewares<RequestHandler>(DebugController.prototype.sendNotification)),
+
+            async function DebugController_sendNotification(request: any, response: any, next: any) {
+            const args = {
+                    password: {"in":"body-prop","name":"password","required":true,"dataType":"string"},
+                    player_id: {"in":"body-prop","name":"player_id","required":true,"dataType":"double"},
+                    heading: {"in":"body-prop","name":"heading","required":true,"dataType":"string"},
+                    message: {"in":"body-prop","name":"message","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<DebugController>(DebugController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.sendNotification.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);

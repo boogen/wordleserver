@@ -19,6 +19,7 @@ import { WordleChallengeController } from './api/v4/wordle/wordle_challenge/word
 import { SpellingBeeSeasonManager } from './spelling_bee_season_manager';
 import { SeasonRulesService } from './api/v4/season_rules';
 import { RankingController } from './api/v4/ranking_controller';
+import { DebugController } from './api/v4/debug/debug_controller';
 import { CronService } from './cron';
 import { Logger } from './logger';
 
@@ -44,6 +45,7 @@ container.bind<GeminiClient>(GeminiClient).toSelf().inSingletonScope();
 container.bind<GeminiExplanationGetter>(GeminiExplanationGetter).toSelf().inSingletonScope();
 container.bind<WordExplainer>(WordExplainer).to(GeminiSpellingBeeWordExplainer).inSingletonScope();
 container.bind<RankingController>(RankingController).toSelf().inSingletonScope();
+container.bind<DebugController>(DebugController).toSelf().inSingletonScope();
 container.bind<CronService>(CronService).toSelf().inSingletonScope();
 container.get(CronService); 
 
