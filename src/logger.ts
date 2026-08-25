@@ -19,6 +19,7 @@ export class Logger {
         level: process.env.LOG_LEVEL || 'info', 
         format: format.combine(
             format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+            format.splat(),
             format.metadata({ fillExcept: ['message', 'level', 'timestamp', 'context'] }),
             logFormat
         ),
@@ -47,19 +48,35 @@ export class Logger {
         this.context = context;
     }
 
-    info(message: any, ...metadata: any) {
-        this.internalLogger.info(message, { context: this.context, ...metadata });
+    info(message: any, ...args: any) {
+        const meta: any = { context: this.context };
+        if (args.length > 0) {
+            meta[Symbol.for('splat')] = args;
+        }
+        this.internalLogger.info(message, meta);
     }
 
-    error(message: any, ...metadata: any) {
-        this.internalLogger.error(message, { context: this.context, ...metadata });
+    error(message: any, ...args: any) {
+        const meta: any = { context: this.context };
+        if (args.length > 0) {
+            meta[Symbol.for('splat')] = args;
+        }
+        this.internalLogger.error(message, meta);
     }
 
-    warn(message: any, ...metadata: any) {
-        this.internalLogger.warn(message, { context: this.context, ...metadata });
+    warn(message: any, ...args: any) {
+        const meta: any = { context: this.context };
+        if (args.length > 0) {
+            meta[Symbol.for('splat')] = args;
+        }
+        this.internalLogger.warn(message, meta);
     }
 
-    debug(message: any, ...metadata: any) {
-        this.internalLogger.debug(message, { context: this.context, ...metadata }); 
+    debug(message: any, ...args: any) {
+        const meta: any = { context: this.context };
+        if (args.length > 0) {
+            meta[Symbol.for('splat')] = args;
+        }
+        this.internalLogger.debug(message, meta);
     }
 }
