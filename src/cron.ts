@@ -17,8 +17,8 @@ export class CronService {
     @inject(SpellingBeeSeasonManager) private seasonManager: SpellingBeeSeasonManager
   ) {
     logger.setContext("CronService");
-    logger.info("Scheduling notifications sending");
-    cron.schedule('0 0 11 * * *', this.sendNotifications.bind(this), {timezone: "UTC"});
+    // logger.info("Scheduling notifications sending");
+    // cron.schedule('0 0 11 * * *', this.sendNotifications.bind(this), {timezone: "UTC"});
     logger.info("Scheduling end of spelling bee season");
     cron.schedule('59 59 10 * * *', this.endSpellingBeeSeason.bind(this), {timezone:"UTC"})
   }
