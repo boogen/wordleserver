@@ -15,9 +15,17 @@ import { RegisterRoutes } from './routes';
 
 import { iocContainer } from './ioc';
 import WordleDBI from './api/v4/DBI/DBI';
+import { Logger } from './logger';
+
+const logger = iocContainer.get(Logger);
+logger.setContext('HTTP');
 
 export const app = express();
-app.use(morgan('dev'));
+app.use(morgan('dev', {
+  stream: {
+    write: (message: string) => logger.info(message.trim())
+  }
+}));
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
