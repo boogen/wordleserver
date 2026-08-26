@@ -48,7 +48,7 @@ export class RankingController {
             return new RankingReply(undefined, []);
         }
         const ranking = await this.dbi.getBeeRanking(bee.bee_id)
-        this.logger.info("Ranking: %s", ranking);
+        this.logger.info(`Ranking: ${ranking}`);
         return await get_ranking(player_id, ranking, this.dbi);
    }
 
@@ -64,7 +64,7 @@ export class RankingController {
         var friends = await friendList(player_id, this.dbi);
         friends.push(player_id)
         const ranking = await this.dbi.getBeeRankingWithFilter(bee.bee_id, friends)
-        this.logger.info("Ranking: %s", ranking);
+        this.logger.info(`Ranking: ${ranking}`);
         return await get_ranking(player_id, ranking, this.dbi);
     }
 
@@ -73,7 +73,7 @@ export class RankingController {
         const player_id = await resolvePlayerId(auth_id, this.dbi);
         const timestamp = Date.now() / 1000;
         const wordEntry = await getGlobalWord(timestamp, this.dbi);
-        this.logger.info("Word entry: %s", wordEntry);
+        this.logger.info(`Word entry: ${wordEntry}`);
         if (wordEntry === null) {
             return new RankingReply(undefined, []);
         }

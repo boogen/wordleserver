@@ -152,10 +152,10 @@ export class SpellingBeeController {
         var pointInfo = await this.dbi.increaseBeeRank(player_id, letters!.bee_id, -letterPrice.price)
         var plainLetters = lettersState.map(ls => ls.letter)
         var possibleLetters = ALPHABET.filter(letter => !plainLetters.includes(letter))
-        this.logger.info("Possible letters: %s", possibleLetters)
+        this.logger.info(`Possible letters: ${possibleLetters}`)
         var boughtLetterIndex:number = Math.floor(Math.random() * possibleLetters.length)
         var boughtLetter:string = possibleLetters[boughtLetterIndex]
-        this.logger.info("Bought letter: %s at index %d", boughtLetter, boughtLetterIndex)
+        this.logger.info(`Bought letter: ${boughtLetter} at index ${boughtLetterIndex}`)
         lettersState.push(new LetterState(boughtLetter, letterPrice.useLimit, 0 , false));
         var newState = await addNewLetterToSpellingBeeState(player_id, letters!.bee_id, lettersState, lettersToBuy, this.dbi);
         return {

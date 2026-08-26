@@ -34,7 +34,7 @@ export class WordleController {
         const player_id = await resolvePlayerId(auth_id, this.dbi);
         var val = await getWord(this.dbi);
         var word = val[0].word;
-        this.logger.info("word %s player id %s", word, player_id);
+        this.logger.info(`word ${word} player id ${player_id}`);
 
         const timestamp = Date.now() / 1000;
         var new_validity_timestamp = GLOBAL_TIME_START;

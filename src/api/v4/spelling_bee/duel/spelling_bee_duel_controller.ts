@@ -104,7 +104,7 @@ export class SpellingBeeDuelController {
 
         }
         const existing_match = await getSpellingBeeDuelMatch(player_id, season_rules.duelTag!, this.dbi);
-        this.logger.info("Duel tag: %s", season_rules.duelTag!)
+        this.logger.info(`Duel tag: ${season_rules.duelTag!}`)
         if (existing_match !== null) {
             return {message:'ok',
                 player: await getSpellingBeeDuelPrematchPlayerInfo(player_id, season_rules, this.dbi),
@@ -116,7 +116,7 @@ export class SpellingBeeDuelController {
         if (Math.random() >= CHANCE_FOR_BOT && opponentsCandidates.length !== 0) {
             var opponent_filter:Set<number> = new Set((await getLastSpellingBeeDuelOpponents(player_id, this.dbi)));
             var filtered_candidates:number[] = opponentsCandidates.filter(id => !opponent_filter.has(id));
-            this.logger.info("Filtered candidates: %s", filtered_candidates);
+            this.logger.info(`Filtered candidates: ${filtered_candidates}`);
             if (filtered_candidates.length !== 0) {
                 opponent_id = filtered_candidates[Math.floor(Math.random() * filtered_candidates.length)];
             }
@@ -139,7 +139,7 @@ export class SpellingBeeDuelController {
         }
         var opponent_guesses:SpellingBeeDuellGuess[] = []
         const season_rules = await this.seasonRulesService.getDuelSeasonRules();
-        this.logger.info("Duel tag: %s", season_rules.duelTag!)
+        this.logger.info(`Duel tag: ${season_rules.duelTag!}`)
         const existing_match = await getSpellingBeeDuelMatch(player_id, season_rules.duelTag!, this.dbi);
         var opponent_id:number = existing_match!.opponent_id
         if (duel === null) {
@@ -153,7 +153,7 @@ export class SpellingBeeDuelController {
                 var best_duel:SpellingBeeDuel|null = (await getDuelsForGivenBee(spelling_bee_model!.id, opponent_id, timestamp, DUEL_DURATION, this.dbi));
                 opponent_guesses = opponent_guesses.concat(best_duel?.player_guesses ?? []).map(g => g = new SpellingBeeDuellGuess(g.word, g.timestamp - best_duel!.start_timestamp ,g.points_after_guess));
             }
-            this.logger.info("Opponent guesses: %s", opponent_guesses);
+            this.logger.info(`Opponent guesses: ${opponent_guesses}`);
             var opponent_points = 0;
             if (opponent_guesses.length > 0) {
                opponent_points = opponent_guesses[opponent_guesses.length - 1].points_after_guess;
@@ -271,10 +271,10 @@ export class SpellingBeeDuelController {
         var lettersState = duel!.letters;
         var plainLetters = lettersState.map(ls => ls.letter)
         var possibleLetters = ALPHABET.filter(letter => !plainLetters.includes(letter))
-        this.logger.info("Possible letters: %s", possibleLetters)
+        this.logger.info(`Possible letters: ${possibleLetters}`)
         var boughtLetterIndex:number = Math.floor(Math.random() * possibleLetters.length)
         var boughtLetter:string = possibleLetters[boughtLetterIndex]
-        this.logger.info("Bought letter: %s at index %d", boughtLetter, boughtLetterIndex)
+        this.logger.info(`Bought letter: ${boughtLetter} at index ${boughtLetterIndex}`)
         lettersState.push(new LetterState(boughtLetter, letterPrice.useLimit, 0 , false));
         var newDuel = await addNewLetterToSpellingBeeDuel(duel!.bee_duel_id, lettersState, lettersToBuy, -letterPrice.price, this.dbi);
         return {

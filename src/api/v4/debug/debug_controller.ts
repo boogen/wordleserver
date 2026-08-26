@@ -38,10 +38,10 @@ export class DebugController {
 
         try {
             const response = await oneSignalClient.createNotification(notification);
-            this.logger.info("Debug notification sent to player %d, status: %d", player_id, response.statusCode);
+            this.logger.info(`Debug notification sent to player ${player_id}, status: ${response.statusCode}`);
             return { status: "ok" };
         } catch (e: any) {
-            this.logger.error("Failed to send debug notification: %s", e.body || e.message);
+            this.logger.error(`Failed to send debug notification: ${e.body || e.message}`);
             return { status: "error", message: e.body?.errors?.[0] || e.message };
         }
     }

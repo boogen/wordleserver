@@ -34,7 +34,7 @@ export class WordleChallengeController {
         }
         var val = await getWord(this.dbi);
         var word = val[0].word;
-        this.logger.info("word %s player id %s", word, player_id);
+        this.logger.info(`word ${word} player id ${player_id}`);
 
         var existing = await getPlayerLastWord(player_id, this.dbi);
 
@@ -57,7 +57,7 @@ export class WordleChallengeController {
         const timestamp = Date.now() / 1000;
         const wordEntry = await getPlayerLastWord(player_id, this.dbi);
 
-        this.logger.info("Player id: %s", player_id);
+        this.logger.info(`Player id: ${player_id}`);
         const answer = wordEntry!.word;
         
         const t = await getPlayerChallengeTries(player_id, wordEntry!.word_id, this.dbi);
@@ -74,7 +74,7 @@ export class WordleChallengeController {
             tries += 1;
         }
 
-        this.logger.info("tries: %s", tries);
+        this.logger.info(`tries: ${tries}`);
         if (tries == 6) {
             guessResult.correctWord = answer;
         }
@@ -83,7 +83,7 @@ export class WordleChallengeController {
             var new_word = val[0].word;
             await addNewPlayerWord(player_id, new_word, 0, this.dbi);
         }
-        this.logger.info("guess result: %s", JSON.stringify(guessResult));
+        this.logger.info(`guess result: ${JSON.stringify(guessResult)}`);
         return guessResult;
     }
 }
