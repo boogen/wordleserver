@@ -7,9 +7,9 @@ export class Logger {
     private internalLogger: winston.Logger;
     private context: string = "GLOBAL";
     constructor() {
-        const logFormat = format.printf(({ level, message, timestamp, context, ...metadata }) => {
+        const logFormat = format.printf(({ level, message, timestamp, context, metadata }) => {
         let msg = `${timestamp} [${level}][${context}] ${message}`;
-        if (Object.keys(metadata).length > 0) {
+        if (metadata && Object.keys(metadata).length > 0) {
             msg += ` ${JSON.stringify(metadata)}`;
         }
         return msg;
